@@ -1,0 +1,22 @@
+{
+    procedure proc (a : integer, b : integer)
+    {
+        procedure proc2 (c : integer)
+        {
+            proc2 (c)
+        }
+        proc2 (a - 1)
+    }
+
+    function f1 (n : integer) : integer
+    {
+        function f2 (m : integer) : integer
+        {
+            f2(m-1)
+            return with m
+        }
+        var a : integer
+        a := f2(n)
+        return with a
+    }
+}
