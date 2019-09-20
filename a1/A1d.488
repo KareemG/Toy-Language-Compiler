@@ -1,26 +1,23 @@
 {
 	procedure PrintHelloWorld
 	{
-		"Hello World!"
-		newline
+		write "Hello World!"
+		write newline
 	}
 	
-	function GetCourseName(is_full_name: boolean) : text
+	function GetCourseCode(is_grad: boolean) : integer
 	{
-		if is_full_name then
-			return with "CSC 488S / CSC2107S Compilers and Interpreters"
+		if is_grad then
+			return 2107
 		else
-			return with "CSC 488"
+			return 488
 	}
 	
 	procedure PrintCourseGreeting
 	{
-		"Welcome to "
-		GetCourseName(true)
-		", or "
-		GetCourseName(false)
-		"for short."
-		newline
+		write "Welcome to CSC", GetCourseName(false)
+		write "/CSC", GetCourseName(true), "!"
+		write newline
 	}
 	
 	PrintHelloWorld
