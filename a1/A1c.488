@@ -1,0 +1,100 @@
+
+{
+    % test the repeat loop by counting to ten
+    procedure count_to_ten
+    {
+        var i : integer
+        i := 1
+
+        repeat
+        {
+            write i
+        }
+        until i > 10
+    }
+
+
+    % test breaking out of loops using 'exit', 'return', and the condition itself
+    procedure wait_for_numbers(a : integer, b : integer, c : integer)
+    {
+        var temp : integer
+        var running : boolean
+
+        running := true
+        while running do
+        {
+            read temp
+            
+            if temp = a then
+            {
+                exit
+            }
+            else if temp = b then
+            {
+                running := false
+            }
+            else if temp = c then
+            {
+                return
+            }
+        }
+    }
+
+    % test the exit multi-loop statements by simulating a mini game
+    % the user needs to guess the number 256
+    % inputting zero ends the game
+    procedure guess_number()
+    {
+        % break out of the loop when we get input 256
+        var temp : integer
+        temp := 0
+
+        write "try to break out of this loop"
+
+        while true do
+        {
+            write "enter loop 1"
+            exit when temp = 256
+
+            while true do
+            {
+                write "enter loop 2"
+                exit when temp < 300
+
+                while true do
+                {
+                    write "enter loop 3"
+                    exit when temp < 200
+
+                    % waits for 0 or a valid guess
+                    while true do
+                    {
+                        write "enter loop 4"
+
+                        read temp
+
+                        if temp = 0 then
+                        {
+                            exit 4
+                        }
+
+                        % if the guess is off by 3 or less, then we go directly into the first state
+                        {
+                            var diff : integer
+                            diff := 256 - temp
+                            if diff < 0 then diff := -diff
+
+                            exit 3 when diff <= 3
+                        }
+
+                        exit
+                    } % loop 4
+                } % loop 3
+            } % loop 2
+        } % loop 1
+    } % procedure
+
+    count_to_ten
+    wait_for_numbers(1, 2, 3)
+    break_out_of_loop
+}
