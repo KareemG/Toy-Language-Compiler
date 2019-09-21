@@ -43,7 +43,7 @@
     % test the exit multi-loop statements by simulating a mini game
     % the user needs to guess the number 256
     % inputting zero ends the game
-    procedure guess_number()
+    procedure guess_number
     {
         % break out of the loop when we get input 256
         var temp : integer
@@ -64,7 +64,7 @@
                 while true do
                 {
                     write "enter loop 3"
-                    exit when temp < 200
+                    exit when temp > 200
 
                     % waits for 0 or a valid guess
                     while true do
