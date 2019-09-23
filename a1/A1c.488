@@ -45,20 +45,25 @@
     }
 
     % test the conditional exit statements: 'exit when expression' and 'exit integer when expression'
-    procedure break_out_of_loop
+    function break_out_of_loop : boolean
     {
         var temp : integer
         temp := 0
 
         while true do
         {
-            write "enter 0 or 1"
+            write "enter 1 or 2"
 
             read temp
 
-            exit when (temp = 0)
-            exit 1 when (temp = 1)
+            exit when (temp = 1)
+            exit 1 when (temp = 2)
+
+            if temp = 0 then
+                return with false
         }
+
+        return with true
     }
 
     count_to_ten
