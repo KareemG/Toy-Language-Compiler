@@ -7,15 +7,15 @@
 	
 	function GetStudentLevel : integer
 	{
-		return 4
+		return with 4
 	}
 
 	function GetCourseCode(is_grad: boolean) : integer
 	{
 		if is_grad then
-			return 2107
+			return with 2107
 		else
-			return 488
+			return with 488
 	}
 	
 	procedure PrintCourseGreeting
