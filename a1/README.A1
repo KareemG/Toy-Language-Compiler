@@ -1,0 +1,27 @@
+Members: Jasmeet Brar, Jasmeet Sidhu, Kareem Golaub, KyoKeun Park
+
+A1a.488 - Written by: Jasmeet Brar
+    Have created a program which declares variables, and perform different 
+    types of arithmetic operators. And then further perform logical and 
+    comparison operations on the aforementioned variables.
+
+A1b.488 - Written by: Jasmeet Brar
+    Have created number of arrays which are declared with different types, 
+    and assigns appropriate values to them.
+
+A1c.488 - Written by: Jasmeet Sidhu
+    Have created 3 different loops, which all utilizes different forms of 
+    loops. Two of the loops utilizes the form of "while x do", while one 
+    of them uses "repeat until x". One of the loop uses "exit" as a way 
+    to escape out of the loop.
+
+A1d.488 - Written by: Kareem Golaub
+    Have created 2 procedures which write to stdout, and a function 
+    with a parameter, which takes in a boolean, and returns an integer, 
+    which then a different procedure utilizes.
+
+A1e.488 - Written by: KyoKeun Park
+    Have created 3 functions and procedures, which are all recursive, or calls 
+    recursive function/procedure. 1 function and 1 procedure does not have
+    any parameters, whereas the others do. Furthermore, one of each function 
+    and procedure is nested inside of another function/procedure.
