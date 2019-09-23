@@ -19,4 +19,17 @@
         a := f2(n)
         return with a
     }
+
+    procedure proc3
+    {
+        write "hello world"
+        proc2
+
+        return
+    }
+
+    function f3 : integer
+    {
+        return with f1 (1000)
+    }
 }
