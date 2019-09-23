@@ -32,4 +32,8 @@
     {
         return with f1 (1000)
     }
+
+    proc3
+    proc (1, 2)
+    write f3
 }
