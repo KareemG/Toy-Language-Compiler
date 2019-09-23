@@ -5,6 +5,11 @@
 		write newline
 	}
 	
+	function GetStudentLevel : integer
+	{
+		return 4
+	}
+
 	function GetCourseCode(is_grad: boolean) : integer
 	{
 		if is_grad then
@@ -15,8 +20,9 @@
 	
 	procedure PrintCourseGreeting
 	{
-		write "Welcome to CSC", GetCourseName(false)
-		write "/CSC", GetCourseName(true), "!"
+		write "Welcome to CSC", GetCourseCode(false)
+		write "/CSC", GetCourseCode(true), ", "
+		write "a ", GetStudentLevel, "th year course!"
 		write newline
 	}
 	
