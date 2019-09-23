@@ -6,7 +6,7 @@
     var c[-3 .. 3] : boolean
     var d[-3 .. -1] : integer
     var e[1,2] : integer
-    var f[-4 .. -2, 2 .. 4] : boolean
+    var f[-4 .. -2, 2 .. 4], g[2] : boolean
 
     a[1] := 4
     a[2] := 10
@@ -26,4 +26,7 @@
     f[-4,2] := true
     f[-3,3] := false
     f[-2,4] := true
+
+    g[1] := true
+    g[2] := false
 }
