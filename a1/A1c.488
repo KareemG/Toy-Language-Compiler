@@ -1,5 +1,8 @@
 
 {
+    % A1c.488: Forms of loop and loop constructs
+    % Author: Jasmeet Sidhu
+
     % test the repeat loop by counting to ten
     procedure count_to_ten
     {
@@ -24,7 +27,7 @@
         while running do
         {
             read temp
-            
+
             if temp = a then
             {
                 exit

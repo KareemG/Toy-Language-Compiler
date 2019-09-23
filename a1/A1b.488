@@ -1,6 +1,7 @@
-% Author: Jasmeet Brar
-
 {
+    % A1b.488: Forms of arrays
+    % Author: Jasmeet Brar
+
     var a[3] : integer
     var b[1 .. 10] : integer
     var c[-3 .. 3] : boolean
