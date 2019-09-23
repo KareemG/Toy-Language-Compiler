@@ -1,6 +1,7 @@
-% Author: Jasmeet Brar
-
 {
+    % A1a.488: Arithmetic, logical and comparison operators
+    % Author: Jasmeet Brar
+
     var a : integer
     var b : integer
     var c : integer

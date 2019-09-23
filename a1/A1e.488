@@ -1,4 +1,7 @@
 {
+    % A1e.488: Recursive functions and procedures
+    % Author: KyoKeun Park
+
     procedure proc (a : integer, b : integer)
     {
         procedure proc2 (c : integer)
