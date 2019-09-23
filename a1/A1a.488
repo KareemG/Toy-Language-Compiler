@@ -26,6 +26,3 @@
     write ((b < a or c < b) and not (b > c or a > a) ? 1 : 0)
     write newline
 }
-
-
-
