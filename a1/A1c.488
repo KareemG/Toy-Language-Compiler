@@ -44,7 +44,7 @@
         }
     }
 
-    % test the conditional exit statements: 'exit when expression' and 'exit integer when expression'
+    % test the 'return with' and conditional exit statements: 'exit when expression' and 'exit integer when expression'
     function break_out_of_loop : boolean
     {
         var temp : integer
