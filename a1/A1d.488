@@ -7,7 +7,7 @@
 		write "Hello World!"
 		write newline
 	}
-	
+
 	function GetStudentLevel : integer
 	{
 		return with 4
@@ -20,7 +20,7 @@
 		else
 			return with 488
 	}
-	
+
 	procedure PrintCourseGreeting
 	{
 		write "Welcome to CSC", GetCourseCode(false)
@@ -28,7 +28,7 @@
 		write "a ", GetStudentLevel, "th year course!"
 		write newline
 	}
-	
+
 	PrintHelloWorld
 	PrintCourseGreeting
 }

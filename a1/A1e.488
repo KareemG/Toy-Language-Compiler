@@ -2,20 +2,20 @@
     % A1e.488: Recursive functions and procedures
     % Author: KyoKeun Park
 
-    procedure proc (a : integer, b : integer)
+    procedure proc(a : integer, b : integer)
     {
-        procedure proc2 (c : integer)
+        procedure proc2(c : integer)
         {
-            proc2 (c)
+            proc2(c)
         }
-        proc2 (a - 1)
+        proc2(a - 1)
     }
 
-    function f1 (n : integer) : integer
+    function f1(n : integer) : integer
     {
-        function f2 (m : integer) : integer
+        function f2(m : integer) : integer
         {
-            f2(m-1)
+            f2(m - 1)
             return with m
         }
         var a : integer
@@ -33,10 +33,10 @@
 
     function f3 : integer
     {
-        return with f1 (1000)
+        return with f1(1000)
     }
 
     proc3
-    proc (1, 2)
+    proc(1, 2)
     write f3
 }
