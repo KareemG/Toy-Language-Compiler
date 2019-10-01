@@ -76,9 +76,13 @@ start with program;
 
 // The main program.
 program ::= scope;
+
+statement_list ::= statement
+    | statement_list statement;
+
 statement ::= variable COLON EQUAL expression
-    | WRITE output
-    | statement statement;
+    | WRITE output_list;
+
 expression ::= INTCONST
     | MINUS expression
     | expression PLUS expression
@@ -99,19 +103,30 @@ expression ::= INTCONST
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
     | variable;
-declaration ::= VAR variablenames COLON type
-    | declaration declaration;
+
+declaration_list ::= declaration
+    | declaration_list declaration;
+
+declaration ::= VAR variablenames COLON type;
+
+output_list ::= output
+    | output_list COMMA output;
+
 output ::= expression
     | TEXTCONST
-    | NEWLINE
-    | output COMMA output;
+    | NEWLINE;
+
 variablenames ::= variablename;
+
 variable ::= variablename;
-scope ::= L_CURLEY declaration statement R_CURLEY
-    | L_CURLEY statement R_CURLEY
+
+scope ::= L_CURLEY declaration_list statement_list R_CURLEY
+    | L_CURLEY statement_list R_CURLEY
     | L_CURLEY R_CURLEY;
+
 type ::= INTEGER
     | BOOLEAN;
+
 variablename ::= IDENT;
 
 /*****************************************************************************
