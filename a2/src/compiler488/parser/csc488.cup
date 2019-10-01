@@ -44,7 +44,21 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
-nonterminal program;
+nonterminal program, scope, variable, expression, statement, output,
+            declaration, variablenames, variablename, type;
+
+precedence left COMMA;
+precedence left PLUS, MINUS;
+precedence left DIVIDE, TIMES;
+precedence left AND, OR, EQUAL, NOT, LESS, GREATER;
+precedence nonassoc ELSE;
+precedence nonassoc IF;
+precedence right WRITE;
+precedence right IDENT;
+precedence left GREATER;
+precedence left LESS;
+precedence left EQUAL;
+precedence right VAR;
 
 /*
     GRAMMAR SECTION
@@ -61,7 +75,44 @@ start with program;
  */
 
 // The main program.
-program  ::=   ;
+program ::= scope;
+statement ::= variable COLON EQUAL expression
+    | WRITE output
+    | statement statement;
+expression ::= INTCONST
+    | MINUS expression
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression TIMES expression
+    | expression DIVIDE expression
+    | TRUE
+    | FALSE
+    | NOT expression
+    | expression AND expression
+    | expression OR expression
+    | expression EQUAL expression
+    | expression NOT EQUAL expression
+    | expression LESS expression
+    | expression LESS EQUAL expression
+    | expression GREATER expression
+    | expression GREATER EQUAL expression
+    | L_PAREN expression R_PAREN
+    | L_PAREN expression QUESTION expression COLON expression R_PAREN
+    | variable;
+declaration ::= VAR variablenames COLON type
+    | declaration declaration;
+output ::= expression
+    | TEXTCONST
+    | NEWLINE
+    | output COMMA output;
+variablenames ::= variablename;
+variable ::= variablename;
+scope ::= L_CURLEY declaration statement R_CURLEY
+    | L_CURLEY statement R_CURLEY
+    | L_CURLEY R_CURLEY;
+type ::= INTEGER
+    | BOOLEAN;
+variablename ::= IDENT;
 
 /*****************************************************************************
 
