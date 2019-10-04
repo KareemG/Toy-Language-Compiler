@@ -1,0 +1,6 @@
+{
+	function 1234:int
+	{
+		return with 0
+	}
+}

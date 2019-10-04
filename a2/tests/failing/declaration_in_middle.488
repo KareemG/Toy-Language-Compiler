@@ -1,0 +1,10 @@
+{
+	write "hello" newline
+
+	var a:int
+
+	write "world"
+
+	a := 7
+
+}
