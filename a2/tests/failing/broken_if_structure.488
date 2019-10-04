@@ -1,0 +1,11 @@
+% if statement should always go:
+%	IF <expr> THEN <statement> ELSE <statement>
+% meaning, "THEN" and "ELSE" should not be mixed up
+
+{
+	if 1
+	then
+		write "hello"
+	else
+		write "world"
+}
