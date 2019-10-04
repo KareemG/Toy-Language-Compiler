@@ -2,10 +2,10 @@
 
 write "there is no scope"
 
-var i:int
+var i:integer
 i := 7
 
-function f:int
+function f:integer
 {
 	return with 0
 }

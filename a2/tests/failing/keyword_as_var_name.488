@@ -1,0 +1,9 @@
+% We cannot use keywords as variable name
+{
+	var false:integer
+	false := 50
+
+	var not:boolean
+
+	var boolean:integer
+}

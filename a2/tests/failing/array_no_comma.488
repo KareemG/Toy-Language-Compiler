@@ -1,4 +1,4 @@
 % when declaring bounds on array, need comma in between
 {
-    var array[1 10]:int
+    var array[1 10]:integer
 }
