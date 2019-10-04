@@ -1,0 +1,8 @@
+% If then else statement
+
+{
+    if true then
+        true
+    else
+        false
+}

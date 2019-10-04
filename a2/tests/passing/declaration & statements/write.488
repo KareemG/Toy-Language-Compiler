@@ -1,0 +1,5 @@
+% Write statement
+
+{
+    write "Hello World!"
+}
