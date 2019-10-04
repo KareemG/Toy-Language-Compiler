@@ -1,3 +1,4 @@
+% our language does not support declaration in the middle of the scope
 {
 	write "hello" newline
 

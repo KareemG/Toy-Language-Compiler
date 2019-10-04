@@ -1,5 +1,6 @@
+% function name should not start with numbers
 {
-	function 1234:int
+	function 1234f:int
 	{
 		return with 0
 	}

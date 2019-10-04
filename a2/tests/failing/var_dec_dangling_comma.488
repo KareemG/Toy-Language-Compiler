@@ -1,3 +1,4 @@
+% Comma implies additional variablenames
 {
 	var should_be_integer,:int
 }

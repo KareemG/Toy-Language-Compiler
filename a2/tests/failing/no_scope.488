@@ -1,3 +1,5 @@
+% Every program should start with a scope
+
 write "there is no scope"
 
 var i:int
