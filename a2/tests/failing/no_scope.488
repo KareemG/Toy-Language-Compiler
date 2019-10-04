@@ -1,0 +1,9 @@
+write "there is no scope"
+
+var i:int
+i := 7
+
+function f:int
+{
+	return with 0
+}
