@@ -1,6 +1,6 @@
 % We cannot use keywords as variable name
 {
-	var false:integer
+	var false:integer	% syntax error here
 	false := 50
 
 	var not:boolean

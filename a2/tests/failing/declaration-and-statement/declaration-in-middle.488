@@ -2,7 +2,7 @@
 {
 	write "hello", newline
 
-	var a:integer
+	var a:integer		% syntax error -- unexpected declaration
 
 	write "world"
 

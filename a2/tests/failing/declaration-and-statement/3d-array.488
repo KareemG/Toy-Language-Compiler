@@ -1,7 +1,7 @@
 % Provided language does not support 3d-array
 {
 
-	var array[10,20,30]:integer
+	var array[10,20,30]:integer	% syntax error should occur here
 
 	write "there should be a problem above"
 
