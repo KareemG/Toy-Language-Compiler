@@ -1,0 +1,8 @@
+% When doing less/greater than or equal comparison, the less/greater than symbol
+% must come before the equal symbol.
+{
+	var a,b : integer
+	var c : boolean
+
+	c := a =< b	% syntax error
+}
