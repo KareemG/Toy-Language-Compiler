@@ -1,0 +1,16 @@
+% Call a function from a function
+
+{
+    function getNum : integer
+    {
+        return with 10
+    }
+
+
+    function test : integer
+    {
+        return with getNum
+    }
+
+    write test
+}

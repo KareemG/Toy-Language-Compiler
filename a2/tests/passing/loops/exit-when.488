@@ -1,0 +1,17 @@
+% Exit when statement
+
+{
+    var x : integer
+    var y : integer
+
+    x := 0
+    y := 0
+
+    while x < 10 do
+    {
+        x := x + 1
+        y := y + 1
+
+        exit when y == 5
+    }
+}
