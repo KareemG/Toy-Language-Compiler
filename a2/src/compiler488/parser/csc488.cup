@@ -46,7 +46,8 @@ terminal String     TEXTCONST;
 
 nonterminal program, scope, variable, variable_list, expression, statement, statement_list,
             output, output_list, declaration, declaration_list, bound, generalBound,
-            variablenames, variablenames_list, type, arguments, parameters;
+            variablenames, variablenames_list, type, argument_list, parameter_list, parameter,
+            value;
 
 precedence left COMMA;
 precedence left PLUS, MINUS;
@@ -93,9 +94,9 @@ statement ::= variable COLON EQUAL expression
     | RETURN WITH expression
     | RETURN
     | WRITE output_list
-    | READ variable_list
-    | IDENT
-    | IDENT L_PAREN arguments R_PAREN
+    | READ variable_list    
+    | IDENT // procedure call without arguments
+    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
     | scope;
 
 expression ::= INTCONST
@@ -117,15 +118,16 @@ expression ::= INTCONST
     | expression GREATER EQUAL expression
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | variable;
+    | value;
 
 declaration_list ::= declaration
     | declaration_list declaration;
 
 declaration ::= VAR variablenames_list COLON type
     | FUNCTION IDENT COLON type scope
+    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
     | PROCEDURE IDENT scope
-    | PROCEDURE IDENT L_PAREN parameters R_PAREN scope;
+    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
 
 output_list ::= output
     | output_list COMMA output;
@@ -150,6 +152,9 @@ generalBound ::= INTCONST
 variable_list ::= variable
     | variable_list COMMA variable;
 
+value ::= variable
+    | IDENT L_PAREN argument_list R_PAREN;
+
 variable ::= IDENT
     | IDENT L_SQUARE expression R_SQUARE
     | IDENT L_SQUARE expression COMMA expression R_SQUARE;
@@ -161,11 +166,13 @@ scope ::= L_CURLEY declaration_list statement_list R_CURLEY
 type ::= INTEGER
     | BOOLEAN;
 
-arguments ::= expression
-    | arguments COMMA arguments;
+argument_list ::= expression
+    | argument_list COMMA expression;
 
-parameters ::= IDENT COLON type
-    | parameters COMMA parameters;
+parameter ::= IDENT COLON type;
+
+parameter_list ::= parameter
+    | parameter_list COMMA parameter;
 
 
 /*****************************************************************************
