@@ -20,7 +20,7 @@ function runtest() {
 		for testcase in $subdir*
 		do
 			OUT="$($ROOT/RUNCOMPILER.sh $testcase \
-				2> /dev/stdout | grep 'Syntax error')"
+				2> /dev/stdout | grep 'Syntax error\|Exception')"
 			if [ -z "$OUT" ]
 			then
 				echo "PASSED: "$(basename $testcase)""
@@ -44,6 +44,7 @@ echo "===== RUNNING PASSING TESTS ====="
 runtest $ROOT/tests/passing 'p'
 echo "Passed tests: $PASSED"
 echo "Failed tests: $FAILED"
+echo ""
 
 # Reset after the first run
 let PASSED=0
