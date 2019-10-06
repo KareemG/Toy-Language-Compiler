@@ -1,0 +1,6 @@
+% When performing inequality check, we should use 'not=' instead of '!='
+{
+	var a,b : integer
+	var c : boolean
+	c := a != b
+}
