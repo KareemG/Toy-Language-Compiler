@@ -14,7 +14,23 @@ function runtest() {
 	# Traverse through all of the sub-directories within given directory
 	for subdir in $DIR/*/
 	do
-		echo "$subdir"
+		echo "Entering "$(basename $subdir)"..."
+
+		# Traverse through all of the tests within given subdirectory
+		for testcase in $subdir*
+		do
+			OUT="$($ROOT/RUNCOMPILER.sh $testcase \
+				2> /dev/stdout | grep 'Syntax error')"
+			if [ -z "$OUT" ]
+			then
+				echo "PASSED: "$(basename $testcase)""
+				let PASSED++
+			else
+				echo "FAILED: "$(basename $testcase)""
+				let FAILED++
+			fi
+		done
+		echo ""
 	done
 }
 
@@ -24,11 +40,17 @@ function runtest() {
 
 ROOT="$(pwd)"
 
-# TODO: Uncomment once passing tests are merged
-# runtest $ROOT/tests/passing
+echo "===== RUNNING PASSING TESTS ====="
+runtest $ROOT/tests/passing 'p'
+echo "Passed tests: $PASSED"
+echo "Failed tests: $FAILED"
 
 # Reset after the first run
 let PASSED=0
 let FAILED=0
 
+echo "===== RUNNING FAILING TESTS ====="
 runtest $ROOT/tests/failing
+
+echo "Passed tests: $PASSED"
+echo "Failed tests: $FAILED"
