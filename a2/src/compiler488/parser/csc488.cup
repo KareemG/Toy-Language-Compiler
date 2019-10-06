@@ -160,7 +160,6 @@ variable ::= IDENT
     | IDENT L_SQUARE expression COMMA expression R_SQUARE;
 
 scope ::= L_CURLEY declaration_list statement_list R_CURLEY
-    | L_CURLEY declaration_list R_CURLEY
     | L_CURLEY statement_list R_CURLEY
     | L_CURLEY R_CURLEY;
 
