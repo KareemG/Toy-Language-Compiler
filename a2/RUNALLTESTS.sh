@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 BASEDIR="$(pwd)"
 cd "${STARTDIR}"
 
-
 for filename in ./tests/passing/**/*.488;
 do
   echo -e "-> Parsing "$filename '\n'
