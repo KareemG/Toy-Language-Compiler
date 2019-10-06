@@ -14,6 +14,7 @@ array-wrong-parenthesis.488		: Should get syntax error if user declares an array
 broken-if-structure.488			: `if` statements should always have 'then' and 'else' in correct order. Parser should throw an error otherwise.
 declaration-in-middle.488		: Since our language only supports declaration first, then statement (in a given scope), this test checks that syntax error occurs if there is declaration in the middle.
 ident-starts-with-integer.488		: All identifiers should not start with numbers. This test will check if we get syntax error if it does.
+if-mult-stmt-no-scope.488		: We are expected for if statement body to use scope if it requires multiple statements. Otherwise, syntax error should occur
 keyword-as-var-name.488			: This test checks whether error occurs if user attempts to make a variable with keyword as identifier.
 var-dec-dangling-comma.488		: Makes sure we throw an error if there are any dangling commas
 write-no-comma.488			: When writing multiple outputs, it should be comma-separated
