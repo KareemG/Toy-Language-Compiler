@@ -1,5 +1,6 @@
 ===== ARITHMETIC =====
 expression-inequality-wrong-order.488	: Checks if the parser throws an error if "=<" or ">=" is given.
+expression-noteq.488			: Checks for incorrect inequality usage by comparing two expr with just 'not'
 integer-increment.488			: Check that if the user attempts to increment integer by "++", parser throws an error.
 integer-power-of.488			: Checks if user attempts to perform exponents by "**", parser throws an error.
 
