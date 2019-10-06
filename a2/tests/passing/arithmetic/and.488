@@ -1,7 +1,7 @@
 % And statement
 
 {
-    if 5 > 4 && -3 < 4 then
+    if 5 > 4 and -3 < 4 then
         write "PASS"
     else
         write "FAIL"

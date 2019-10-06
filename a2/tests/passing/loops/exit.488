@@ -9,5 +9,5 @@
     {
         exit
     }
-    until x == 5
+    until x = 5
 }

@@ -1,7 +1,7 @@
 % Or statement
 
 {
-    if 0 > 4 || -3 < 4 then
+    if 0 > 4 or -3 < 4 then
         write "PASS"
     else
         write "FAIL"

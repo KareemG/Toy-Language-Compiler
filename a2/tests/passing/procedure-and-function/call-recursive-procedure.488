@@ -3,7 +3,7 @@
 {
     procedure printNum(n : integer)
     {
-        if n == 0 then
+        if n = 0 then
         {
             write "I'm done!"
             write newline
