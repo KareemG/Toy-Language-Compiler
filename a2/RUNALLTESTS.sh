@@ -42,9 +42,10 @@ ROOT="$(pwd)"
 
 echo "===== RUNNING PASSING TESTS ====="
 runtest $ROOT/tests/passing 'p'
-echo "Passed tests: $PASSED"
-echo "Failed tests: $FAILED"
-echo ""
+
+let pPASSED=$PASSED
+let pFAILED=$FAILED
+let pTOTAL=$PASSED+$FAILED
 
 # Reset after the first run
 let PASSED=0
@@ -53,5 +54,15 @@ let FAILED=0
 echo "===== RUNNING FAILING TESTS ====="
 runtest $ROOT/tests/failing
 
-echo "Passed tests: $PASSED"
-echo "Failed tests: $FAILED"
+let TOTAL=$PASSED+$FAILED
+
+echo "===== SUMMARY ====="
+echo -e "Passing tests:"
+echo -e "\tPassed tests: $pPASSED"
+echo -e "\tFailed tests: $pFAILED"
+echo -e "\tTotal tests: $pTOTAL"
+echo ""
+echo -e "Failing tests:"
+echo -e "\tPassed tests: $PASSED"
+echo -e "\tFailed tests: $FAILED"
+echo -e "\tTotal tests: $TOTAL"
