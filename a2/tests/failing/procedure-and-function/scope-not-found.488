@@ -1,0 +1,11 @@
+% Every program should start with a scope
+
+write "there is no scope"
+
+var i:integer
+i := 7
+
+function f:integer
+{
+	return with 0
+}
