@@ -44,9 +44,10 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
-nonterminal program, scope, variable, expression, statement, statement_list,
+nonterminal program, scope, variable, variable_list, expression, statement, statement_list,
             output, output_list, declaration, declaration_list, bound, generalBound,
-            variablenames, variablenames_list, variablename, arrayname, type;
+            variablenames, variablenames_list, type, argument_list, parameter_list, parameter,
+            value;
 
 precedence left COMMA;
 precedence left PLUS, MINUS;
@@ -82,7 +83,21 @@ statement_list ::= statement
     | statement_list statement;
 
 statement ::= variable COLON EQUAL expression
-    | WRITE output_list;
+    | IF expression THEN statement
+    | IF expression THEN statement ELSE statement
+    | WHILE expression DO statement
+    | REPEAT statement UNTIL expression
+    | EXIT
+    | EXIT INTCONST
+    | EXIT WHEN expression
+    | EXIT INTCONST WHEN expression
+    | RETURN WITH expression
+    | RETURN
+    | WRITE output_list
+    | READ variable_list    
+    | IDENT // procedure call without arguments
+    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
+    | scope;
 
 expression ::= INTCONST
     | MINUS expression
@@ -103,12 +118,16 @@ expression ::= INTCONST
     | expression GREATER EQUAL expression
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | variable;
+    | value;
 
 declaration_list ::= declaration
     | declaration_list declaration;
 
-declaration ::= VAR variablenames_list COLON type;
+declaration ::= VAR variablenames_list COLON type
+    | FUNCTION IDENT COLON type scope
+    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
+    | PROCEDURE IDENT scope
+    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
 
 output_list ::= output
     | output_list COMMA output;
@@ -117,9 +136,9 @@ output ::= expression
     | TEXTCONST
     | NEWLINE;
 
-variablenames ::= variablename
-    | variablename L_SQUARE bound R_SQUARE
-    | variablename L_SQUARE bound COMMA bound R_SQUARE;
+variablenames ::= IDENT
+    | IDENT L_SQUARE bound R_SQUARE
+    | IDENT L_SQUARE bound COMMA bound R_SQUARE;
 
 variablenames_list ::= variablenames
     | variablenames_list COMMA variablenames;
@@ -130,9 +149,15 @@ bound ::= INTCONST
 generalBound ::= INTCONST
     | MINUS INTCONST;
 
-variable ::= variablename
-    | arrayname L_SQUARE expression R_SQUARE
-    | arrayname L_SQUARE expression COMMA expression R_SQUARE;
+variable_list ::= variable
+    | variable_list COMMA variable;
+
+value ::= variable
+    | IDENT L_PAREN argument_list R_PAREN;
+
+variable ::= IDENT
+    | IDENT L_SQUARE expression R_SQUARE
+    | IDENT L_SQUARE expression COMMA expression R_SQUARE;
 
 scope ::= L_CURLEY declaration_list statement_list R_CURLEY
     | L_CURLEY statement_list R_CURLEY
@@ -141,7 +166,14 @@ scope ::= L_CURLEY declaration_list statement_list R_CURLEY
 type ::= INTEGER
     | BOOLEAN;
 
-variablename ::= IDENT;
+argument_list ::= expression
+    | argument_list COMMA expression;
+
+parameter ::= IDENT COLON type;
+
+parameter_list ::= parameter
+    | parameter_list COMMA parameter;
+
 
 arrayname ::= IDENT;
 
