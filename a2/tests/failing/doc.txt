@@ -1,0 +1,33 @@
+===== ARITHMETIC =====
+expression-bang-instead.488		: Checks for incorrect inequality syntax ("!=" instead of "not=")
+expression-inequality-wrong-order.488	: Checks if the parser throws an error if "=<" or ">=" is given.
+expression-noteq.488			: Checks for incorrect inequality usage by comparing two expr with just 'not'
+integer-increment.488			: Check that if the user attempts to increment integer by "++", parser throws an error.
+integer-increment-2.488			: Similar to "integer-increment" but with "+=" instead.
+integer-power-of.488			: Checks if user attempts to perform exponents by "**", parser throws an error.
+
+===== DECLARATION AND STATEMENT =====
+3d-array.488				: Since our language only supports up to 2d array, make sure it throws an error if user attempts to declare 3d array.
+array-no-comma.488			: When declaring 2d array, comma must be given to separate between first array size and second. This test checks for that.
+array-no-rsquare.488			: Checks for array declaration where right squared bracket is forgotten.
+array-wrong-parenthesis.488		: Should get syntax error if user declares an array with parenthesis rather than square brackets.
+broken-if-structure.488			: `if` statements should always have 'then' and 'else' in correct order. Parser should throw an error otherwise.
+declaration-in-middle.488		: Since our language only supports declaration first, then statement (in a given scope), this test checks that syntax error occurs if there is declaration in the middle.
+ident-starts-with-integer.488		: All identifiers should not start with numbers. This test will check if we get syntax error if it does.
+if-mult-stmt-no-scope.488		: We are expected for if statement body to use scope if it requires multiple statements. Otherwise, syntax error should occur
+keyword-as-var-name.488			: This test checks whether error occurs if user attempts to make a variable with keyword as identifier.
+var-dec-dangling-comma.488		: Makes sure we throw an error if there are any dangling commas
+write-no-comma.488			: When writing multiple outputs, it should be comma-separated
+
+===== LOOP =====
+loop-declaration-without-scope.488	: Our language does not support declaration of local variable without scope in a loop. This will test for this case.
+loop-do-when.488			: This test checks for the syntax error for cases where user uses 'do' 'when' at the same time.
+loop-while-no-cond.488			: This test checks for the syntax error when expression is not given after while keyword.
+loop-while-until.488			: Similar to 'loop-do-when.488' test, checks for syntax error for when user uses 'while' 'until' at the same time.
+
+===== PROCEDURE AND FUNCTION =====
+function-name-integer.488		: Function name should be an identifier, as such, cannot be a number.
+function-no-type.488			: Functions are meant to return a value. Hence, it must specify the return type.
+procedure-with-type.488			: Opposite of 'function-no-type.488'. Since procedures does not return a value, it should not have a return type.
+scope-not-closed.488			: Checks for the cases where user may have forgotten to close the scope with '}'.
+scope-not-found.488			: If user forgets to start the program with scope '{', then we should raise an error.

@@ -1,0 +1,5 @@
+% attempt in evaluation exponents through "**". Our langauge does not support this
+{
+	var a : integer
+	a := 2 ** 16		% expected to hit syntax error here
+}

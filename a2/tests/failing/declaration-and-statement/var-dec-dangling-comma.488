@@ -1,0 +1,4 @@
+% Comma implies additional variablenames
+{
+	var a,:integer	% syntax error here
+}
