@@ -1,7 +1,7 @@
 % Exit integer when statement
 
 {
-    x : integer
+    var x : integer
 
     x := 0
 
