@@ -1,5 +1,0 @@
-% Declare an integer
-
-{
-    var x : integer
-}

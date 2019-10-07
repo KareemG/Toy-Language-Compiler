@@ -1,7 +1,0 @@
-% Declaring boolean arrays
-
-{
-    var a[5] : boolean
-    var b[1..10] : boolean
-    var c[-3..3] : boolean
-}

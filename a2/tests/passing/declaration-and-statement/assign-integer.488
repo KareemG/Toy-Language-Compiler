@@ -1,7 +1,0 @@
-% Declare and assign an integer
-
-{
-    var x : integer
-    
-    x := 5
-}

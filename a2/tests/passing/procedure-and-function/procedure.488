@@ -1,8 +1,10 @@
-% Declare procedure
+% Declaring and calling a procedure
 
 {
     procedure test
     {
         write "Hello World!"
     }
+
+    test
 }

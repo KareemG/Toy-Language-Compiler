@@ -14,24 +14,18 @@ or.488                  : Checks that or operation syntax works
 subtraction.488         : Checks that subtraction operation syntax works
 
 ===== DECLARATION AND STATEMENT =====
-assign-2D-boolean-array.488  : Checks the syntax for assigning 2D boolean array works
-assign-2D-integer-array.488  : Checks the syntax for assigning 2D integer array works
-assign-boolean-array.488     : Checks the syntax for assigning boolean array works
-assign-boolean.488           : Checks the syntax for assigning boolean to a variable works
-assign-integer.488           : Checks the syntax for assigning integer to a variable works
-assign-integer-array.488     : Checks the syntax for assigning integer array works
-declare-2D-boolean-array.488 : Checks the syntax for declaring 2D boolean array works
-declare-2D-integer-array.488 : Checks the syntax for declaring 2D integer array works
-declare-boolean-array.488    : Checks the syntax for declaring boolean array works
-declare-boolean.488          : Checks the syntax for declaring boolean variable works
-declare-integer-array.488    : Checks the syntax for declaring integer array works
-declare-integer.488          : Checks the syntax for declaring integer variable works
-if-then-else.488             : Checks that the if then else syntax works
-if-then.488                  : Checks that the if then syntax works
-read.488                     : Checks that read statement syntax works
-ternery-operator.488         : Checks that the ternery operator syntax works
-write-newline.488            : Checks that the write statement with newline syntax works
-write.488                    : Checks that the write statement syntax works
+2D-boolean-array.488 : Checks the syntax for declaring and assigning 2D boolean array works
+2D-integer-array.488 : Checks the syntax for declaring and assigning 2D integer array works
+boolean-array.488    : Checks the syntax for declaring and assigning boolean array works
+boolean.488          : Checks the syntax for declaring and assigning boolean to a variable works
+integer.488          : Checks the syntax for declaring and assigning integer to a variable works
+integer-array.488    : Checks the syntax for declaring and assigning integer array works
+if-then-else.488     : Checks that the if then else syntax works
+if-then.488          : Checks that the if then syntax works
+read.488             : Checks that read statement syntax works
+ternery-operator.488 : Checks that the ternery operator syntax works
+write-newline.488    : Checks that the write statement with newline syntax works
+write.488            : Checks that the write statement syntax works
 
 ===== LOOPS =====
 exit-integer-when.488 : Checks that the exit integer when statement syntax works when exiting out of an integer loop
@@ -42,16 +36,11 @@ repeat-until-loop.488 : Checks that the repeat until loop syntax works
 while-loop.488        : Checks that the while loop syntax works
 
 ===== PROCEDURE AND FUNCTION =====
-call-boolean-function.488           : Checks that the syntax for calling a function that returns a boolean works
-call-function-from-function.488     : Checks that the syntax for calling a function from a function works
-call-function-multiple-args.488     : Checks that the syntax for calling a function with multiple arguments works
-call-integer-function.488           : Checks that the syntax for calling a function that returns an integer works
-call-procedure-multiple-args.488    : Checks that the syntax for calling a procedure with multiple arguments works
-call-procedure.488                  : Checks that the syntax for calling a procedure works
-call-recursive-function.488         : Checks that the syntax for calling a recursive function works
-call-recursive-procedure.488        : Checks that the syntax for calling a recursive procedure works
-declare-boolean-function.488        : Checks that the syntax for declaring a function that returns a boolean works
-declare-function-multiple-args.488  : Checks that the syntax for declaring a function with multiple arguments works
-declare-integer-function.488        : Checks that the syntax for declaring a function that returns an integer works
-declare-procedure-multiple-args.488 : Checks that the syntax for declaring a proecure with multiple arguments works
-declare-procedure.488               : Checks that the syntax for declaring a procedure works
+boolean-function.488        : Checks that the syntax for declaring and calling a function that returns a boolean works
+function-from-function.488  : Checks that the syntax for declaring and calling a function from a function works
+function-multiple-args.488  : Checks that the syntax for declaring and calling a function with multiple arguments works
+integer-function.488        : Checks that the syntax for declaring and calling a function that returns an integer works
+procedure-multiple-args.488 : Checks that the syntax for declaring and calling a procedure with multiple arguments works
+procedure.488               : Checks that the syntax for declaring and calling a procedure works
+recursive-function.488      : Checks that the syntax for declaring and calling a recursive function works
+recursive-procedure.488     : Checks that the syntax for declaring and calling a recursive procedure works

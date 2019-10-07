@@ -1,8 +1,0 @@
-% Declare procedure with multiple arguments
-
-{
-    procedure printAdd(a : integer, b : integer)
-    {
-        write a + b
-    }
-}
