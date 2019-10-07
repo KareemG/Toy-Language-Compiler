@@ -45,9 +45,9 @@ terminal String     TEXTCONST;
 */
 
 nonterminal program, scope, variable, variable_list, expression, statement, statement_list,
-            output, output_list, declaration, declaration_list, bound, generalBound,
-            variablenames, variablenames_list, type, argument_list, parameter_list, parameter,
-            value;
+            output, output_list, declaration, declaration_list, bound, general_bound,
+            variable_names, variable_names_list, type, argument_list, parameter_list, parameter,
+            array_name, function_name, procedure_name, variable_name, array_member;
 
 precedence left COMMA;
 precedence left PLUS, MINUS;
@@ -79,9 +79,6 @@ start with program;
 // The main program.
 program ::= scope;
 
-statement_list ::= statement
-    | statement_list statement;
-
 statement ::= variable COLON EQUAL expression
     | IF expression THEN statement
     | IF expression THEN statement ELSE statement
@@ -95,9 +92,12 @@ statement ::= variable COLON EQUAL expression
     | RETURN
     | WRITE output_list
     | READ variable_list    
-    | IDENT // procedure call without arguments
-    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
+    | procedure_name
+    | procedure_name L_PAREN argument_list R_PAREN
     | scope;
+
+statement_list ::= statement
+    | statement_list statement;
 
 expression ::= INTCONST
     | MINUS expression
@@ -118,46 +118,46 @@ expression ::= INTCONST
     | expression GREATER EQUAL expression
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | value;
+    | IDENT // variable_name or function_name
+    | array_member
+    | function_name L_PAREN argument_list R_PAREN;
 
 declaration_list ::= declaration
     | declaration_list declaration;
 
-declaration ::= VAR variablenames_list COLON type
+declaration ::= VAR variable_names_list COLON type
     | FUNCTION IDENT COLON type scope
     | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
     | PROCEDURE IDENT scope
     | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
 
-output_list ::= output
-    | output_list COMMA output;
+variable_names ::= IDENT
+    | IDENT L_SQUARE bound R_SQUARE
+    | IDENT L_SQUARE bound COMMA bound R_SQUARE;
+
+variable_names_list ::= variable_names
+    | variable_names_list COMMA variable_names;
 
 output ::= expression
     | TEXTCONST
     | NEWLINE;
 
-variablenames ::= IDENT
-    | IDENT L_SQUARE bound R_SQUARE
-    | IDENT L_SQUARE bound COMMA bound R_SQUARE;
-
-variablenames_list ::= variablenames
-    | variablenames_list COMMA variablenames;
+output_list ::= output
+    | output_list COMMA output;
 
 bound ::= INTCONST
-    | generalBound DOT DOT generalBound;
+    | general_bound DOT DOT general_bound;
 
-generalBound ::= INTCONST
+general_bound ::= INTCONST
     | MINUS INTCONST;
+
+variable ::= variable_name | array_member;
+    
+array_member ::= array_name L_SQUARE expression R_SQUARE
+    | array_name L_SQUARE expression COMMA expression R_SQUARE;
 
 variable_list ::= variable
     | variable_list COMMA variable;
-
-value ::= variable
-    | IDENT L_PAREN argument_list R_PAREN;
-
-variable ::= IDENT
-    | IDENT L_SQUARE expression R_SQUARE
-    | IDENT L_SQUARE expression COMMA expression R_SQUARE;
 
 scope ::= L_CURLEY declaration_list statement_list R_CURLEY
     | L_CURLEY statement_list R_CURLEY
@@ -174,14 +174,7 @@ parameter ::= IDENT COLON type;
 parameter_list ::= parameter
     | parameter_list COMMA parameter;
 
-
-arrayname ::= IDENT;
-
-/*****************************************************************************
-
-  YOUR CAREFULLY CRAFTED GRAMMAR FOR THE CSC488S SOURCE LANGUAGE
-
-    GOES HERE
-
-****************************************************************************/
-
+variable_name ::= IDENT;
+array_name ::= IDENT;
+function_name ::= IDENT;
+procedure_name ::= IDENT;
