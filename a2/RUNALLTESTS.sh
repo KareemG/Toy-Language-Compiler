@@ -4,12 +4,18 @@
 declare -i PASSED=0
 declare -i FAILED=0
 
+declare -a pARRAY
+declare -a fARRAY
+declare -i pARRCOUNT=0
+declare -i fARRCOUNT=0
+
 # Prerequisite: argument 1 is a main directory where all the tests are
 #		argument 2 is the expected behaviour (fail or pass?). Either p or f.
 # Behaviour:	Runs all of the test within given directory, and returns
 #		number of failed tests and passed tests.
 function runtest() {
 	DIR=$1
+	FLAG=$2
 
 	# Traverse through all of the sub-directories within given directory
 	for subdir in $DIR/*/
@@ -25,9 +31,19 @@ function runtest() {
 			then
 				echo "PASSED: "$(basename $testcase)""
 				let PASSED++
+				if [ "$FLAG" == 'f' ]
+				then
+					fARRAY[$fARRCOUNT]="$(basename $testcase)"
+					let fARRCOUNT+=1
+				fi
 			else
 				echo "FAILED: "$(basename $testcase)""
 				let FAILED++
+				if [ "$FLAG" == 'p' ]
+				then
+					pARRAY[$pARRCOUNT]="$(basename $testcase)"
+					let pARRCOUNT+=1
+				fi
 			fi
 		done
 		echo ""
@@ -52,7 +68,7 @@ let PASSED=0
 let FAILED=0
 
 echo "===== RUNNING FAILING TESTS ====="
-runtest $ROOT/tests/failing
+runtest $ROOT/tests/failing 'f'
 
 let TOTAL=$PASSED+$FAILED
 
@@ -61,8 +77,12 @@ echo -e "Passing tests:"
 echo -e "\tPassed tests: $pPASSED"
 echo -e "\tFailed tests: $pFAILED"
 echo -e "\tTotal tests: $pTOTAL"
+echo -e "\tFailed tests that is expected to pass: "
+echo -e "\t\t${pARRAY[@]}"
 echo ""
 echo -e "Failing tests:"
 echo -e "\tPassed tests: $PASSED"
 echo -e "\tFailed tests: $FAILED"
 echo -e "\tTotal tests: $TOTAL"
+echo -e "\tPassed tests that is expected to fail: "
+echo -e "\t\t${fARRAY[@]}"
