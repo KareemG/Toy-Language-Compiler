@@ -173,15 +173,3 @@ parameter ::= IDENT COLON type;
 
 parameter_list ::= parameter
     | parameter_list COMMA parameter;
-
-
-arrayname ::= IDENT;
-
-/*****************************************************************************
-
-  YOUR CAREFULLY CRAFTED GRAMMAR FOR THE CSC488S SOURCE LANGUAGE
-
-    GOES HERE
-
-****************************************************************************/
-
