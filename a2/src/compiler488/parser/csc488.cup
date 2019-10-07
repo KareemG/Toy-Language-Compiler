@@ -46,7 +46,7 @@ terminal String     TEXTCONST;
 
 nonterminal program, scope, variable, variable_list, expression, statement, statement_list,
             output, output_list, declaration, declaration_list, bound, general_bound,
-            variable_names, variable_names_list, type, argument_list, parameter_list, parameter,
+            variable_names, variable_name_list, type, argument_list, parameter_list, parameter,
             array_name, function_name, procedure_name, variable_name, array_member;
 
 precedence left COMMA;
@@ -125,7 +125,7 @@ expression ::= INTCONST
 declaration_list ::= declaration
     | declaration_list declaration;
 
-declaration ::= VAR variable_names_list COLON type
+declaration ::= VAR variable_name_list COLON type
     | FUNCTION IDENT COLON type scope
     | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
     | PROCEDURE IDENT scope
@@ -135,8 +135,8 @@ variable_names ::= IDENT
     | IDENT L_SQUARE bound R_SQUARE
     | IDENT L_SQUARE bound COMMA bound R_SQUARE;
 
-variable_names_list ::= variable_names
-    | variable_names_list COMMA variable_names;
+variable_name_list ::= variable_names
+    | variable_name_list COMMA variable_names;
 
 output ::= expression
     | TEXTCONST
