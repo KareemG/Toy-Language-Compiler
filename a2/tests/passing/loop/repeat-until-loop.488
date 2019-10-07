@@ -1,7 +1,7 @@
 % Repeat until loop
 
 {
-    x : integer
+    var x : integer
     x := 0
 
     repeat

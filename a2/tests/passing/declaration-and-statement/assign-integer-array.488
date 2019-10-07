@@ -1,7 +1,0 @@
-% Assigning integer array
-
-{
-    a[4] : integer
-
-    a[1] := 0
-}

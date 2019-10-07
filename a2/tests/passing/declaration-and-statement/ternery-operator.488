@@ -1,5 +1,7 @@
 % Ternary operator
 
 {
-    (5 > 4 ? write "PASS" : write "FAIL")
+    var x : integer
+
+    x := (5 > 4 ? 5 : 4)
 }

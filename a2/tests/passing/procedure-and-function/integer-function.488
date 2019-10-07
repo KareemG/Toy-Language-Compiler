@@ -1,4 +1,4 @@
-% Call function that returns an integer
+% Declaring and calling a function that returns an integer
 
 {
     function test : integer

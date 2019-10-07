@@ -1,4 +1,4 @@
-% Call recursive procedure
+% Declaring and calling a recursive procedure
 
 {
     procedure printNum(n : integer)

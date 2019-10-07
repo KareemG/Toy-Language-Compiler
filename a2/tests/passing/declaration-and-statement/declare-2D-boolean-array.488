@@ -1,7 +1,0 @@
-% Declaring 2D boolean arrays
-
-{
-    a[1,2] : boolean
-    b[1,3..10] : boolean
-    c[-3..3,4..7] : boolean
-}
