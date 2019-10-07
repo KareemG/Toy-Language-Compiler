@@ -1,0 +1,7 @@
+% Declare and assign a boolean
+
+{
+    var x : boolean
+
+    x := true
+}

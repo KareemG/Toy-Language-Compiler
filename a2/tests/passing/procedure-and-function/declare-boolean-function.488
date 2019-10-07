@@ -1,0 +1,8 @@
+% Declare function that returns an boolean
+
+{
+    function test : boolean
+    {
+        return with true
+    }
+}

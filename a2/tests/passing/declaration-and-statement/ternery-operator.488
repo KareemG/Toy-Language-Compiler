@@ -1,0 +1,5 @@
+% Ternary operator
+
+{
+    (5 > 4 ? write "PASS" : write "FAIL")
+}

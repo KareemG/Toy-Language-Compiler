@@ -1,0 +1,7 @@
+% Declaring boolean arrays
+
+{
+    a[5] : boolean
+    b[1..10] : boolean
+    c[-3..3] : boolean
+}

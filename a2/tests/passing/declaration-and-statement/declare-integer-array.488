@@ -1,0 +1,7 @@
+% Declaring integer arrays
+
+{
+    a[5] : integer
+    b[1..10] : integer
+    c[-3..3] : integer
+}
