@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Global variable to hold the passed and failed tests per run
 declare -i PASSED=0
@@ -77,12 +77,12 @@ echo -e "Passing tests:"
 echo -e "\tPassed tests: $pPASSED"
 echo -e "\tFailed tests: $pFAILED"
 echo -e "\tTotal tests: $pTOTAL"
-echo -e "\tFailed tests that is expected to pass: "
+echo -e "\tFailed tests expected to pass: "
 echo -e "\t\t${pARRAY[@]}"
 echo ""
 echo -e "Failing tests:"
 echo -e "\tPassed tests: $PASSED"
 echo -e "\tFailed tests: $FAILED"
 echo -e "\tTotal tests: $TOTAL"
-echo -e "\tPassed tests that is expected to fail: "
+echo -e "\tPassed tests expected to fail: "
 echo -e "\t\t${fARRAY[@]}"
