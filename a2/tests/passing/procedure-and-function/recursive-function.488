@@ -1,4 +1,4 @@
-% Calling a recursive function
+% Declaring and calling a recursive function
 
 {
     function factorial(n : integer) : integer

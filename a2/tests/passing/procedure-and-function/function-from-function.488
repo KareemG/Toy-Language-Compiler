@@ -1,4 +1,4 @@
-% Call a function from a function
+% Declaring and calling a function from a function
 
 {
     function getNum : integer

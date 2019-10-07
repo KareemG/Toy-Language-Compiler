@@ -1,8 +1,0 @@
-% Declare function that returns an integer
-
-{
-    function test : integer
-    {
-        return with 5
-    }
-}

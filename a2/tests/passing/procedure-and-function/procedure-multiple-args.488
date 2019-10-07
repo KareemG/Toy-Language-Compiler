@@ -1,4 +1,4 @@
-% Call procedure with multiple arguments
+% Declaring and calling a procedure with multiple arguments
 
 {
     procedure printAdd(a : integer, b : integer)

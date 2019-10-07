@@ -1,7 +1,0 @@
-% Assigning 2D integer array
-
-{
-    var a[1,2] : integer
-
-    a[1,1] := 5
-}

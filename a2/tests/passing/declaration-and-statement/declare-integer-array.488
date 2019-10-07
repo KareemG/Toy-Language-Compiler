@@ -1,7 +1,0 @@
-% Declaring integer arrays
-
-{
-    var a[5] : integer
-    var b[1..10] : integer
-    var c[-3..3] : integer
-}

@@ -1,4 +1,4 @@
-% Call function that requires multiple arguments
+% Declaring and calling a function that requires multiple arguments
 
 {
     function test(a : integer, b : boolean) : integer

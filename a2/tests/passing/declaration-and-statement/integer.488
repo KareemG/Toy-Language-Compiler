@@ -1,0 +1,7 @@
+% Declaring and assigning an integer variable
+
+{
+    var x : integer
+    
+    x := 5
+}
