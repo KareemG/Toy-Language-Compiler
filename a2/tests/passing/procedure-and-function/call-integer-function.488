@@ -1,0 +1,10 @@
+% Call function that returns an integer
+
+{
+    function test : integer
+    {
+        return with 5
+    }
+
+    write test
+}

@@ -1,0 +1,6 @@
+% Less than or equal to operation
+
+{
+    if 4 <= 5 then
+        write "PASS"
+}

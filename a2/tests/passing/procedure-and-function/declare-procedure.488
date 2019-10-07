@@ -1,0 +1,8 @@
+% Declare procedure
+
+{
+    procedure test
+    {
+        write "Hello World!"
+    }
+}

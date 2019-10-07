@@ -1,0 +1,10 @@
+% Call function that returns a boolean
+
+{
+    function test : boolean
+    {
+        return with true
+    }
+
+    write test
+}
