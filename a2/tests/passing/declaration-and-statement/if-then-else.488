@@ -2,7 +2,7 @@
 
 {
     if true then
-        true
+        write "PASS"
     else
-        false
+        write "FAIL"
 }
