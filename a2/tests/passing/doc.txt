@@ -1,0 +1,46 @@
+===== ARITHMETIC =====
+addition.488            : Checks that add operation syntax works
+and.488                 : Checks that and operation syntax works
+division.488            : Checks that division operation syntax works
+equality.488            : Checks that equality operaton syntax works
+greater-than-equal.488  : Checks that greater than or equal to operation syntax works
+greater-than.488        : Checks that greater than operation syntax works
+inequality.488          : Checks that the inequality operation syntax works
+less-than-equal.488     : Checks that the less than or equal to operation syntax works
+less-than.488           : Checks that the less than operation syntax works
+multiple-operations.488 : Checks that having multiple different operations in one line syntax works
+multiplication.488      : Checks that multiplication operation syntax works
+or.488                  : Checks that or operation syntax works
+subtraction.488         : Checks that subtraction operation syntax works
+
+===== DECLARATION AND STATEMENT =====
+2D-boolean-array.488 : Checks the syntax for declaring and assigning 2D boolean array works
+2D-integer-array.488 : Checks the syntax for declaring and assigning 2D integer array works
+boolean-array.488    : Checks the syntax for declaring and assigning boolean array works
+boolean.488          : Checks the syntax for declaring and assigning boolean to a variable works
+integer.488          : Checks the syntax for declaring and assigning integer to a variable works
+integer-array.488    : Checks the syntax for declaring and assigning integer array works
+if-then-else.488     : Checks that the if then else syntax works
+if-then.488          : Checks that the if then syntax works
+read.488             : Checks that read statement syntax works
+ternery-operator.488 : Checks that the ternery operator syntax works
+write-newline.488    : Checks that the write statement with newline syntax works
+write.488            : Checks that the write statement syntax works
+
+===== LOOPS =====
+exit-integer-when.488 : Checks that the exit integer when statement syntax works when exiting out of an integer loop
+exit-integer.488      : Checks that the exit integer syntax works when exiting out of an integer loop
+exit-when.488         : Checks that the exit when syntax works when exiting out of a containing loop
+exit.488              : Checks that the exit syntax works when exiting out of a containing loop
+repeat-until-loop.488 : Checks that the repeat until loop syntax works
+while-loop.488        : Checks that the while loop syntax works
+
+===== PROCEDURE AND FUNCTION =====
+boolean-function.488        : Checks that the syntax for declaring and calling a function that returns a boolean works
+function-from-function.488  : Checks that the syntax for declaring and calling a function from a function works
+function-multiple-args.488  : Checks that the syntax for declaring and calling a function with multiple arguments works
+integer-function.488        : Checks that the syntax for declaring and calling a function that returns an integer works
+procedure-multiple-args.488 : Checks that the syntax for declaring and calling a procedure with multiple arguments works
+procedure.488               : Checks that the syntax for declaring and calling a procedure works
+recursive-function.488      : Checks that the syntax for declaring and calling a recursive function works
+recursive-procedure.488     : Checks that the syntax for declaring and calling a recursive procedure works

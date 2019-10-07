@@ -1,0 +1,8 @@
+% If then else statement
+
+{
+    if true then
+        write "PASS"
+    else
+        write "FAIL"
+}

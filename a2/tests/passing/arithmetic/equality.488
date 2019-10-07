@@ -1,0 +1,8 @@
+% Equality operation
+
+{
+    if 5 = 5 then
+        write "PASS"
+    else
+        write "FAIL"
+}
