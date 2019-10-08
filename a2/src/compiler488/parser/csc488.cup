@@ -118,7 +118,7 @@ expression ::= INTCONST
     | expression GREATER EQUAL expression
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | IDENT // variable name or function call with arguments
+    | IDENT // variable name or function call without arguments
     | IDENT L_PAREN argument_list R_PAREN // function call with arguments
     | array_member;
 
