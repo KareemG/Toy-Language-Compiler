@@ -46,8 +46,8 @@ terminal String     TEXTCONST;
 
 nonterminal program, scope, variable, variable_list, expression, statement, statement_list,
             output, output_list, declaration, declaration_list, bound, general_bound,
-            variable_names, variable_name_list, type, argument_list, parameter_list, parameter,
-            array_name, function_name, procedure_name, variable_name, array_member;
+            variable_name, variable_name_list, type, argument_list, parameter_list, parameter,
+            array_member;
 
 precedence left COMMA;
 precedence left PLUS, MINUS;
@@ -92,8 +92,8 @@ statement ::= variable COLON EQUAL expression
     | RETURN
     | WRITE output_list
     | READ variable_list    
-    | procedure_name
-    | procedure_name L_PAREN argument_list R_PAREN
+    | IDENT // procedure call without arguments 
+    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
     | scope;
 
 statement_list ::= statement
@@ -118,9 +118,9 @@ expression ::= INTCONST
     | expression GREATER EQUAL expression
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
-    | IDENT // variable_name or function_name
-    | array_member
-    | function_name L_PAREN argument_list R_PAREN;
+    | IDENT // variable name or function call with arguments
+    | IDENT L_PAREN argument_list R_PAREN // function call with arguments
+    | array_member;
 
 declaration_list ::= declaration
     | declaration_list declaration;
@@ -131,12 +131,12 @@ declaration ::= VAR variable_name_list COLON type
     | PROCEDURE IDENT scope
     | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
 
-variable_names ::= IDENT
+variable_name ::= IDENT
     | IDENT L_SQUARE bound R_SQUARE
     | IDENT L_SQUARE bound COMMA bound R_SQUARE;
 
-variable_name_list ::= variable_names
-    | variable_name_list COMMA variable_names;
+variable_name_list ::= variable_name
+    | variable_name_list COMMA variable_name;
 
 output ::= expression
     | TEXTCONST
@@ -151,10 +151,10 @@ bound ::= INTCONST
 general_bound ::= INTCONST
     | MINUS INTCONST;
 
-variable ::= variable_name | array_member;
+variable ::= IDENT | array_member;
     
-array_member ::= array_name L_SQUARE expression R_SQUARE
-    | array_name L_SQUARE expression COMMA expression R_SQUARE;
+array_member ::= IDENT L_SQUARE expression R_SQUARE
+    | IDENT L_SQUARE expression COMMA expression R_SQUARE;
 
 variable_list ::= variable
     | variable_list COMMA variable;
@@ -174,7 +174,3 @@ parameter ::= IDENT COLON type;
 parameter_list ::= parameter
     | parameter_list COMMA parameter;
 
-variable_name ::= IDENT;
-array_name ::= IDENT;
-function_name ::= IDENT;
-procedure_name ::= IDENT;
