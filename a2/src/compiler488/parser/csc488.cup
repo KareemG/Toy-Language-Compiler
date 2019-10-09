@@ -79,57 +79,57 @@ start with program;
 // The main program.
 program ::= scope;
 
-statement ::= variable COLON EQUAL expression {: System.out.println("VAR DECL"); :}
-    | IF expression THEN statement {: System.out.println("IF"); :}
-    | IF expression THEN statement ELSE statement {: System.out.println("IF ELSE"); :}
-    | WHILE expression DO statement {: System.out.println("WHILE DO"); :}
-    | REPEAT statement UNTIL expression {: System.out.println("REPEAT UNTIL"); :}
-    | EXIT {: System.out.println("EXIT"); :}
-    | EXIT INTCONST {: System.out.println("EXIT INTCONST"); :}
-    | EXIT WHEN expression {: System.out.println("EXIT WHEN"); :}
-    | EXIT INTCONST WHEN expression {: System.out.println("EXIT INTCONST WHEN"); :}
-    | RETURN WITH expression {: System.out.println("RETURN WITH"); :}
-    | RETURN {: System.out.println("RETURN"); :}
-    | WRITE output_list {: System.out.println("WRITE"); :}
-    | READ variable_list {: System.out.println("READ"); :}
-    | IDENT {: System.out.println("VAR OR PROC"); :} // procedure call without arguments 
-    | IDENT L_PAREN argument_list R_PAREN {: System.out.println("PROC"); :} // procedure call with arguments
-    | scope {: System.out.println("SCOPE"); :};
+statement ::= variable COLON EQUAL expression
+    | IF expression THEN statement
+    | IF expression THEN statement ELSE statement
+    | WHILE expression DO statement
+    | REPEAT statement UNTIL expression
+    | EXIT
+    | EXIT INTCONST
+    | EXIT WHEN expression
+    | EXIT INTCONST WHEN expression
+    | RETURN WITH expression
+    | RETURN
+    | WRITE output_list
+    | READ variable_list
+    | IDENT // procedure call without arguments 
+    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
+    | scope;
 
-statement_list ::= statement {: System.out.println("STATEMENT"); :}
+statement_list ::= statement
     | statement_list statement;
 
-expression ::= INTCONST {: System.out.println("CONST INT"); :}
-    | MINUS expression {: System.out.println("NEG"); :} %prec UMINUS
-    | expression PLUS expression {: System.out.println("+"); :}
-    | expression MINUS expression {: System.out.println("-"); :}
-    | expression TIMES expression {: System.out.println("*"); :}
-    | expression DIVIDE expression {: System.out.println("/"); :}
-    | TRUE {: System.out.println("T"); :}
-    | FALSE {: System.out.println("F"); :}
-    | NOT expression {: System.out.println("!"); :}
-    | expression AND expression {: System.out.println("&"); :}
-    | expression OR expression {: System.out.println("|"); :}
-    | expression EQUAL expression {: System.out.println("="); :}
-    | expression NOT EQUAL expression {: System.out.println("!="); :} %prec NOT_EQUAL
-    | expression LESS expression {: System.out.println("<"); :}
-    | expression LESS EQUAL expression {: System.out.println("<="); :} %prec L_EQUAL
-    | expression GREATER expression {: System.out.println(">"); :}
-    | expression GREATER EQUAL expression {: System.out.println(">="); :} %prec G_EQUAL
-    | L_PAREN expression R_PAREN {: System.out.println("subexpr"); :}
-    | L_PAREN expression QUESTION expression COLON expression R_PAREN {: System.out.println("?"); :}
-    | IDENT {: System.out.println("ident"); :} // variable name or function call without arguments
-    | IDENT L_PAREN argument_list R_PAREN {: System.out.println("func with args"); :} // function call with arguments
-    | array_member {: System.out.println("index"); :};
+expression ::= INTCONST
+    | MINUS expression %prec UMINUS
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression TIMES expression
+    | expression DIVIDE expression
+    | TRUE
+    | FALSE
+    | NOT expression
+    | expression AND expression
+    | expression OR expression
+    | expression EQUAL expression
+    | expression NOT EQUAL expression %prec NOT_EQUAL
+    | expression LESS expression
+    | expression LESS EQUAL expression %prec L_EQUAL
+    | expression GREATER expression
+    | expression GREATER EQUAL expression %prec G_EQUAL
+    | L_PAREN expression R_PAREN
+    | L_PAREN expression QUESTION expression COLON expression R_PAREN
+    | IDENT // variable name or function call without arguments
+    | IDENT L_PAREN argument_list R_PAREN // function call with arguments
+    | array_member;
 
-declaration_list ::= declaration {: System.out.println("DECLARATION"); :}
+declaration_list ::= declaration
     | declaration_list declaration;
 
-declaration ::= VAR variable_name_list COLON type {: System.out.println("DECL VAR"); :}
-    | FUNCTION IDENT COLON type scope {: System.out.println("DECL FUNC"); :}
-    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope {: System.out.println("DECL FUNC"); :}
-    | PROCEDURE IDENT scope {: System.out.println("DECL PROC"); :}
-    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope {: System.out.println("DECL PROC"); :};
+declaration ::= VAR variable_name_list COLON type
+    | FUNCTION IDENT COLON type scope
+    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
+    | PROCEDURE IDENT scope
+    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
 
 variable_name ::= IDENT
     | IDENT L_SQUARE bound R_SQUARE
@@ -138,9 +138,9 @@ variable_name ::= IDENT
 variable_name_list ::= variable_name
     | variable_name_list COMMA variable_name;
 
-output ::= expression {: System.out.println("EXPRESSION"); :}
-    | TEXTCONST:str {: System.out.println("CONST STR: " + str); :}
-    | NEWLINE {: System.out.println("NEWLINE"); :};
+output ::= expression
+    | TEXTCONST:str
+    | NEWLINE;
 
 output_list ::= output
     | output_list COMMA output;
