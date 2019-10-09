@@ -51,7 +51,7 @@ nonterminal program, scope, variable, variable_list, expression, statement, stat
             variable_name, variable_name_list, type, argument_list, parameter_list, parameter,
             array_member;
 
-precedence left COMMA;
+// precedence left COMMA;
 precedence nonassoc ELSE;
 precedence nonassoc IF;
 // precedence right WRITE;
