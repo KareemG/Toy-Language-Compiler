@@ -83,24 +83,24 @@ start with program;
 // The main program.
 program ::= scope;
 
-statement ::= variable COLON EQUAL expression
-    | IF expression THEN statement
-    | IF expression THEN statement ELSE statement
-    | WHILE expression DO statement
-    | REPEAT statement UNTIL expression
-    | EXIT
-    | EXIT INTCONST
-    | EXIT WHEN expression
-    | EXIT INTCONST WHEN expression
-    | RETURN WITH expression
-    | RETURN
-    | WRITE output_list
-    | READ variable_list    
-    | IDENT // procedure call without arguments 
-    | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
-    | scope;
+statement ::= variable COLON EQUAL expression {: System.out.println("VAR DECL"); :}
+    | IF expression THEN statement {: System.out.println("IF"); :}
+    | IF expression THEN statement ELSE statement {: System.out.println("IF ELSE"); :}
+    | WHILE expression DO statement {: System.out.println("WHILE DO"); :}
+    | REPEAT statement UNTIL expression {: System.out.println("REPEAT UNTIL"); :}
+    | EXIT {: System.out.println("EXIT"); :}
+    | EXIT INTCONST {: System.out.println("EXIT INTCONST"); :}
+    | EXIT WHEN expression {: System.out.println("EXIT WHEN"); :}
+    | EXIT INTCONST WHEN expression {: System.out.println("EXIT INTCONST WHEN"); :}
+    | RETURN WITH expression {: System.out.println("RETURN WITH"); :}
+    | RETURN {: System.out.println("RETURN"); :}
+    | WRITE output_list {: System.out.println("WRITE"); :}
+    | READ variable_list {: System.out.println("READ"); :}
+    | IDENT {: System.out.println("VAR OR PROC"); :} // procedure call without arguments 
+    | IDENT L_PAREN argument_list R_PAREN {: System.out.println("PROC"); :} // procedure call with arguments
+    | scope {: System.out.println("SCOPE"); :};
 
-statement_list ::= statement
+statement_list ::= statement {: System.out.println("STATEMENT"); :}
     | statement_list statement;
 
 expression ::= INTCONST {: System.out.println("CONST INT"); :}
@@ -126,14 +126,14 @@ expression ::= INTCONST {: System.out.println("CONST INT"); :}
     | IDENT L_PAREN argument_list R_PAREN {: System.out.println("func with args"); :} // function call with arguments
     | array_member {: System.out.println("index"); :};
 
-declaration_list ::= declaration
+declaration_list ::= declaration {: System.out.println("DECLARATION"); :}
     | declaration_list declaration;
 
-declaration ::= VAR variable_name_list COLON type
-    | FUNCTION IDENT COLON type scope
-    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope
-    | PROCEDURE IDENT scope
-    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope;
+declaration ::= VAR variable_name_list COLON type {: System.out.println("DECL VAR"); :}
+    | FUNCTION IDENT COLON type scope {: System.out.println("DECL FUNC"); :}
+    | FUNCTION IDENT L_PAREN parameter_list R_PAREN COLON type scope {: System.out.println("DECL FUNC"); :}
+    | PROCEDURE IDENT scope {: System.out.println("DECL PROC"); :}
+    | PROCEDURE IDENT L_PAREN parameter_list R_PAREN scope {: System.out.println("DECL PROC"); :};
 
 variable_name ::= IDENT
     | IDENT L_SQUARE bound R_SQUARE
@@ -142,9 +142,9 @@ variable_name ::= IDENT
 variable_name_list ::= variable_name
     | variable_name_list COMMA variable_name;
 
-output ::= expression
-    | TEXTCONST
-    | NEWLINE;
+output ::= expression {: System.out.println("EXPRESSION"); :}
+    | TEXTCONST:str {: System.out.println("CONST STR: " + str); :}
+    | NEWLINE {: System.out.println("NEWLINE"); :};
 
 output_list ::= output
     | output_list COMMA output;
