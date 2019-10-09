@@ -28,6 +28,8 @@ terminal VAR, WHEN, WHILE, WITH, WRITE;
 terminal L_PAREN, R_PAREN, L_SQUARE, R_SQUARE, L_CURLEY, R_CURLEY;
 terminal EQUAL, GREATER, LESS, COMMA, DOT, QUESTION, COLON;
 terminal PLUS, MINUS, TIMES, DIVIDE;
+terminal UMINUS;
+terminal L_EQUAL, G_EQUAL, NOT_EQUAL;
 
 // Terminals returned by the scanner that carry a value of a specific Java type:
 terminal String     IDENT;
@@ -49,18 +51,16 @@ nonterminal program, scope, variable, variable_list, expression, statement, stat
             variable_name, variable_name_list, type, argument_list, parameter_list, parameter,
             array_member;
 
-precedence left COMMA;
-precedence left PLUS, MINUS;
-precedence left DIVIDE, TIMES;
-precedence left AND, OR, EQUAL, NOT, LESS, GREATER;
 precedence nonassoc ELSE;
 precedence nonassoc IF;
-precedence right WRITE;
-precedence right IDENT;
-precedence left GREATER;
-precedence left LESS;
-precedence left EQUAL;
-precedence right VAR;
+
+precedence left OR;
+precedence left AND;
+precedence right NOT;
+precedence nonassoc EQUAL, NOT_EQUAL, LESS, L_EQUAL, GREATER, G_EQUAL;
+precedence left PLUS, MINUS;
+precedence left DIVIDE, TIMES;
+precedence left UMINUS;
 
 /*
     GRAMMAR SECTION
@@ -91,7 +91,7 @@ statement ::= variable COLON EQUAL expression
     | RETURN WITH expression
     | RETURN
     | WRITE output_list
-    | READ variable_list    
+    | READ variable_list
     | IDENT // procedure call without arguments 
     | IDENT L_PAREN argument_list R_PAREN // procedure call with arguments
     | scope;
@@ -100,7 +100,7 @@ statement_list ::= statement
     | statement_list statement;
 
 expression ::= INTCONST
-    | MINUS expression
+    | MINUS expression %prec UMINUS
     | expression PLUS expression
     | expression MINUS expression
     | expression TIMES expression
@@ -111,11 +111,11 @@ expression ::= INTCONST
     | expression AND expression
     | expression OR expression
     | expression EQUAL expression
-    | expression NOT EQUAL expression
+    | expression NOT EQUAL expression %prec NOT_EQUAL
     | expression LESS expression
-    | expression LESS EQUAL expression
+    | expression LESS EQUAL expression %prec L_EQUAL
     | expression GREATER expression
-    | expression GREATER EQUAL expression
+    | expression GREATER EQUAL expression %prec G_EQUAL
     | L_PAREN expression R_PAREN
     | L_PAREN expression QUESTION expression COLON expression R_PAREN
     | IDENT // variable name or function call without arguments
