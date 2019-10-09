@@ -27,7 +27,9 @@ terminal VAR, WHEN, WHILE, WITH, WRITE;
 // Special-character terminals (with no value attached):
 terminal L_PAREN, R_PAREN, L_SQUARE, R_SQUARE, L_CURLEY, R_CURLEY;
 terminal EQUAL, GREATER, LESS, COMMA, DOT, QUESTION, COLON;
-terminal PLUS, MINUS, TIMES, DIVIDE, UMINUS;
+terminal PLUS, MINUS, TIMES, DIVIDE;
+terminal UMINUS;
+terminal L_EQUAL, G_EQUAL, NOT_EQUAL;
 
 // Terminals returned by the scanner that carry a value of a specific Java type:
 terminal String     IDENT;
@@ -50,17 +52,18 @@ nonterminal program, scope, variable, variable_list, expression, statement, stat
             array_member;
 
 precedence left COMMA;
-precedence left PLUS, MINUS;
-precedence left DIVIDE, TIMES;
-precedence left AND, OR, EQUAL, NOT, LESS, GREATER;
 precedence nonassoc ELSE;
 precedence nonassoc IF;
-precedence right WRITE;
-precedence right IDENT;
-precedence left GREATER;
-precedence left LESS;
-precedence left EQUAL;
-precedence right VAR;
+// precedence right WRITE;
+// precedence right IDENT;
+// precedence right VAR;
+
+precedence left OR;
+precedence left AND;
+precedence right NOT;
+precedence nonassoc EQUAL, NOT_EQUAL, LESS, L_EQUAL, GREATER, G_EQUAL;
+precedence left PLUS, MINUS;
+precedence left DIVIDE, TIMES;
 precedence left UMINUS;
 
 /*
@@ -101,7 +104,7 @@ statement_list ::= statement
     | statement_list statement;
 
 expression ::= INTCONST {: System.out.println("CONST INT"); :}
-    | MINUS expression {: System.out.println("NEG"); :} %prec UMINUS 
+    | MINUS expression {: System.out.println("NEG"); :} %prec UMINUS
     | expression PLUS expression {: System.out.println("+"); :}
     | expression MINUS expression {: System.out.println("-"); :}
     | expression TIMES expression {: System.out.println("*"); :}
@@ -112,11 +115,11 @@ expression ::= INTCONST {: System.out.println("CONST INT"); :}
     | expression AND expression {: System.out.println("&"); :}
     | expression OR expression {: System.out.println("|"); :}
     | expression EQUAL expression {: System.out.println("="); :}
-    | expression NOT EQUAL expression {: System.out.println("!="); :}
+    | expression NOT EQUAL expression {: System.out.println("!="); :} %prec NOT_EQUAL
     | expression LESS expression {: System.out.println("<"); :}
-    | expression LESS EQUAL expression {: System.out.println("<="); :}
+    | expression LESS EQUAL expression {: System.out.println("<="); :} %prec L_EQUAL
     | expression GREATER expression {: System.out.println(">"); :}
-    | expression GREATER EQUAL expression {: System.out.println(">="); :}
+    | expression GREATER EQUAL expression {: System.out.println(">="); :} %prec G_EQUAL
     | L_PAREN expression R_PAREN {: System.out.println("subexpr"); :}
     | L_PAREN expression QUESTION expression COLON expression R_PAREN {: System.out.println("?"); :}
     | IDENT {: System.out.println("ident"); :} // variable name or function call without arguments
