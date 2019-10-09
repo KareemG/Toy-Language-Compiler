@@ -139,7 +139,7 @@ variable_name_list ::= variable_name
     | variable_name_list COMMA variable_name;
 
 output ::= expression
-    | TEXTCONST:str
+    | TEXTCONST
     | NEWLINE;
 
 output_list ::= output
