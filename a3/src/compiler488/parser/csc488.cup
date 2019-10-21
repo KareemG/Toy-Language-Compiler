@@ -45,10 +45,11 @@ terminal String     TEXTCONST;
 */
 
  
-nonterminal	program,	statement,	declaration,	scope	;
-nonterminal	statements,	declarations,	matchedStatement, unmatchedStatement ;
+nonterminal	Program program,	Stmt statement,	Declaration declaration,	Scope scope	;
+// TODO: should matchedStatement be just Stmt here?
+nonterminal	AstList<Stmt> statements,	AstList<Declaration> declarations,	Stmt matchedStatement, IfStmt unmatchedStatement ;
 nonterminal	variablenames,		output			;
-nonterminal	type,  	arguments,	parameters,	variable	;
+nonterminal	Type type,  	arguments,	parameters,	variable	;
 nonterminal 	expression,	variablename 			;
 nonterminal	inputs, outputs, bound , generalBound ;
 nonterminal	procedureCall, parameter, conjunction, negation, compareExpn ;
