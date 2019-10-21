@@ -5,6 +5,11 @@
 package compiler488.parser;
 
 // TODO: You can add Java import statements here as necessary
+import compiler488.ast.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.type.*;
+import compiler488.ast.decl.*;
 
 /*
     SYMBOL LISTS
@@ -44,16 +49,20 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
- 
-nonterminal	Program program,	Stmt statement,	Declaration declaration,	Scope scope	;
-// TODO: should matchedStatement be just Stmt here?
-nonterminal	AstList<Stmt> statements,	AstList<Declaration> declarations,	Stmt matchedStatement, IfStmt unmatchedStatement ;
 nonterminal	variablenames,		output			;
-nonterminal	Type type,  	arguments,	parameters,	variable	;
-nonterminal 	expression,	variablename 			;
+nonterminal	type,  	arguments,	parameters,	variable	;
+nonterminal	variablename 			;
 nonterminal	inputs, outputs, bound , generalBound ;
 nonterminal	procedureCall, parameter, conjunction, negation, compareExpn ;
 nonterminal	arithExpn, term, factor, primary, constant ;
+
+nonterminal Program program;
+nonterminal Scope scope;
+nonterminal Stmt statement, matchedStatement, unmatchedStatement;
+nonterminal ASTList<Stmt> statements;
+nonterminal Declaration declaration;
+nonterminal ASTList<Declaration> declarations;
+nonterminal Expn expression;
  
 
 /*
@@ -83,23 +92,23 @@ start with program;
     will act on the production.
  */
 
-program ::= scope                           // the main program
+program ::= scope {: RESULT = new Program(); :}                           // the main program
     ;
 
 scope
-    ::= L_CURLEY declarations statements R_CURLEY   // scope with declarations and statements
-    |   L_CURLEY statements R_CURLEY                // scope with statements only
-    |   L_CURLEY R_CURLEY                           // empty scope
+    ::= L_CURLEY declarations:decls statements:stmts R_CURLEY {: RESULT = new Scope(); :}  // scope with declarations and statements
+    |   L_CURLEY statements R_CURLEY {: RESULT = new Scope(); :}                // scope with statements only
+    |   L_CURLEY R_CURLEY {: RESULT = new Scope(); :}                           // empty scope
     ;
 
 statements
-    ::= statement                       // sequence of statements
-    |   statements statement
+    ::= statement:stmt {: RESULT = new ASTList<Stmt>(stmt); :}                       // sequence of statements
+    |   statements:stmts statement:stmt {: RESULT = stmts.append(stmt); :}
     ;
 
 declarations
-    ::= declaration                     // sequence of declarations
-    |   declarations declaration
+    ::= declaration:decl {: RESULT = new ASTList<Declaration>(decl); :}                     // sequence of declarations
+    |   declarations:decls declaration:decl {: RESULT = decls.append(decl); :}
     ;
 
 statement
@@ -125,8 +134,8 @@ matchedStatement
     ;
 
 unmatchedStatement
-    ::= IF expression THEN statement
-    |   IF expression THEN matchedStatement ELSE unmatchedStatement
+    ::= IF expression:expr THEN statement:stmt {: RESULT = new IfStmt(expr, stmt); :}
+    |   IF expression:expr THEN matchedStatement:matched ELSE unmatchedStatement:unmatched {: RESULT = new IfStmt(expr, matched, unmatched); :}
     ;
 
 procedureCall
