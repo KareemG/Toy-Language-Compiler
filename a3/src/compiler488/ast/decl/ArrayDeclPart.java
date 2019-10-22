@@ -64,8 +64,7 @@ public class ArrayDeclPart extends DeclarationPart {
 	 * @return size of the array
 	 */
 	public int getSize() {
-		// FIXME: This is broken.
-		throw new UnsupportedOperationException();
+		return (ub2 - lb2) * (ub1 - lb1);
 	}
 
 	public Integer getLowerBoundary1() {

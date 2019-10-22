@@ -49,11 +49,11 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
-nonterminal	variablenames,		output			;
-nonterminal	type,  	arguments,	parameters,	variable	;
+nonterminal	variablenames,		output	;
+nonterminal	variable			;
 nonterminal	variablename 			;
-nonterminal	inputs, outputs, bound , generalBound ;
-nonterminal	parameter, conjunction, negation;
+nonterminal	inputs, outputs;
+nonterminal	conjunction, negation;
 
 nonterminal Program program;
 nonterminal Scope scope;
@@ -62,16 +62,19 @@ nonterminal Stmt statement, matchedStatement, unmatchedStatement;
 nonterminal ProcedureCallStmt procedureCall;
 nonterminal ASTList<Stmt> statements;
 
-nonterminal Declaration declaration;
-nonterminal ASTList<Declaration> declarations;
+nonterminal Declaration declaration, parameter;
+nonterminal ASTList<Declaration> declarations, parameters;
 
 nonterminal Expn expression, term, factor, primary;
+nonterminal ASTList<Expn> arguments;
 nonterminal ConstExpn constant;
 nonterminal ArithExpn arithExpn;
 nonterminal CompareExpn compareExpn;
 
-nonterminal Type type, variable;
+nonterminal Type type;
 
+nonterminal Integer[] bound; // ???
+nonterminal Integer generalBound; // ???
 
 /*
     PLEASE NOTE: Your grammar may not use the 'precedence' feature of JCup to
@@ -120,8 +123,8 @@ declarations
     ;
 
 statement
-    ::= matchedStatement
-    |   unmatchedStatement
+    ::= matchedStatement {: RESULT = new Stmt(); :}
+    |   unmatchedStatement {: RESULT = new Stmt(); :}
     ;
 
 matchedStatement
@@ -181,8 +184,8 @@ generalBound
     ;
 
 type
-    ::= INTEGER                     // integer type
-    |   BOOLEAN                     // boolean type
+    ::= INTEGER {: RESULT = new IntegerType(); :} // integer type
+    |   BOOLEAN {: RESULT = new BooleanType(); :} // boolean type
     ;
 
 outputs
@@ -202,8 +205,8 @@ inputs
     ;
 
 arguments
-    ::= expression                  // list of function/procedure arguments
-    |   arguments COMMA expression
+    ::= expression:expr {: RESULT = new ASTList<Expn>(expr); :} // list of function/procedure arguments
+    |   arguments:args COMMA expression:expr {: RESULT = args.append(expr); :}
     ;
 
 parameters
@@ -258,7 +261,7 @@ factor
     ;
 
 primary
-    ::= constant                                                            // integer or boolean constant
+    ::= constant {: RESULT = new ConstExpn(); :}                                                            // integer or boolean constant
     |   variable                                                            // scalar, array variable or function call
     |   IDENT L_PAREN arguments R_PAREN                                     // function call
     |   L_PAREN expression R_PAREN                                          // parenthesized expression
@@ -266,9 +269,9 @@ primary
     ;
 
 constant
-    ::= INTCONST                    // integer constant
-    |   TRUE                        // constant true
-    |   FALSE                       // constant false
+    ::= INTCONST:integer {: RESULT = new IntConstExpn(integer); :} // integer constant
+    |   TRUE:bool {: RESULT = new BoolConstExpn(bool); :} // constant true
+    |   FALSE:bool {: RESULT = new BoolConstExpn(bool); :} // constant false
     ;
 
 variable
