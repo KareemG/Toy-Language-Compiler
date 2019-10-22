@@ -123,8 +123,8 @@ declarations
     ;
 
 statement
-    ::= matchedStatement {: RESULT = new Stmt(); :}
-    |   unmatchedStatement {: RESULT = new Stmt(); :}
+    ::= matchedStatement:stmt {: RESULT = stmt; :}
+    |   unmatchedStatement:stmt {: RESULT = stmt; :}
     ;
 
 matchedStatement
@@ -261,7 +261,7 @@ factor
     ;
 
 primary
-    ::= constant {: RESULT = new ConstExpn(); :}                                                            // integer or boolean constant
+    ::= constant:constant {: RESULT = constant; :}                                                            // integer or boolean constant
     |   variable                                                            // scalar, array variable or function call
     |   IDENT L_PAREN arguments R_PAREN                                     // function call
     |   L_PAREN expression R_PAREN                                          // parenthesized expression
@@ -270,8 +270,8 @@ primary
 
 constant
     ::= INTCONST:integer {: RESULT = new IntConstExpn(integer); :} // integer constant
-    |   TRUE:bool {: RESULT = new BoolConstExpn(bool); :} // constant true
-    |   FALSE:bool {: RESULT = new BoolConstExpn(bool); :} // constant false
+    |   TRUE {: RESULT = new BoolConstExpn(true); :} // constant true
+    |   FALSE {: RESULT = new BoolConstExpn(false); :} // constant false
     ;
 
 variable
