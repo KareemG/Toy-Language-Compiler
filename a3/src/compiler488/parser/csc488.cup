@@ -53,12 +53,13 @@ nonterminal	variablenames,		output			;
 nonterminal	type,  	arguments,	parameters,	variable	;
 nonterminal	variablename 			;
 nonterminal	inputs, outputs, bound , generalBound ;
-nonterminal	procedureCall, parameter, conjunction, negation;
+nonterminal	parameter, conjunction, negation;
 
 nonterminal Program program;
 nonterminal Scope scope;
 
 nonterminal Stmt statement, matchedStatement, unmatchedStatement;
+nonterminal ProcedureCallStmt procedureCall;
 nonterminal ASTList<Stmt> statements;
 
 nonterminal Declaration declaration;
@@ -67,9 +68,10 @@ nonterminal ASTList<Declaration> declarations;
 nonterminal Expn expression, term, factor, primary;
 nonterminal ConstExpn constant;
 nonterminal ArithExpn arithExpn;
-
 nonterminal CompareExpn compareExpn;
- 
+
+nonterminal Type type, variable;
+
 
 /*
     PLEASE NOTE: Your grammar may not use the 'precedence' feature of JCup to
@@ -145,8 +147,8 @@ unmatchedStatement
     ;
 
 procedureCall
-    ::= IDENT                                       // call procedure with no parameters
-    |   IDENT L_PAREN arguments R_PAREN             // call procedure with parameters
+    ::= IDENT:ident {: RESULT = new ProcedureCallStmt(ident); :}                           // call procedure with no parameters
+    |   IDENT:ident L_PAREN arguments:args R_PAREN {: RESULT = new ProcedureCallStmt(ident, args); :} // call procedure with parameters
     ;
 
 declaration
