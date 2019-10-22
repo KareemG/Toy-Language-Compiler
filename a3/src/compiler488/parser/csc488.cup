@@ -53,16 +53,22 @@ nonterminal	variablenames,		output			;
 nonterminal	type,  	arguments,	parameters,	variable	;
 nonterminal	variablename 			;
 nonterminal	inputs, outputs, bound , generalBound ;
-nonterminal	procedureCall, parameter, conjunction, negation, compareExpn ;
-nonterminal	arithExpn, term, factor, primary, constant ;
+nonterminal	procedureCall, parameter, conjunction, negation;
 
 nonterminal Program program;
 nonterminal Scope scope;
+
 nonterminal Stmt statement, matchedStatement, unmatchedStatement;
 nonterminal ASTList<Stmt> statements;
+
 nonterminal Declaration declaration;
 nonterminal ASTList<Declaration> declarations;
-nonterminal Expn expression;
+
+nonterminal Expn expression, term, factor, primary;
+nonterminal ConstExpn constant;
+nonterminal ArithExpn arithExpn;
+
+nonterminal CompareExpn compareExpn;
  
 
 /*
