@@ -49,9 +49,9 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
-nonterminal	variablenames,		output	;
-nonterminal	variablename 			;
-nonterminal	inputs, outputs;
+nonterminal	variablenames;
+nonterminal	variablename;
+nonterminal	inputs;
 
 nonterminal Program program;
 nonterminal Scope scope;
@@ -65,9 +65,9 @@ nonterminal ASTList<Declaration> declarations;
 nonterminal ScalarDecl parameter;
 nonterminal ASTList<ScalarDecl> parameters;
 
-nonterminal Expn expression, arithExpn, term, factor, primary;
+nonterminal Expn expression, arithExpn, term, factor, primary, output;
 nonterminal Expn conjunction, negation, compareExpn, variable;
-nonterminal ASTList<Expn> arguments;
+nonterminal ASTList<Expn> arguments, outputs;
 nonterminal ConstExpn constant;
 
 nonterminal Type type;
@@ -192,14 +192,16 @@ type
     ;
 
 outputs
-    ::= output                      // list of output expressions
-    |   outputs COMMA output
+    // list of output expressions
+    ::= output:output {: RESULT = new ASTList<Expn>(output); :}
+    |   outputs:outputs COMMA output:output
+        {: RESULT = outputs.append(output); :}
     ;
 
 output
-    ::= expression                  // integer expression
-    |   TEXTCONST                   // text constant
-    |   NEWLINE                     // newline constant
+    ::= expression:expr {: RESULT = expr; :}     // integer expression
+    |   TEXTCONST:txt {: RESULT = new TextConstExpn(txt); :} // text constant
+    |   NEWLINE {: RESULT = new SkipConstExpn(); :}    // newline constant
     ;
 
 inputs
