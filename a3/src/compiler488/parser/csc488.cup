@@ -130,7 +130,7 @@ statement
 
 matchedStatement
     ::= variable COLON EQUAL expression                             // assignment statement
-    |   IF expression THEN matchedStatement ELSE matchedStatement   // if statements
+    |   IF expression:cond THEN matchedStatement:if_body ELSE matchedStatement:else_body {: RESULT = new IfStmt(cond, if_body, else_body); :} // if statements
     |   WHILE expression DO statement                               // while statement
     |   REPEAT statements UNTIL expression                           // repeat statement
     |   EXIT                                                        // exit statements
@@ -142,7 +142,7 @@ matchedStatement
     |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
     |   READ inputs:args {: RESULT = new ReadStmt(args); :}
     |   procedureCall:call {: RESULT = call; :} // procedure call
-    |   scope                                                       // embedded scope
+    |   scope:scp {: RESULT = scp; :} // embedded scope
     ;
 
 unmatchedStatement

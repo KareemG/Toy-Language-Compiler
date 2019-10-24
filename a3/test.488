@@ -4,4 +4,11 @@
 
     write "how old are you?"
     read age
+
+    if (age < 21) then
+        write "you cannot drink"
+    else
+    {
+        write "you can drink!"
+    }
 }
