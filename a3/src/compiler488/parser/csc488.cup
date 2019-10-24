@@ -63,12 +63,12 @@ nonterminal ProcedureCallStmt procedureCall;
 nonterminal ASTList<Stmt> statements;
 
 nonterminal Declaration declaration, parameter;
-nonterminal ASTList<Declaration> declarations, parameters;
+nonterminal ASTList<Declaration> declarations;
+nonterminal ASTList<ScalarDecl> parameters;
 
-nonterminal Expn expression, term, factor, primary;
+nonterminal Expn expression, arithExpn, term, factor, primary;
 nonterminal ASTList<Expn> arguments;
 nonterminal ConstExpn constant;
-nonterminal ArithExpn arithExpn;
 nonterminal CompareExpn compareExpn;
 
 nonterminal Type type;
@@ -156,10 +156,14 @@ procedureCall
 
 declaration
     ::= VAR variablenames COLON type                                // declare scalar/array variables
-    | FUNCTION IDENT COLON type scope                               // declare function
-    | FUNCTION IDENT L_PAREN parameters R_PAREN COLON type scope
-    | PROCEDURE IDENT scope                                         // declare procedure
-    | PROCEDURE IDENT L_PAREN parameters R_PAREN scope
+    | FUNCTION IDENT:ident COLON type:type scope:scope // declare function
+      {: RESULT = new RoutineDecl(ident, type, scope); :}
+    | FUNCTION IDENT:ident L_PAREN parameters:params R_PAREN COLON type:type scope:scope
+      {: RESULT = new RoutineDecl(ident, type, params, scope); :}
+    | PROCEDURE IDENT:ident scope:scope                // declare procedure
+      {: RESULT = new RoutineDecl(ident, scope); :}
+    | PROCEDURE IDENT:ident L_PAREN parameters:params R_PAREN scope:scope
+      {: RESULT = new RoutineDecl(ident, params, scope); :}
     ;
 
 variablenames
@@ -244,20 +248,24 @@ compareExpn
     ;
 
 arithExpn
-    ::= term                        // expressions, associate + , - left-to-right
-    |   arithExpn PLUS term
-    |   arithExpn MINUS term
+    ::= term:term {: RESULT = term; :}                        // expressions, associate + , - left-to-right
+    |   arithExpn:left PLUS term:right
+        {: RESULT = new ArithExpn("+", left, right); :}
+    |   arithExpn:left MINUS term:right
+        {: RESULT = new ArithExpn("-", left, right); :}
     ;
 
 term
     ::= factor                      // terms, associate * , / left-to-right
-    |   term TIMES factor
-    |   term DIVIDE factor
+    |   term:left TIMES factor:right
+        {: RESULT = new ArithExpn("*", left, right); :}
+    |   term:left DIVIDE factor:right
+        {: RESULT = new ArithExpn("/", left, right); :}
     ;
 
 factor
-    ::= primary                     // unary minus
-    |   MINUS factor
+    ::= primary:primary {: RESULT = primary; :}                     // unary minus
+    |   MINUS factor:fact {: RESULT = new UnaryMinusExpn(fact); :}
     ;
 
 primary
