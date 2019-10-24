@@ -50,10 +50,8 @@ terminal String     TEXTCONST;
 */
 
 nonterminal	variablenames,		output	;
-nonterminal	variable			;
 nonterminal	variablename 			;
 nonterminal	inputs, outputs;
-nonterminal	conjunction, negation;
 
 nonterminal Program program;
 nonterminal Scope scope;
@@ -62,14 +60,15 @@ nonterminal Stmt statement, matchedStatement, unmatchedStatement;
 nonterminal ProcedureCallStmt procedureCall;
 nonterminal ASTList<Stmt> statements;
 
-nonterminal Declaration declaration, parameter;
+nonterminal Declaration declaration;
 nonterminal ASTList<Declaration> declarations;
+nonterminal ScalarDecl parameter;
 nonterminal ASTList<ScalarDecl> parameters;
 
 nonterminal Expn expression, arithExpn, term, factor, primary;
+nonterminal Expn conjunction, negation, compareExpn, variable;
 nonterminal ASTList<Expn> arguments;
 nonterminal ConstExpn constant;
-nonterminal CompareExpn compareExpn;
 
 nonterminal Type type;
 
@@ -214,41 +213,50 @@ arguments
     ;
 
 parameters
-    ::= parameter                   // list of function/procedure formal parameters
-    |   parameters COMMA parameter
+    // list of function/procedure formal parameters
+    ::= parameter:param {: RESULT = new ASTList<ScalarDecl>(param); :}
+    |   parameters:params COMMA parameter:param {: RESULT = params.append(param); :}
     ;
 
 parameter
-    ::= IDENT COLON type            // declare one parameter
+    ::= IDENT:ident COLON type:type {: RESULT = new ScalarDecl(ident, type); :}// declare one parameter
     ;
 
 expression
-    ::= conjunction                 // disjunctions, associate left-to-right
-    |   expression OR conjunction
+    ::= conjunction:conj {: RESULT = conj; :}               // disjunctions, associate left-to-right
+    |   expression:left OR conjunction:right
+        {: RESULT = new BoolExpn("or", left, right); :}
     ;
 
 conjunction
-    ::= negation                    // conjunctions, associate left-to-right
-    |   conjunction AND negation
+    ::= negation:neg {: RESULT = neg; :}                // conjunctions, associate left-to-right
+    |   conjunction:left AND negation:right
+        {: RESULT = new BoolExpn("and", left, right); :}
     ;
 
 negation
-    ::= compareExpn                 // negations
-    |   NOT negation
+    ::= compareExpn:compexpn {: RESULT = compexpn; :}          // negations
+    |   NOT negation:neg {: RESULT = new NotExpn(neg); :}
     ;
 
 compareExpn
-    ::= arithExpn                                   // comparisons, do not associate
-    |   arithExpn EQUAL arithExpn
-    |   arithExpn NOT EQUAL arithExpn
-    |   arithExpn LESS arithExpn
-    |   arithExpn LESS EQUAL arithExpn
-    |   arithExpn GREATER arithExpn
-    |   arithExpn GREATER EQUAL arithExpn
+    ::= arithExpn:arith {: RESULT = arith; :}  // comparisons, do not associate
+    |   arithExpn:left EQUAL arithExpn:right
+        {: RESULT = new EqualsExpn("=", left, right); :}
+    |   arithExpn:left NOT EQUAL arithExpn:right
+        {: RESULT = new EqualsExpn("not =", left, right); :}
+    |   arithExpn:left LESS arithExpn:right
+        {: RESULT = new CompareExpn("<", left, right); :}
+    |   arithExpn:left LESS EQUAL arithExpn:right
+        {: RESULT = new CompareExpn("<=", left, right); :}
+    |   arithExpn:left GREATER arithExpn:right
+        {: RESULT = new CompareExpn(">", left, right); :}
+    |   arithExpn:left GREATER EQUAL arithExpn:right
+        {: RESULT = new CompareExpn(">=", left, right); :}
     ;
 
 arithExpn
-    ::= term:term {: RESULT = term; :}                        // expressions, associate + , - left-to-right
+    ::= term:term {: RESULT = term; :} // expressions, associate + , - left-to-right
     |   arithExpn:left PLUS term:right
         {: RESULT = new ArithExpn("+", left, right); :}
     |   arithExpn:left MINUS term:right
@@ -256,7 +264,7 @@ arithExpn
     ;
 
 term
-    ::= factor                      // terms, associate * , / left-to-right
+    ::= factor:fact {: RESULT = fact; :}  // terms, associate * , / left-to-right
     |   term:left TIMES factor:right
         {: RESULT = new ArithExpn("*", left, right); :}
     |   term:left DIVIDE factor:right
@@ -269,11 +277,13 @@ factor
     ;
 
 primary
-    ::= constant:constant {: RESULT = constant; :}                                                            // integer or boolean constant
-    |   variable                                                            // scalar, array variable or function call
-    |   IDENT L_PAREN arguments R_PAREN                                     // function call
-    |   L_PAREN expression R_PAREN                                          // parenthesized expression
-    |   L_PAREN expression QUESTION expression COLON expression R_PAREN     // conditional expression
+    ::= constant:constant {: RESULT = constant; :}                          // integer or boolean constant
+    |   variable:variable {: RESULT = variable; :}                          // scalar, array variable or function call
+    |   IDENT:ident L_PAREN arguments:args R_PAREN                          // function call
+        {: RESULT = new FunctionCallExpn(ident, args); :}
+    |   L_PAREN expression:expr R_PAREN {: RESULT = expr; :}                // parenthesized expression
+    |   L_PAREN expression:cond QUESTION expression:tval COLON expression:fval R_PAREN     // conditional expression
+        {: RESULT = new ConditionalExpn(cond, tval, fval); :}
     ;
 
 constant
@@ -283,7 +293,10 @@ constant
     ;
 
 variable
-    ::= IDENT                                                               // scalar variable or function call
-    |   IDENT L_SQUARE expression R_SQUARE                                  // element of 1-dimensional array
-    |   IDENT L_SQUARE expression COMMA expression R_SQUARE                 // element of 2-dimensional array;
+    ::= IDENT:ident              // scalar variable or function call
+        {: RESULT = new FunctionCallExpn(ident, new ASTList<Expn>()); :}
+    |   IDENT:ident L_SQUARE expression:sub1 R_SQUARE                       // element of 1-dimensional array
+        {: RESULT = new SubsExpn(ident, sub1); :}
+    |   IDENT:ident L_SQUARE expression:sub1 COMMA expression:sub2 R_SQUARE // element of 2-dimensional array;
+        {: RESULT = new SubsExpn(ident, sub1, sub2); :}
     ;

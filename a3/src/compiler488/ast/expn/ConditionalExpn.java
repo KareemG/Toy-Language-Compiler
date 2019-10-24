@@ -9,6 +9,14 @@ public class ConditionalExpn extends Expn {
 
 	private Expn falseValue; // Otherwise, the value is this.
 
+	public ConditionalExpn(Expn condition, Expn trueValue, Expn falseValue) {
+		super();
+
+		this.condition = condition;
+		this.trueValue = trueValue;
+		this.falseValue = falseValue;
+	}
+
 	/** Returns a string that describes the conditional expression. */
 	@Override
 	public String toString() {
