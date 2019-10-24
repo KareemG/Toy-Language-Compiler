@@ -49,8 +49,8 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
-nonterminal	variablenames;
-nonterminal	variablename;
+nonterminal ASTList<DeclarationPart> variablenames;
+nonterminal DeclarationPart variablename;
 nonterminal	inputs;
 
 nonterminal Program program;
@@ -155,7 +155,8 @@ procedureCall
     ;
 
 declaration
-    ::= VAR variablenames COLON type                                // declare scalar/array variables
+    ::= VAR variablenames:names COLON type:t                                // declare scalar/array variables
+      {: RESULT = new MultiDeclarations(t, names); :}
     | FUNCTION IDENT:ident COLON type:type scope:scope // declare function
       {: RESULT = new RoutineDecl(ident, type, scope); :}
     | FUNCTION IDENT:ident L_PAREN parameters:params R_PAREN COLON type:type scope:scope
@@ -167,24 +168,24 @@ declaration
     ;
 
 variablenames
-    ::= variablename                                // list of variables being declared
-    |   variablenames COMMA variablename
+    ::= variablename:name                           {: RESULT = new ASTList<DeclarationPart>(name); :} // list of variables being declared
+    |   variablenames:names COMMA variablename:name {: RESULT = names.append(name); :}
     ;
 
 variablename
-    ::= IDENT                                       // scalar variable
-    |   IDENT L_SQUARE bound R_SQUARE               // 1-dimension array variable
-    |   IDENT L_SQUARE bound COMMA bound R_SQUARE   // 2-dimensional array variable
+    ::= IDENT:name                                           {: RESULT = new ScalarDeclPart(name); :} // scalar variable
+    |   IDENT:name L_SQUARE bound:b R_SQUARE                 {: RESULT = new ArrayDeclPart(name, b); :} // 1-dimension array variable
+    |   IDENT:name L_SQUARE bound:b1 COMMA bound:b2 R_SQUARE {: RESULT = new ArrayDeclPart(name, b1, b2); :} // 2-dimensional array variable
     ;
 
 bound
-    ::= INTCONST                                    // positive array bound
-    |   generalBound DOT DOT generalBound           // upper and lower bounds
+    ::= INTCONST:b                              {: Integer[] bnd = new Integer[2]; bnd[0] =  1; bnd[1] =  b; RESULT = bnd; :} // positive array bound
+    |   generalBound:b1 DOT DOT generalBound:b2 {: Integer[] bnd = new Integer[2]; bnd[0] = b1; bnd[1] = b2; RESULT = bnd; :} // upper and lower bounds
     ;
 
 generalBound
-    ::= INTCONST                    // positive integer bounds
-    |   MINUS INTCONST              // negative integer bounds
+    ::= INTCONST:b       {: RESULT =  b; :} // positive integer bounds
+    |   MINUS INTCONST:b {: RESULT = -b; :} // negative integer bounds
     ;
 
 type
