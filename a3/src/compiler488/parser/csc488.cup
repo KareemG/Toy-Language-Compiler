@@ -102,12 +102,12 @@ start with program;
     will act on the production.
  */
 
-program ::= scope {: RESULT = new Program(); :}                           // the main program
+program ::= scope:scp {: RESULT = new Program(scp); :}                           // the main program
     ;
 
 scope
-    ::= L_CURLEY declarations:decls statements:stmts R_CURLEY {: RESULT = new Scope(); :}  // scope with declarations and statements
-    |   L_CURLEY statements R_CURLEY {: RESULT = new Scope(); :}                // scope with statements only
+    ::= L_CURLEY declarations:decls statements:stmts R_CURLEY {: RESULT = new Scope(decls, stmts); :}  // scope with declarations and statements
+    |   L_CURLEY statements:stmts R_CURLEY {: RESULT = new Scope(stmts); :}                // scope with statements only
     |   L_CURLEY R_CURLEY {: RESULT = new Scope(); :}                           // empty scope
     ;
 
@@ -139,7 +139,7 @@ matchedStatement
     |   RETURN                                                      // return statements
     |   WRITE outputs                                               // input/output statements
     |   READ inputs
-    |   procedureCall                                               // procedure call
+    |   procedureCall:call {: RESULT = call; :} // procedure call
     |   scope                                                       // embedded scope
     ;
 
