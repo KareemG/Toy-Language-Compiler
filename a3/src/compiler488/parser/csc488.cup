@@ -10,6 +10,7 @@ import compiler488.ast.stmt.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.type.*;
 import compiler488.ast.decl.*;
+import compiler488.ast.Readable;
 
 /*
     SYMBOL LISTS
@@ -51,7 +52,7 @@ terminal String     TEXTCONST;
 
 nonterminal ASTList<DeclarationPart> variablenames;
 nonterminal DeclarationPart variablename;
-nonterminal	inputs;
+nonterminal ASTList<Readable> inputs;
 
 nonterminal Program program;
 nonterminal Scope scope;
@@ -139,7 +140,7 @@ matchedStatement
     |   RETURN WITH expression
     |   RETURN                                                      // return statements
     |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
-    |   READ inputs
+    |   READ inputs:args {: RESULT = new ReadStmt(args); :}
     |   procedureCall:call {: RESULT = call; :} // procedure call
     |   scope                                                       // embedded scope
     ;
@@ -207,8 +208,8 @@ output
     ;
 
 inputs
-    ::= variable                    // list of variables being read into
-    |   inputs COMMA variable
+    ::= variable:var {: RESULT = new ASTList<Readable>((Readable) var); :} // list of variables being read into
+    |   inputs:list COMMA variable:var {: RESULT = list.append((Readable) var); :}
     ;
 
 arguments
@@ -298,7 +299,7 @@ constant
 
 variable
     ::= IDENT:ident              // scalar variable or function call
-        {: RESULT = new FunctionCallExpn(ident, new ASTList<Expn>()); :}
+        {: RESULT = new IdentExpn(ident); :}
     |   IDENT:ident L_SQUARE expression:sub1 R_SQUARE                       // element of 1-dimensional array
         {: RESULT = new SubsExpn(ident, sub1); :}
     |   IDENT:ident L_SQUARE expression:sub1 COMMA expression:sub2 R_SQUARE // element of 2-dimensional array;

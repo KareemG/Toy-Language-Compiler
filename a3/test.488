@@ -1,12 +1,7 @@
 
 {
-    procedure hello_world
-    {
-        write "hello world"
-    }
+    var age : integer
 
-    var a: integer
-    var b, c[3], d[4..10]: integer
-
-    hello_world
+    write "how old are you?"
+    read age
 }
