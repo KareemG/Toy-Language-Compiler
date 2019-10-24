@@ -67,7 +67,8 @@ nonterminal ASTList<ScalarDecl> parameters;
 
 nonterminal Expn expression, arithExpn, term, factor, primary, output;
 nonterminal Expn conjunction, negation, compareExpn, variable;
-nonterminal ASTList<Expn> arguments, outputs;
+nonterminal ASTList<Expn> arguments;
+nonterminal ASTList<Printable> outputs;
 nonterminal ConstExpn constant;
 
 nonterminal Type type;
@@ -137,7 +138,7 @@ matchedStatement
     |   EXIT INTCONST WHEN expression
     |   RETURN WITH expression
     |   RETURN                                                      // return statements
-    |   WRITE outputs                                               // input/output statements
+    |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
     |   READ inputs
     |   procedureCall:call {: RESULT = call; :} // procedure call
     |   scope                                                       // embedded scope
@@ -193,7 +194,7 @@ type
 
 outputs
     // list of output expressions
-    ::= output:output {: RESULT = new ASTList<Expn>(output); :}
+    ::= output:output {: RESULT = new ASTList<Printable>(output); :}
     |   outputs:outputs COMMA output:output
         {: RESULT = outputs.append(output); :}
     ;

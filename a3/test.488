@@ -2,6 +2,7 @@
 {
     procedure hello_world
     {
+        write "hello world"
     }
 
     hello_world
