@@ -129,16 +129,16 @@ statement
     ;
 
 matchedStatement
-    ::= variable COLON EQUAL expression                             // assignment statement
+    ::= variable:lval COLON EQUAL expression:rval {: RESULT = new AssignStmt(lval, rval); :} // assignment statement
     |   IF expression:cond THEN matchedStatement:if_body ELSE matchedStatement:else_body {: RESULT = new IfStmt(cond, if_body, else_body); :} // if statements
-    |   WHILE expression DO statement                               // while statement
-    |   REPEAT statements UNTIL expression                           // repeat statement
-    |   EXIT                                                        // exit statements
-    |   EXIT INTCONST
-    |   EXIT WHEN expression
-    |   EXIT INTCONST WHEN expression
-    |   RETURN WITH expression
-    |   RETURN                                                      // return statements
+    |   WHILE expression:cond DO statement:body {: RESULT = new WhileDoStmt(cond, new ASTList<Stmt>(body)); :} // while statement
+    |   REPEAT statements:body UNTIL expression:cond {: RESULT = new RepeatUntilStmt(cond, body); :} // repeat statement
+    |   EXIT {: RESULT = new ExitStmt(); :} // exit statements
+    |   EXIT INTCONST:level {: RESULT = new ExitStmt(level); :}
+    |   EXIT WHEN expression:expn {: RESULT = new ExitStmt(expn); :}
+    |   EXIT INTCONST:level WHEN expression:expn {: RESULT = new ExitStmt(expn, level); :}
+    |   RETURN WITH expression:expn {: RESULT = new ReturnStmt(expn); :}
+    |   RETURN {: RESULT = new ReturnStmt(); :} // return statements
     |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
     |   READ inputs:args {: RESULT = new ReadStmt(args); :}
     |   procedureCall:call {: RESULT = call; :} // procedure call
