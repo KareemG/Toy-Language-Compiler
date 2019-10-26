@@ -1,6 +1,7 @@
 package compiler488.symbol;
 
 import java.io.*;
+import java.util.*;
 
 /** Symbol Table
  *  This almost empty class is a framework for implementing
@@ -9,16 +10,22 @@ import java.io.*;
  *  Each implementation can change/modify/delete this class
  *  as they see fit.
  *
- *  @author  <B> PUT YOUR NAMES HERE </B>
+ *  @author  KyoKeun Park
  */
 
 public class SymbolTable {
+	private Hashtable symbols;
+	private SymbolTable prevScope = null;
 	
 	/** Symbol Table  constructor
          *  Create and initialize a symbol table 
 	 */
 	public SymbolTable  (){
 	
+	}
+	
+	public SymbolTable (SymbolTable prev) {
+		this.prevScope = prev;
 	}
 
 	/**  Initialize - called once by semantic analysis  
