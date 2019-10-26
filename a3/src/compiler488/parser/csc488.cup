@@ -287,7 +287,7 @@ primary
     |   IDENT:ident L_PAREN arguments:args R_PAREN                          // function call
         {: RESULT = new FunctionCallExpn(ident, args); :}
     |   L_PAREN expression:expr R_PAREN {: RESULT = expr; :}                // parenthesized expression
-    |   L_PAREN expression:cond QUESTION expression:tval COLON expression:fval R_PAREN     // conditional expression
+    |   L_PAREN expression:cond QUESTION expression:tval COLON expression:fval R_PAREN {: RESULT = new ConditionalExpn(cond, tval, fval); :} // conditional expression
         {: RESULT = new ConditionalExpn(cond, tval, fval); :}
     ;
 
