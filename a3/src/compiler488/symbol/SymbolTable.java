@@ -1,7 +1,6 @@
 package compiler488.symbol;
 
 import java.io.*;
-import java.util.*;
 import compiler488.ast.*;
 
 /** Symbol Table
@@ -15,14 +14,12 @@ import compiler488.ast.*;
  */
 
 public class SymbolTable {
-	private Hashtable<String, BaseAST> symbols = null;
-	private SymbolTable next;
-	
+	private ScopeNode root = null;
+
 	/** Symbol Table  constructor
          *  Create and initialize a symbol table 
 	 */
 	public SymbolTable  (){
-		this.Initialize();
 	}
 
 	/**  Initialize - called once by semantic analysis  
@@ -36,7 +33,6 @@ public class SymbolTable {
 	    *	Any additional symbol table initialization
 	    *  GOES HERE                                	
 	    */
-		symbols = new Hashtable<String, BaseAST>();
 	
 	}
 
@@ -57,50 +53,37 @@ public class SymbolTable {
  	 *  to implement the Symbol Table
 	 *  GO HERE.				
 	 */
-	ScopeNode root;
-
-	static class ScopeNode {
-		Hashtable<String, BaseAST> symbols;
-		ScopeNode next;
-
-		ScopeNode() {
-			symbols = new Hashtable<String, BaseAST>();
-			next = null;
-		}
-	}
 
 	/** Get a given key - value combination from the symbol table.
 	 *  If not present, asserts
 	 *  TODO: Maybe just throw an error here instead...
 	 */
-	public ASTBase Get(String key) {
-		assert(symbols.containsKey(key));
-		return symbols.get(key);
+	public BaseAST Get(String key) {
+		return this.root.Get(key);
 	}
 
 	/** Put a given key - value combination into the symbol table
 	 *  Returns 0 if successful, 1 if not.
 	 *  TODO: Maybe just throw an error here instead...
 	 */
-	public void Put(String key, ASTBase val) {
-		assert(!symbols.containsKey(key));
-		symbols.put(key, val);
+	public void Put(String key, BaseAST val) {
+		this.root.Put(key, val);
 	}
 
+	/** Call when entering a new scope.
+	 *  Creates another hashtable/ScopeNode, and pushes it on top of
+	 *  stack of nodes.
+	 */
 	public void EnterScope() {
-		ScopeNode newScope = new ScopeNode();
-		if (root == null) {
-			root = newScope;
-		} else {
-			ScopeNode tmp = root;
-			root = newScope;
-			root.next = tmp;
-		}
+		ScopeNode newScope = new ScopeNode(this.root);
+		this.root = newScope;
 	}
 
 	public void ExitScope() {
-		assert(root != null);
-		root = root.next;
+		assert(this.root != null);
+		ScopeNode tmp = this.root;
+		this.root = root.GetParent();
+		this.root.AddArchive(tmp);
 	}
 
 }
