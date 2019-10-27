@@ -24,9 +24,6 @@ public interface AST_Visitor
     public void visitEnter(LoopingStmt node);
     public void visitLeave(LoopingStmt node);
 
-    public void visitEnter(WhileDoStmt node);
-    public void visitLeave(WhileDoStmt node);
-
     public void visit(ExitStmt node);
     
     public void visit(ReturnStmt node);

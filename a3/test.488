@@ -1,9 +1,11 @@
 
 {
-    function add : integer
+    while true do
     {
-        a := b + c
+        repeat
+        {
+            exit 3
+        }
+        until true
     }
-    
-    add
 }

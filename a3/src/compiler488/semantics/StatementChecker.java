@@ -76,16 +76,6 @@ public class StatementChecker extends BaseVisitor
         current.loop_count --;
     }
 
-    public void visitEnter(WhileDoStmt node)
-    {
-        current.loop_count ++;
-    }
-
-    public void visitLeave(WhileDoStmt node)
-    {
-        current.loop_count --;
-    }
-
     public void visit(ExitStmt node)
     {
         if(current == null || current.loop_count == 0)
