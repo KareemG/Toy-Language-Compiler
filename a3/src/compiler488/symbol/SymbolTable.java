@@ -38,7 +38,7 @@ public class SymbolTable {
 	}
 
 	/**  Finalize - called once by Semantics at the end of compilation
-	 *              May be unnecessary 		
+	 *              May be unnecessary
 	 */
 	public void Finalize(){
 	

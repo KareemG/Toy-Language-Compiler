@@ -6,9 +6,9 @@ import compiler488.ast.*;
 
 /** Scope Node
  *  This will represent a single instance of a scope.
- * 
+ *
  *  Holds currently declared items within a given symbol.
- * 
+ *
  *  Also has access to its parent so we can look back for any
  *  previously declared variables or functions
  */
@@ -19,13 +19,15 @@ class ScopeNode {
 
     ScopeNode() {
         this.symbols = new Hashtable<String, BaseAST>();
+        this.archive = new ArrayList<ScopeNode>();
     }
 
     ScopeNode(ScopeNode parent) {
         this.symbols = new Hashtable<String, BaseAST>();
+        this.archive = new ArrayList<ScopeNode>();
         this.parent = parent;
     }
-    
+
     public int Put(String key, BaseAST value) {
         if (this.symbols.containsKey(key)) {
             return 1;
