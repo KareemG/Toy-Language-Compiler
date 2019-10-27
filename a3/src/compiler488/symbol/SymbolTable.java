@@ -14,12 +14,13 @@ import compiler488.ast.*;
  */
 
 public class SymbolTable {
-	private ScopeNode root = null;
+	private ScopeNode root;
 
 	/** Symbol Table  constructor
          *  Create and initialize a symbol table 
 	 */
-	public SymbolTable  (){
+	public SymbolTable(){
+		this.root = new ScopeNode(null);
 	}
 
 	/**  Initialize - called once by semantic analysis  
@@ -32,7 +33,7 @@ public class SymbolTable {
 	   /**   Initialize the symbol table             
 	    *	Any additional symbol table initialization
 	    *  GOES HERE                                	
-	    */
+		*/
 	
 	}
 
@@ -56,18 +57,25 @@ public class SymbolTable {
 
 	/** Get a given key - value combination from the symbol table.
 	 *  If not present, asserts
-	 *  TODO: Maybe just throw an error here instead...
 	 */
 	public BaseAST Get(String key) {
-		return this.root.Get(key);
+		ScopeNode traverse = root;
+		while (traverse != null) {
+			BaseAST value = traverse.Get(key);
+			if (value != null) {
+				return value;
+			}
+			traverse = traverse.GetParent();
+		}
+		assert(false);
+		return null;
 	}
 
 	/** Put a given key - value combination into the symbol table
-	 *  Returns 0 if successful, 1 if not.
-	 *  TODO: Maybe just throw an error here instead...
+	 *  Asserts if the key is already present
 	 */
 	public void Put(String key, BaseAST val) {
-		this.root.Put(key, val);
+		assert(this.root.Put(key, val) == 0);
 	}
 
 	/** Call when entering a new scope.
@@ -79,6 +87,15 @@ public class SymbolTable {
 		this.root = newScope;
 	}
 
+	/** Call when exiting the current scope.
+	 * 
+	 *  Sets the root to current scope's parent.
+	 * 
+	 *  Gives the parent reference to the current scope.
+	 *  This may not seem necessary, but may require in the future if 
+	 *  we need to create a symbol file or something like that.
+	 *  Can always be removed if deemed unnecessary
+	 */
 	public void ExitScope() {
 		assert(this.root != null);
 		ScopeNode tmp = this.root;

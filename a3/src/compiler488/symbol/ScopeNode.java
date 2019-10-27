@@ -4,30 +4,38 @@ import java.io.*;
 import java.util.*;
 import compiler488.ast.*;
 
+/** Scope Node
+ *  This will represent a single instance of a scope.
+ * 
+ *  Holds currently declared items within a given symbol.
+ * 
+ *  Also has access to its parent so we can look back for any
+ *  previously declared variables or functions
+ */
 class ScopeNode {
-    Hashtable<String, BaseAST> symbols;
-    ArrayList<ScopeNode> archive;
-    ScopeNode parent = null;
+    private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
+    private ArrayList<ScopeNode> archive; // essentially children of given scope
+    private ScopeNode parent = null; // reference to parent
 
     ScopeNode() {
-        symbols = new Hashtable<String, BaseAST>();
+        this.symbols = new Hashtable<String, BaseAST>();
     }
 
     ScopeNode(ScopeNode parent) {
-        symbols = new Hashtable<String, BaseAST>();
+        this.symbols = new Hashtable<String, BaseAST>();
         this.parent = parent;
     }
     
     public int Put(String key, BaseAST value) {
-        if (symbols.containsKey(key)) {
+        if (this.symbols.containsKey(key)) {
             return 1;
         }
-        symbols.put(key, value);
+        this.symbols.put(key, value);
         return 0;
     }
 
     public BaseAST Get(String key) {
-        return symbols.get(key);
+        return this.symbols.get(key);
     }
 
     public void AddArchive(ScopeNode node) {
