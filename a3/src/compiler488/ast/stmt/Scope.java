@@ -1,8 +1,12 @@
 package compiler488.ast.stmt;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.decl.Declaration;
+
+import compiler488.semantics.*;
 
 /**
  * Represents the declarations and statements of a scope construct.
@@ -55,5 +59,24 @@ public class Scope extends Stmt {
 			statements.prettyPrintBlock(p);
 		}
 		p.print(" } ");
+	}
+
+	public void accept(AST_Visitor visitor)
+	{
+		visitor.visitEnter(this);
+		
+		ListIterator<Declaration> decl_it = declarations.listIterator();
+		while(decl_it.hasNext())
+		{
+			decl_it.next().accept(visitor);
+		}
+		
+		ListIterator<Stmt> stmt_it = statements.listIterator();
+		while(stmt_it.hasNext())
+		{
+			stmt_it.next().accept(visitor);
+		}
+		
+		visitor.visitLeave(this);
 	}
 }

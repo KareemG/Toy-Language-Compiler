@@ -2,6 +2,8 @@ package compiler488.ast.stmt;
 
 import compiler488.ast.expn.*;
 
+import compiler488.semantics.AST_Visitor;
+
 /**
  * Represents the command to exit from a loop.
  */
@@ -65,5 +67,10 @@ public class ExitStmt extends Stmt {
 
 	public void setLevel(Integer level) {
 		this.level = level;
+	}
+
+	public void accept(AST_Visitor visitor)
+	{
+		visitor.visit(this);
 	}
 }

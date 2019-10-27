@@ -3,6 +3,8 @@ package compiler488.ast.stmt;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
 
+import compiler488.semantics.AST_Visitor;
+
 /**
  * The command to return from a function.
  */
@@ -42,5 +44,10 @@ public class ReturnStmt extends Stmt {
 			p.print(" with ");
 			value.prettyPrint(p);
 		}
+	}
+
+	public void accept(AST_Visitor visitor)
+	{
+		visitor.visit(this);
 	}
 }

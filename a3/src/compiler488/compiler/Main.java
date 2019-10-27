@@ -18,6 +18,8 @@ import compiler488.symbol.SymbolTable;
 import compiler488.codegen.CodeGen;
 import compiler488.runtime.*;
 
+import compiler488.semantics.*;
+
 /**
  * This class serves as the main driver for the CSC488S compiler.<BR>
  * It accepts user options and coordinates overall control flow. The main flow
@@ -382,21 +384,13 @@ public class Main {
 	 *            the Abstract Syntax Tree produced during parsing
 	 */
 	private static void semanticAnalysis(Program programAST) {
-		try {
-			// INSERT CODE HERE TO DO SEMANTIC ANALYSIS
-			// e.g.
-			//
-			// ASTVisitor visitor = new Semantics();
-			// programAST.accept(visitor);
-			//
-			// or
-			//
-			// programAST.doSemantics() ;
-			//
-			// or
-			//
-			// Semantics.doIt( programAST );
-		} catch (Exception e) {
+		try
+		{
+			StatementChecker checker = new StatementChecker();
+			programAST.accept(checker);
+		}
+		catch (Exception e)
+		{
 			System.err.println("Exception during Semantic Analysis");
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			e.printStackTrace();

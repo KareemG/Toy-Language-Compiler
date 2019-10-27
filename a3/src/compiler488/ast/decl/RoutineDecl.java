@@ -5,6 +5,8 @@ import compiler488.ast.PrettyPrinter;
 import compiler488.ast.stmt.Scope;
 import compiler488.ast.type.Type;
 
+import compiler488.semantics.AST_Visitor;
+
 /**
  * Represents the declaration of a function or procedure.
  */
@@ -116,5 +118,12 @@ public class RoutineDecl extends Declaration {
 			p.print(" ");
 			body.prettyPrint(p);
 		}
+	}
+
+	public void accept(AST_Visitor visitor)
+	{
+		visitor.visitEnter(this);
+		this.body.accept(visitor);
+		visitor.visitLeave(this);
 	}
 }
