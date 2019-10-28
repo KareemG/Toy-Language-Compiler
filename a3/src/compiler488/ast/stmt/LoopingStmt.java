@@ -39,7 +39,7 @@ public abstract class LoopingStmt extends Stmt {
 	public void accept(AST_Visitor visitor)
 	{
 		visitor.visitEnter(this);
-		
+
 		ListIterator<Stmt> stmt_it = body.listIterator();
 		while(stmt_it.hasNext())
 		{

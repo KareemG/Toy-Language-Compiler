@@ -46,8 +46,11 @@ public class ReturnStmt extends Stmt {
 		}
 	}
 
-	public void accept(AST_Visitor visitor)
-	{
-		visitor.visit(this);
+	public void accept(AST_Visitor visitor) {
+		visitor.visitEnter(this);
+		if (this.value != null) {
+			this.value.accept(visitor);
+		}
+		visitor.visitLeave(this);
 	}
 }
