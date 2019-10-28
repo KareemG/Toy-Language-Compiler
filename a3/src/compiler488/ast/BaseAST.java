@@ -1,5 +1,7 @@
 package compiler488.ast;
 
+import compiler488.semantics.AST_Visitor;
+
 /**
  * Base class implementation for the AST hierarchy.
  *
@@ -27,5 +29,10 @@ public abstract class BaseAST implements AST {
 	@Override
 	public void prettyPrint(PrettyPrinter p) {
 		p.print(toString());
+	}
+
+	// base method for visitors
+	public void accept(AST_Visitor visitor) {
+		// do nothing
 	}
 }
