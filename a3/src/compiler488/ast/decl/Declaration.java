@@ -2,6 +2,7 @@ package compiler488.ast.decl;
 
 import compiler488.ast.BaseAST;
 import compiler488.ast.type.Type;
+import compiler488.semantics.AST_Visitor;
 
 /**
  * The common features of declarations.
@@ -26,5 +27,12 @@ public abstract class Declaration extends BaseAST {
 
 	public Type getType() {
 		return type;
+	}
+
+	@Override
+	public void accept(AST_Visitor visitor) {
+		visitor.visitEnter(this);
+		this.type.accept(visitor);
+		visitor.visitLeave(this);
 	}
 }

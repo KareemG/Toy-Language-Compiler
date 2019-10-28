@@ -1,6 +1,7 @@
 package compiler488.ast.decl;
 
 import compiler488.ast.BaseAST;
+import compiler488.semantics.AST_Visitor;
 
 /**
  * The common features of declarations' parts.
@@ -17,5 +18,10 @@ public abstract class DeclarationPart extends BaseAST {
 
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public void accept(AST_Visitor visitor) {
+		visitor.visit(this);
 	}
 }
