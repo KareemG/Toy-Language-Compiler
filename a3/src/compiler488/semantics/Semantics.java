@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
 import compiler488.ast.BaseAST;
+import compiler488.ast.decl.DeclarationPart;
 import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
 import compiler488.ast.stmt.AssignStmt;
@@ -167,7 +169,10 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visitLeave(MultiDeclarations decls) {
-		semanticAction(47, decls);
+		ListIterator<DeclarationPart> dec_part = decls.getParts().listIterator();
+		while(dec_part.hasNext()) {
+			semanticAction(47, dec_part.next(), decls.getType());
+		}
 	}
 
 	// ===== STATEMENTS ===== //

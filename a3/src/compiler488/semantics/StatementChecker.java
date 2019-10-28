@@ -3,7 +3,7 @@ package compiler488.semantics;
 import compiler488.ast.decl.*;
 import compiler488.ast.stmt.*;
 
-public class StatementChecker extends BaseVisitor
+public class StatementChecker extends AST_Visitor.Default
 {
     private class Entry
     {
