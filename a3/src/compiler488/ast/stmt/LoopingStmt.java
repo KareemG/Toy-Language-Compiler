@@ -36,6 +36,7 @@ public abstract class LoopingStmt extends Stmt {
 		return body;
 	}
 
+	@Override
 	public void accept(AST_Visitor visitor)
 	{
 		if (this.expn != null) {
@@ -43,7 +44,7 @@ public abstract class LoopingStmt extends Stmt {
 		}
 
 		visitor.visitEnter(this);
-		
+
 		ListIterator<Stmt> stmt_it = body.listIterator();
 		while(stmt_it.hasNext())
 		{

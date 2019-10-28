@@ -1,8 +1,11 @@
 package compiler488.ast.stmt;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
+import compiler488.semantics.AST_Visitor;
 
 /**
  * Represents calling a procedure.
@@ -49,5 +52,15 @@ public class ProcedureCallStmt extends Stmt {
 			arguments.prettyPrintCommas(p);
 			p.print(")");
 		}
+	}
+
+	@Override
+	public void accept(AST_Visitor visitor) {
+		visitor.visitEnter(this);
+		ListIterator<Expn> args = arguments.listIterator();
+		while(args.hasNext()) {
+			args.next().accept(visitor);
+		}
+		visitor.visitLeave(this);
 	}
 }

@@ -1,5 +1,7 @@
 package compiler488.ast.decl;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.stmt.Scope;
@@ -120,9 +122,17 @@ public class RoutineDecl extends Declaration {
 		}
 	}
 
+	@Override
 	public void accept(AST_Visitor visitor)
 	{
 		visitor.visitEnter(this);
+		ListIterator<ScalarDecl> param_lst = parameters.listIterator();
+		if (this.type != null) {
+			this.type.accept(visitor);
+		}
+		while(param_lst.hasNext()) {
+			param_lst.next().accept(visitor);
+		}
 		this.body.accept(visitor);
 		visitor.visitLeave(this);
 	}

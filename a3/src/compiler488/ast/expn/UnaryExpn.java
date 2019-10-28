@@ -1,6 +1,7 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.PrettyPrinter;
+import compiler488.semantics.AST_Visitor;
 
 /**
  * The common features of unary expressions.
@@ -46,5 +47,12 @@ public abstract class UnaryExpn extends Expn {
 		operand.prettyPrint(p);
 		p.print(")");
 
+	}
+
+	@Override
+	public void accept(AST_Visitor visitor) {
+		visitor.visitEnter(this);
+		this.operand.accept(visitor);
+		visitor.visitLeave(this);
 	}
 }

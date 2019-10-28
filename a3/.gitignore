@@ -5,3 +5,6 @@ BaseParser.java
 Lexer.java
 sym.java
 doc/compiler488.ps
+jdt.ls-java-project
+.project
+.vscode
