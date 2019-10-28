@@ -17,13 +17,13 @@ public class Scope extends Stmt {
 	protected ASTList<Stmt> statements;
 
 	public Scope() {
-		declarations = new ASTList<Declaration>();
-		statements = new ASTList<Stmt>();
+		declarations = null;
+		statements = null;
 	}
 
 	public Scope(ASTList<Stmt> stmts)
 	{
-		declarations = new ASTList<Declaration>();
+		declarations = null;
 		statements = stmts;
 	}
 

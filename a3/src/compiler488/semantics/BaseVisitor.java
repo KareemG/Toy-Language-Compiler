@@ -18,7 +18,8 @@ public class BaseVisitor implements AST_Visitor
     public void visit(Scope node)        { }
     public void visitLeave(Scope node)   { }
 
-    public void visitEnter(RoutineDecl node) { }
+    public void visitEnter(RoutineDecl node) {
+     }
     public void visitLeave(RoutineDecl node) { }
 
     public void visitEnter(LoopingStmt node) { }
