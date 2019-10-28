@@ -36,6 +36,7 @@ public class AssignStmt extends Stmt {
 		rval.prettyPrint(p);
 	}
 
+	@Override
 	public void accept(AST_Visitor visitor) {
 		visitor.visitEnter(this);
 		this.lval.accept(visitor);

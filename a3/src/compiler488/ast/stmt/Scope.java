@@ -61,6 +61,7 @@ public class Scope extends Stmt {
 		p.print(" } ");
 	}
 
+	@Override
 	public void accept(AST_Visitor visitor)
 	{
 		visitor.visitEnter(this);

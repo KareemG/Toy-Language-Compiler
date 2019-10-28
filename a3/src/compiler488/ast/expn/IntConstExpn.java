@@ -1,5 +1,7 @@
 package compiler488.ast.expn;
 
+import compiler488.semantics.AST_Visitor;
+
 /**
  * Represents a literal integer constant.
  */
@@ -22,5 +24,10 @@ public class IntConstExpn extends ConstExpn {
 	@Override
 	public String toString() {
 		return value.toString();
+	}
+
+	@Override
+	public void accept(AST_Visitor visitor) {
+		visitor.visit(this);
 	}
 }

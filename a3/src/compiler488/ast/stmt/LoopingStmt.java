@@ -36,6 +36,7 @@ public abstract class LoopingStmt extends Stmt {
 		return body;
 	}
 
+	@Override
 	public void accept(AST_Visitor visitor)
 	{
 		visitor.visitEnter(this);

@@ -1,5 +1,6 @@
 package compiler488.ast.expn;
 
+import compiler488.semantics.AST_Visitor;
 
 /**
  * Place holder for all binary expression where both operands must be integer
@@ -18,5 +19,13 @@ public class ArithExpn extends BinaryExpn {
                 (opSymbol == OP_MINUS) ||
                 (opSymbol == OP_TIMES) ||
                 (opSymbol == OP_DIVIDE));
+    }
+
+    @Override
+    public void accept(AST_Visitor visitor) {
+        visitor.visitEnter(this);
+        this.left.accept(visitor);
+        this.right.accept(visitor);
+        visitor.visitLeave(this);
     }
 }
