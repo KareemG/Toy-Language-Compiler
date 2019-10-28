@@ -2,7 +2,6 @@ package compiler488.semantics;
 
 import java.io.*;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,9 +9,11 @@ import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
 import compiler488.ast.BaseAST;
+import compiler488.ast.decl.ArrayDeclPart;
 import compiler488.ast.decl.DeclarationPart;
 import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
+import compiler488.ast.decl.ScalarDeclPart;
 import compiler488.ast.stmt.AssignStmt;
 import compiler488.ast.stmt.ExitStmt;
 import compiler488.ast.stmt.IfStmt;
@@ -21,6 +22,8 @@ import compiler488.ast.stmt.ProcedureCallStmt;
 import compiler488.ast.stmt.Program;
 import compiler488.ast.stmt.ReturnStmt;
 import compiler488.ast.stmt.Scope;
+import compiler488.ast.type.BooleanType;
+import compiler488.ast.type.IntegerType;
 import compiler488.symbol.SymbolTable;
 
 /**
@@ -116,6 +119,7 @@ public class Semantics extends AST_Visitor.Default {
 		return;
 	}
 
+	// ===== PROGRAM AND SCOPE ===== //
 	@Override
 	public void visitEnter(Program prog) {
 		semanticAction(0, prog);
@@ -124,7 +128,6 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(Program prog) {
 		semanticAction(1, prog);
 	}
-
 	@Override
 	public void visitEnter(Scope scope) {
 		if (scope.getDeclarations() != null) {
@@ -194,9 +197,21 @@ public class Semantics extends AST_Visitor.Default {
 		}
 	}
 
+	// ===== NON LEAF NODES ===== //
+
 	@Override
 	public void visitEnter(IfStmt ifStmt) {
 		semanticAction(30, ifStmt.getCondition());
+	}
+
+	@Override
+	public void visit(ArrayDeclPart arrPart) {
+		semanticAction(19, arrPart);
+	}
+
+	@Override
+	public void visit(ScalarDeclPart scaPart) {
+		semanticAction(10, scaPart);
 	}
 
 	@Override
@@ -218,6 +233,15 @@ public class Semantics extends AST_Visitor.Default {
 		} else {
 			semanticAction(52, retStmt);
 		}
+	}
+
+	@Override
+	public void visit(BooleanType boolType) {
+		semanticAction(20, boolType);
+	}
+	@Override
+	public void visit(IntegerType intType) {
+		semanticAction(21, intType);
 	}
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE

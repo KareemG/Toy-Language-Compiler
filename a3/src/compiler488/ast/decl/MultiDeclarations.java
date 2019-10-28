@@ -33,11 +33,11 @@ public class MultiDeclarations extends Declaration {
 	@Override
 	public void accept(AST_Visitor visitor) {
 		visitor.visitEnter(this);
-		this.type.accept(visitor);
 		ListIterator<DeclarationPart> elst = elements.listIterator();
 		while(elst.hasNext()) {
 			elst.next().accept(visitor);
 		}
+		this.type.accept(visitor);
 		visitor.visitLeave(this);
 	}
 }
