@@ -131,14 +131,37 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	@Override
-	public void visitLeave(Scope scope) { } // Nothing to do
-
-	@Override
-	public void visitEnter(RoutineDecl node) {
+	public void visitEnter(RoutineDecl routine) {
+		if(routine.getType() != null) { // Routine is a function
+			if(routine.getParameters() != null) {
+				semanticAction(4, routine);
+				semanticAction(14, routine);
+				semanticAction(15, routine);
+			} else {
+				semanticAction(11, routine);
+				semanticAction(4, routine);
+			}
+		} else { // Routine is a procedure
+			if(routine.getParameters() != null) {
+				semanticAction(8, routine);
+				semanticAction(14, routine);
+				semanticAction(18, routine);
+			} else {
+				semanticAction(17, routine);
+				semanticAction(18, routine);
+			}
+		}
 	}
 
 	@Override
-	public void visitLeave(RoutineDecl node) {
+	public void visitLeave(RoutineDecl routine) {
+		if(routine.getType() != null) {
+			semanticAction(5, routine);
+			semanticAction(54, routine);
+		} else {
+			semanticAction(9, routine);
+		}
+		semanticAction(13, routine);
 	}
 
 	@Override
@@ -147,9 +170,6 @@ public class Semantics extends AST_Visitor.Default {
 			semanticAction(30, loopStmt.getExpn());
 		}
 	}
-
-	@Override
-	public void visitLeave(LoopingStmt node) { } // Nothing to do
 
 	@Override
 	public void visit(ExitStmt exitStmt) {
