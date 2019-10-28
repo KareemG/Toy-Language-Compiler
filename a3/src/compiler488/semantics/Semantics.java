@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import compiler488.ast.BaseAST;
+import compiler488.ast.decl.MultiDeclarations;
 import compiler488.ast.decl.RoutineDecl;
+import compiler488.ast.stmt.AssignStmt;
 import compiler488.ast.stmt.ExitStmt;
+import compiler488.ast.stmt.IfStmt;
 import compiler488.ast.stmt.LoopingStmt;
+import compiler488.ast.stmt.ProcedureCallStmt;
 import compiler488.ast.stmt.Program;
 import compiler488.ast.stmt.ReturnStmt;
 import compiler488.ast.stmt.Scope;
@@ -33,7 +37,6 @@ public class Semantics extends AST_Visitor.Default {
 
 	private SymbolTable symTable;
 	private Map<Integer, BiConsumer<List<BaseAST>, Semantics>> analyzers;
-	private List<BaseAST> analyzee;
 
 	/** SemanticAnalyzer constructor */
 	public Semantics() {
@@ -52,7 +55,6 @@ public class Semantics extends AST_Visitor.Default {
 
 		this.symTable = new SymbolTable();
 		this.analyzers = new HashMap<>();
-		this.analyzee = null;
 
 		this.symTable.Initialize();
 
@@ -107,7 +109,6 @@ public class Semantics extends AST_Visitor.Default {
 		/* FEEL FREE TO ignore or replace this procedure */
 		/*************************************************************/
 
-		assert(analyzee != null);
 		System.out.println("Semantic Action: S" + actionNumber);
 		this.analyzers.get(actionNumber).accept(Arrays.asList(nodes), this);
 		return;
@@ -117,7 +118,6 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitEnter(Program prog) {
 		semanticAction(0, prog);
 	}
-
 	@Override
 	public void visitLeave(Program prog) {
 		semanticAction(1, prog);
@@ -129,6 +129,8 @@ public class Semantics extends AST_Visitor.Default {
 			semanticAction(2, scope);
 		}
 	}
+
+	// ===== DECLARATIONS ===== //
 
 	@Override
 	public void visitEnter(RoutineDecl routine) {
@@ -152,7 +154,6 @@ public class Semantics extends AST_Visitor.Default {
 			}
 		}
 	}
-
 	@Override
 	public void visitLeave(RoutineDecl routine) {
 		if(routine.getType() != null) {
@@ -165,10 +166,32 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	@Override
+	public void visitLeave(MultiDeclarations decls) {
+		semanticAction(47, decls);
+	}
+
+	// ===== STATEMENTS ===== //
+
+	@Override
+	public void visitLeave(AssignStmt assign) {
+		semanticAction(34, assign.getLval(), assign.getRval());
+	}
+
+	@Override
+	public void visitEnter(ProcedureCallStmt procStmt) {
+		semanticAction(42, procStmt);
+	}
+
+	@Override
 	public void visitEnter(LoopingStmt loopStmt) {
 		if(loopStmt.getExpn() != null) {
 			semanticAction(30, loopStmt.getExpn());
 		}
+	}
+
+	@Override
+	public void visitEnter(IfStmt ifStmt) {
+		semanticAction(30, ifStmt.getCondition());
 	}
 
 	@Override

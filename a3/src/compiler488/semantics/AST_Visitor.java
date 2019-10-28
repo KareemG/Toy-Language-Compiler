@@ -18,8 +18,20 @@ public interface AST_Visitor
     public void visitEnter(RoutineDecl node);
     public void visitLeave(RoutineDecl node);
 
+    public void visitEnter(MultiDeclarations decl);
+    public void visitLeave(MultiDeclarations decl);
+
+    public void visitEnter(AssignStmt assign);
+    public void visitLeave(AssignStmt assign);
+
+    public void visitEnter(ProcedureCallStmt procStmt);
+    public void visitLeave(ProcedureCallStmt procStmt);
+
     public void visitEnter(LoopingStmt node);
     public void visitLeave(LoopingStmt node);
+
+    public void visitEnter(IfStmt node);
+    public void visitLeave(IfStmt node);
 
     // ===== LEAF NODES ===== //
     public void visit(ExitStmt node);
@@ -45,7 +57,6 @@ public interface AST_Visitor
         public void visitLeave(Program prog) {
             defaultVisitLeave(prog);
         }
-
         public void visitEnter(Scope scope) {
             defaultVisitEnter(scope);
         }
@@ -58,6 +69,37 @@ public interface AST_Visitor
         }
         public void visitLeave(RoutineDecl routine) {
             defaultVisitLeave(routine);
+        }
+        public void visitEnter(MultiDeclarations decls) {
+            defaultVisitEnter(decls);
+        }
+        public void visitLeave(MultiDeclarations decls) {
+            defaultVisitLeave(decls);
+        }
+
+        public void visitEnter(AssignStmt assign) {
+            defaultVisitEnter(assign);
+        }
+        public void visitLeave(AssignStmt assign) {
+            defaultVisitLeave(assign);
+        }
+        public void visitEnter(ProcedureCallStmt procStmt) {
+            defaultVisitEnter(procStmt);
+        }
+        public void visitLeave(ProcedureCallStmt procStmt) {
+            defaultVisitLeave(procStmt);
+        }
+        public void visitEnter(LoopingStmt loopStmt) {
+            defaultVisitEnter(loopStmt);
+        }
+        public void visitLeave(LoopingStmt loopStmt) {
+            defaultVisitLeave(loopStmt);
+        }
+        public void visitEnter(IfStmt ifStmt) {
+            defaultVisitEnter(ifStmt);
+        }
+        public void visitLeave(IfStmt ifStmt) {
+            defaultVisitLeave(ifStmt);
         }
 
         // ===== LEAF NODES ===== //
