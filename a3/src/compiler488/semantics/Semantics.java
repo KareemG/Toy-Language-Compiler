@@ -139,26 +139,22 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visitLeave(RoutineDecl node) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void visitEnter(LoopingStmt node) {
-		// TODO Auto-generated method stub
-
+	public void visitEnter(LoopingStmt loopStmt) {
+		if(loopStmt.getExpn() != null) {
+			semanticAction(30, loopStmt.getExpn());
+		}
 	}
 
 	@Override
-	public void visitLeave(LoopingStmt node) {
-		// TODO Auto-generated method stub
-
-	}
+	public void visitLeave(LoopingStmt node) { } // Nothing to do
 
 	@Override
 	public void visit(ExitStmt exitStmt) {
 		if (exitStmt.getExpn() != null) {
-			semanticAction(30, exitStmt);
+			semanticAction(30, exitStmt.getExpn());
 		}
 		semanticAction(50, exitStmt);
 		if (exitStmt.getLevel() != -1) {
@@ -167,9 +163,13 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	@Override
-	public void visit(ReturnStmt node) {
-		// TODO Auto-generated method stub
-
+	public void visit(ReturnStmt retStmt) {
+		if (retStmt.getValue() != null) {
+			semanticAction(51, retStmt);
+			semanticAction(35, retStmt);
+		} else {
+			semanticAction(52, retStmt);
+		}
 	}
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE
