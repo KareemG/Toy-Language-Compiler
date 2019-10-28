@@ -1,13 +1,13 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.PrettyPrinter;
-import compiler488.ast.Readable;
+// import compiler488.ast.Readable;
 import compiler488.semantics.AST_Visitor;
 
 /**
  * References to an array element variable
  */
-public class SubsExpn extends Expn implements Readable {
+public class SubsExpn extends ReadableExpn {
 	/** Name of the array variable. */
 	private String variable;
 

@@ -67,10 +67,12 @@ nonterminal ScalarDecl parameter;
 nonterminal ASTList<ScalarDecl> parameters;
 
 nonterminal Expn expression, arithExpn, term, factor, primary, output;
-nonterminal Expn conjunction, negation, compareExpn, variable;
+nonterminal Expn conjunction, negation, compareExpn;
 nonterminal ASTList<Expn> arguments;
 nonterminal ASTList<Printable> outputs;
 nonterminal ConstExpn constant;
+
+nonterminal ReadableExpn variable;
 
 nonterminal Type type;
 
