@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
-import compiler488.ast.BaseAST;
-import compiler488.ast.decl.*;
+import compiler488.ast.*;
 import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
-import compiler488.symbol.SymbolTable;
+import compiler488.ast.expn.*;
+import compiler488.ast.decl.*;
+import compiler488.symbol.*;
 
 /**
  * Implement semantic analysis for compiler 488
@@ -29,6 +30,7 @@ public class Semantics extends AST_Visitor.Default {
 	public File f;
 
 	private SymbolTable symTable;
+	private Context context;
 	private Map<Integer, BiConsumer<List<BaseAST>, Semantics>> analyzers;
 
 	/** SemanticAnalyzer constructor */
@@ -46,6 +48,7 @@ public class Semantics extends AST_Visitor.Default {
 		/* GOES HERE */
 		/*********************************************/
 
+		this.context = new Context(null, ContextType.MAIN);
 		this.symTable = new SymbolTable();
 		this.analyzers = new HashMap<>();
 
@@ -171,6 +174,17 @@ public class Semantics extends AST_Visitor.Default {
 		// Associate type with variables.
 		analyzers.put(47, (s, self) -> {
 			// TODO(golaubka): Seems like the type is already stored in the associated Decl class.
+    });
+
+		// Custom semantic action -- new loop. Need to create a new context
+		analyzers.put(98, (s, self) -> {
+			Context newContext = new Context(this.context, ContextType.LOOP);
+			this.context = newContext;
+		});
+
+		// Custom semantic action -- exit context. Need to switch to previous context
+		analyzers.put(99, (s, self) -> {
+			this.context = this.context.GetPrev();
 		});
 	}
 
@@ -189,7 +203,7 @@ public class Semantics extends AST_Visitor.Default {
 
 	/**
 	 * Perform one semantic analysis action
-	 * 
+	 *
 	 * @param actionNumber semantic analysis action number
 	 */
 	void semanticAction(int actionNumber, BaseAST... nodes) {
@@ -295,25 +309,132 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visitEnter(ProcedureCallStmt procStmt) {
-		semanticAction(42, procStmt);
+		if(procStmt.getArguments() != null) {
+			semanticAction(44, procStmt);
+		}
 	}
-
 	@Override
-	public void visitEnter(LoopingStmt loopStmt) {
-		if(loopStmt.getExpn() != null) {
-			semanticAction(30, loopStmt.getExpn());
+	public void visitLeave(ProcedureCallStmt procStmt) {
+		if(procStmt.getArguments() != null) {
+			semanticAction(43, procStmt);
+		} else {
+			semanticAction(42, procStmt);
 		}
 	}
 
-	// ===== NON LEAF NODES ===== //
+	@Override
+	public void visitEnter(WhileDoStmt whileStmt) {
+		if(whileStmt.getExpn() != null) {
+			semanticAction(30, whileStmt.getExpn());
+		}
+		semanticAction(98);
+	}
+	@Override
+	public void visitLeave(WhileDoStmt whileStmt) {
+		semanticAction(99);
+	}
 
+	@Override
+	public void visitEnter(RepeatUntilStmt repeatStmt) {
+		semanticAction(98);
+	}
+	@Override
+	public void visitLeave(RepeatUntilStmt repeatStmt) {
+		if(repeatStmt.getExpn() != null) {
+			semanticAction(30, repeatStmt.getExpn());
+		}
+		semanticAction(99);
+	}
+	@Override
+	public void visitEnter(ScopeStmt scopeStmt) {
+		semanticAction(6);
+	}
+	@Override
+	public void visitLeave(ScopeStmt scopeStmt) {
+		semanticAction(7);
+	}
 	@Override
 	public void visitEnter(IfStmt ifStmt) {
 		semanticAction(30, ifStmt.getCondition());
 	}
 
+	// ===== EXPRESSIONS ===== //
+	@Override
+	public void visitEnter(ArithExpn arith) {
+		semanticAction(31, arith.getLeft());
+	}
+	@Override
+	public void visitLeave(ArithExpn arith) {
+		semanticAction(31, arith.getRight());
+		semanticAction(21, arith);
+	}
+	@Override
+	public void visitEnter(BoolExpn boolExpn) {
+		semanticAction(30, boolExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(BoolExpn boolExpn) {
+		semanticAction(30, boolExpn.getRight());
+		semanticAction(20, boolExpn);
+	}
+	@Override
+	public void visitEnter(CompareExpn compExpn) {
+		semanticAction(31, compExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(CompareExpn compExpn) {
+		semanticAction(31, compExpn.getRight());
+		semanticAction(20, compExpn);
+	}
+	@Override
+	public void visitEnter(ConditionalExpn condExpn) {
+		semanticAction(30, condExpn.getCondition());
+	}
+	@Override
+	public void visitLeave(ConditionalExpn condExpn) {
+		semanticAction(33, condExpn.getTrueValue(), condExpn.getFalseValue());
+		semanticAction(24, condExpn);
+	}
+	@Override
+	public void visitEnter(EqualsExpn equalExpn) {
+		semanticAction(31, equalExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(EqualsExpn equalExpn) {
+		semanticAction(31, equalExpn.getLeft());
+		semanticAction(21, equalExpn);
+	}
+	@Override
+	public void visitEnter(FunctionCallExpn funcExpn) {
+		if(funcExpn.getArguments() != null) {
+			semanticAction(44, funcExpn);
+		}
+	}
+	@Override
+	public void visitLeave(FunctionCallExpn funcExpn) {
+		if(funcExpn.getArguments() != null) {
+			semanticAction(43, funcExpn);
+		} else {
+			semanticAction(42, funcExpn);
+		}
+		semanticAction(28, funcExpn);
+	}
+	@Override
+	public void visitLeave(NotExpn notExpn) {
+		semanticAction(30, notExpn.getOperand());
+		semanticAction(20, notExpn);
+	}
+	@Override
+	public void visitLeave(UnaryMinusExpn minusExpn) {
+		semanticAction(31, minusExpn.getOperand());
+		semanticAction(21, minusExpn);
+	}
+
+	// ===== NON LEAF NODES ===== //
+
 	@Override
 	public void visit(ArrayDeclPart arrPart) {
+		semanticAction(46, arrPart);
 		semanticAction(19, arrPart);
 	}
 
@@ -364,4 +485,25 @@ public class Semantics extends AST_Visitor.Default {
 		symTable.ExitScope();
 	}
 	
+	@Override
+	public void visit(IdentExpn ident) {
+		semanticAction(37, ident);
+		semanticAction(26, ident);
+	}
+	@Override
+	public void visit(SubsExpn subs) {
+		semanticAction(31, subs.getSubscript1());
+		if (subs.getSubscript2() != null) {
+			semanticAction(31, subs.getSubscript2());
+		}
+		semanticAction(27, subs);
+	}
+	@Override
+	public void visit(BoolConstExpn boolExpn) {
+		semanticAction(20);
+	}
+	@Override
+	public void visit(IntConstExpn intExpn) {
+		semanticAction(21);
+	}
 }

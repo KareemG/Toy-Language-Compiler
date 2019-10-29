@@ -1,0 +1,12 @@
+{
+    write "hello "
+    write "world "
+    
+    {
+        write ", "
+        write "how "
+        write "are "
+        write "you"
+        write "?"
+    }
+}

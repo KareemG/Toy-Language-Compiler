@@ -48,11 +48,4 @@ public abstract class UnaryExpn extends Expn {
 		p.print(")");
 
 	}
-
-	@Override
-	public void accept(AST_Visitor visitor) {
-		visitor.visitEnter(this);
-		this.operand.accept(visitor);
-		visitor.visitLeave(this);
-	}
 }

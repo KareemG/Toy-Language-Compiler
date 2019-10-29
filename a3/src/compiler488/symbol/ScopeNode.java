@@ -11,6 +11,8 @@ import compiler488.ast.*;
  *
  *  Also has access to its parent so we can look back for any
  *  previously declared variables or functions
+ *
+ * @author  KyoKeun Park
  */
 class ScopeNode {
     private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
@@ -18,14 +20,17 @@ class ScopeNode {
     private ScopeNode parent = null; // reference to parent
 
     ScopeNode() {
-        this.symbols = new Hashtable<String, BaseAST>();
-        this.archive = new ArrayList<ScopeNode>();
+        Initialize();
     }
 
     ScopeNode(ScopeNode parent) {
+        Initialize();
+        this.parent = parent;
+    }
+
+    private void Initialize() {
         this.symbols = new Hashtable<String, BaseAST>();
         this.archive = new ArrayList<ScopeNode>();
-        this.parent = parent;
     }
 
     public int Put(String key, BaseAST value) {

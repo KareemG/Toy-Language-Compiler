@@ -1,2 +1,7 @@
 .DS_Store
 a3/.vscode/settings.json
+*.jar
+*.class
+sym.java
+Lexer.java
+BaseParser.java

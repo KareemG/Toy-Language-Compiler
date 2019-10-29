@@ -1,0 +1,10 @@
+
+{
+    var a : integer
+    var b : boolean
+
+    a := 1
+    b := true
+
+    a := a + b
+}

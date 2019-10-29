@@ -1,11 +1,16 @@
 
 {
-    while true do
+    var a : integer
+    var b, c : integer
+
+    read a
+    read b
+    read c
+
+    if a + b = c then
     {
-        repeat
-        {
-            exit 3
-        }
-        until true
+        write "valid"
     }
+    else
+        write "invalid"
 }

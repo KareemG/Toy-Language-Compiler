@@ -52,7 +52,7 @@ terminal String     TEXTCONST;
 
 nonterminal ASTList<DeclarationPart> variablenames;
 nonterminal DeclarationPart variablename;
-nonterminal ASTList<Readable> inputs;
+nonterminal ASTList<ReadableExpn> inputs;
 
 nonterminal Program program;
 nonterminal Scope scope;
@@ -144,7 +144,7 @@ matchedStatement
     |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
     |   READ inputs:args {: RESULT = new ReadStmt(args); :}
     |   procedureCall:call {: RESULT = call; :} // procedure call
-    |   scope:scp {: RESULT = scp; :} // embedded scope
+    |   scope:scp {: RESULT = new ScopeStmt(scp); :} // embedded scope
     ;
 
 unmatchedStatement
@@ -210,8 +210,8 @@ output
     ;
 
 inputs
-    ::= variable:var {: RESULT = new ASTList<Readable>((Readable) var); :} // list of variables being read into
-    |   inputs:list COMMA variable:var {: RESULT = list.append((Readable) var); :}
+    ::= variable:var {: RESULT = new ASTList<ReadableExpn>(var); :} // list of variables being read into
+    |   inputs:list COMMA variable:var {: RESULT = list.append(var); :}
     ;
 
 arguments

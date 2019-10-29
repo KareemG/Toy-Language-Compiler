@@ -2,9 +2,9 @@ package compiler488.semantics;
 
 import compiler488.ast.*;
 import compiler488.ast.decl.*;
+import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
-import compiler488.ast.type.BooleanType;
-import compiler488.ast.type.IntegerType;
+import compiler488.ast.type.*;
 
 public interface AST_Visitor
 {
@@ -19,8 +19,6 @@ public interface AST_Visitor
 
     public void visitEnter(RoutineDecl routine);
     public void visitLeave(RoutineDecl routine);
-    public void visitEnter(Declaration decl);
-    public void visitLeave(Declaration decl);
     public void visitEnter(MultiDeclarations decl);
     public void visitLeave(MultiDeclarations decl);
     public void visitEnter(ScalarDecl decl);
@@ -30,19 +28,47 @@ public interface AST_Visitor
     public void visitLeave(AssignStmt assign);
     public void visitEnter(ProcedureCallStmt procStmt);
     public void visitLeave(ProcedureCallStmt procStmt);
-    public void visitEnter(LoopingStmt loopStmt);
-    public void visitLeave(LoopingStmt loopStmt);
+    public void visitEnter(WhileDoStmt whileStmt);
+    public void visitLeave(WhileDoStmt whileStmt);
+    public void visitEnter(RepeatUntilStmt repeatStmt);
+    public void visitLeave(RepeatUntilStmt repeatStmt);
+    public void visitEnter(ReadStmt readStmt);
+    public void visitLeave(ReadStmt readStmt);
+    public void visitEnter(ScopeStmt scopeStmt);
+    public void visitLeave(ScopeStmt scopeStmt);
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
 
+    public void visitEnter(ArithExpn arith);
+    public void visitLeave(ArithExpn arith);
+    public void visitEnter(BoolExpn boolExpn);
+    public void visitLeave(BoolExpn boolExpn);
+    public void visitEnter(CompareExpn compExpn);
+    public void visitLeave(CompareExpn compExpn);
+    public void visitEnter(ConditionalExpn condExpn);
+    public void visitLeave(ConditionalExpn condExpn);
+    public void visitEnter(EqualsExpn equalExpn);
+    public void visitLeave(EqualsExpn equalExpn);
+    public void visitEnter(FunctionCallExpn funcExpn);
+    public void visitLeave(FunctionCallExpn funcExpn);
+    public void visitEnter(NotExpn notExpn);
+    public void visitLeave(NotExpn notExpn);
+    public void visitEnter(UnaryMinusExpn minusExpn);
+    public void visitLeave(UnaryMinusExpn minusExpn);
+
     // ===== LEAF NODES ===== //
-    public void visit(DeclarationPart declPart);
     public void visit(ArrayDeclPart arrPart);
     public void visit(ScalarDeclPart scaPart);
     public void visit(ExitStmt node);
     public void visit(ReturnStmt node);
     public void visit(BooleanType boolType);
     public void visit(IntegerType intType);
+    public void visit(IdentExpn ident);
+    public void visit(SubsExpn subs);
+    public void visit(BoolConstExpn boolExpn);
+    public void visit(IntConstExpn intExpn);
+    public void visit(SkipConstExpn skipExpn);
+    public void visit(TextConstExpn textExpn);
 
     public static class Default implements AST_Visitor {
         // ===== DEFAULT ACTIONS ===== //
@@ -71,12 +97,6 @@ public interface AST_Visitor
             defaultVisitLeave(scope);
         }
 
-        public void visitEnter(Declaration decl) {
-            defaultVisitEnter(decl);
-        }
-        public void visitLeave(Declaration decl) {
-            defaultVisitLeave(decl);
-        }
         public void visitEnter(RoutineDecl routine) {
             defaultVisitEnter(routine);
         }
@@ -108,11 +128,29 @@ public interface AST_Visitor
         public void visitLeave(ProcedureCallStmt procStmt) {
             defaultVisitLeave(procStmt);
         }
-        public void visitEnter(LoopingStmt loopStmt) {
-            defaultVisitEnter(loopStmt);
+        public void visitEnter(WhileDoStmt whileStmt) {
+            defaultVisitEnter(whileStmt);
         }
-        public void visitLeave(LoopingStmt loopStmt) {
-            defaultVisitLeave(loopStmt);
+        public void visitLeave(WhileDoStmt whileStmt) {
+            defaultVisitLeave(whileStmt);
+        }
+        public void visitEnter(RepeatUntilStmt repeatStmt) {
+            defaultVisitEnter(repeatStmt);
+        }
+        public void visitLeave(RepeatUntilStmt repeatStmt) {
+            defaultVisitLeave(repeatStmt);
+        }
+        public void visitEnter(ReadStmt readStmt) {
+            defaultVisitEnter(readStmt);
+        }
+        public void visitLeave(ReadStmt readStmt) {
+            defaultVisitLeave(readStmt);
+        }
+        public void visitEnter(ScopeStmt scopeStmt) {
+            defaultVisitEnter(scopeStmt);
+        }
+        public void visitLeave(ScopeStmt scopeStmt) {
+            defaultVisitLeave(scopeStmt);
         }
         public void visitEnter(IfStmt ifStmt) {
             defaultVisitEnter(ifStmt);
@@ -121,10 +159,56 @@ public interface AST_Visitor
             defaultVisitLeave(ifStmt);
         }
 
-        // ===== LEAF NODES ===== //
-        public void visit(DeclarationPart declPart) {
-            defaultVisitForLeaf(declPart);
+        public void visitEnter(ArithExpn arith) {
+            defaultVisitEnter(arith);
         }
+        public void visitLeave(ArithExpn arith) {
+            defaultVisitLeave(arith);
+        }
+        public void visitEnter(BoolExpn boolExpn) {
+            defaultVisitEnter(boolExpn);
+        }
+        public void visitLeave(BoolExpn boolExpn) {
+            defaultVisitLeave(boolExpn);
+        }
+        public void visitEnter(CompareExpn compExpn) {
+            defaultVisitEnter(compExpn);
+        }
+        public void visitLeave(CompareExpn compExpn) {
+            defaultVisitLeave(compExpn);
+        }
+        public void visitEnter(ConditionalExpn condExpn) {
+            defaultVisitEnter(condExpn);
+        }
+        public void visitLeave(ConditionalExpn condExpn) {
+            defaultVisitLeave(condExpn);
+        }
+        public void visitEnter(EqualsExpn equalExpn) {
+            defaultVisitEnter(equalExpn);
+        }
+        public void visitLeave(EqualsExpn equalExpn) {
+            defaultVisitLeave(equalExpn);
+        }
+        public void visitEnter(FunctionCallExpn funcExpn) {
+            defaultVisitEnter(funcExpn);
+        }
+        public void visitLeave(FunctionCallExpn funcExpn) {
+            defaultVisitLeave(funcExpn);
+        }
+        public void visitEnter(NotExpn notExpn) {
+            defaultVisitEnter(notExpn);
+        }
+        public void visitLeave(NotExpn notExpn) {
+            defaultVisitLeave(notExpn);
+        }
+        public void visitEnter(UnaryMinusExpn minusExpn) {
+            defaultVisitEnter(minusExpn);
+        }
+        public void visitLeave(UnaryMinusExpn minusExpn) {
+            defaultVisitLeave(minusExpn);
+        }
+
+        // ===== LEAF NODES ===== //
         public void visit(ArrayDeclPart arrPart) {
             defaultVisitForLeaf(arrPart);
         }
@@ -145,6 +229,24 @@ public interface AST_Visitor
         }
         public void visit(IntegerType intType) {
             defaultVisitForLeaf(intType);
+        }
+        public void visit(IdentExpn ident) {
+            defaultVisitForLeaf(ident);
+        }
+        public void visit(SubsExpn subs) {
+            defaultVisitForLeaf(subs);
+        }
+        public void visit(BoolConstExpn boolExpn) {
+            defaultVisitForLeaf(boolExpn);
+        }
+        public void visit(IntConstExpn intExpn) {
+            defaultVisitForLeaf(intExpn);
+        }
+        public void visit(SkipConstExpn skipExpn) {
+            defaultVisitForLeaf(skipExpn);
+        }
+        public void visit(TextConstExpn textExpn) {
+            defaultVisitForLeaf(textExpn);
         }
     }
 }
