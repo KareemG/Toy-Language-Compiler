@@ -50,8 +50,8 @@ public class ConditionalExpn extends Expn {
 
 	@Override
 	public void accept(AST_Visitor visitor) {
-		visitor.visitEnter(this);
 		this.condition.accept(visitor);
+		visitor.visitEnter(this);
 		this.trueValue.accept(visitor);
 		this.falseValue.accept(visitor);
 		visitor.visitLeave(this);

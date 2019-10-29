@@ -223,6 +223,49 @@ public class Semantics extends AST_Visitor.Default {
 		semanticAction(31, arith.getRight());
 		semanticAction(21, arith);
 	}
+	@Override
+	public void visitEnter(ConditionalExpn condExpn) {
+		semanticAction(30, condExpn.getCondition());
+	}
+	@Override
+	public void visitLeave(ConditionalExpn condExpn) {
+		semanticAction(33, condExpn.getTrueValue(), condExpn.getFalseValue());
+		semanticAction(24, condExpn);
+	}
+	@Override
+	public void visitEnter(EqualsExpn equalExpn) {
+		semanticAction(31, equalExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(EqualsExpn equalExpn) {
+		semanticAction(31, equalExpn.getLeft());
+		semanticAction(21, equalExpn);
+	}
+	@Override
+	public void visitEnter(FunctionCallExpn funcExpn) {
+		if(funcExpn.getArguments() != null) {
+			semanticAction(44, funcExpn);
+		}
+	}
+	@Override
+	public void visitLeave(FunctionCallExpn funcExpn) {
+		if(funcExpn.getArguments() != null) {
+			semanticAction(43, funcExpn);
+		} else {
+			semanticAction(42, funcExpn);
+		}
+		semanticAction(28, funcExpn);
+	}
+	@Override
+	public void visitLeave(NotExpn notExpn) {
+		semanticAction(30, notExpn.getOperand());
+		semanticAction(20, notExpn);
+	}
+	@Override
+	public void visitLeave(UnaryMinusExpn minusExpn) {
+		semanticAction(31, minusExpn.getOperand());
+		semanticAction(21, minusExpn);
+	}
 
 	// ===== NON LEAF NODES ===== //
 
@@ -287,6 +330,10 @@ public class Semantics extends AST_Visitor.Default {
 	@Override
 	public void visit(BoolConstExpn boolExpn) {
 		semanticAction(20);
+	}
+	@Override
+	public void visit(IntConstExpn intExpn) {
+		semanticAction(21);
 	}
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE
