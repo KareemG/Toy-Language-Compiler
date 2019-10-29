@@ -31,22 +31,4 @@ public abstract class LoopingStmt extends Stmt {
 	public ASTList<Stmt> getBody() {
 		return body;
 	}
-
-	// @Override
-	// public void accept(AST_Visitor visitor)
-	// {
-	// 	if (this.expn != null) {
-	// 		this.expn.accept(visitor);
-	// 	}
-
-	// 	visitor.visitEnter(this);
-
-	// 	ListIterator<Stmt> stmt_it = body.listIterator();
-	// 	while(stmt_it.hasNext())
-	// 	{
-	// 		stmt_it.next().accept(visitor);
-	// 	}
-
-	// 	visitor.visitLeave(this);
-	// }
 }
