@@ -25,8 +25,8 @@ public class WhileDoStmt extends LoopingStmt {
 
 	@Override
 	public void accept(AST_Visitor visitor) {
-		visitor.visitEnter(this);
 		this.expn.accept(visitor);
+		visitor.visitEnter(this);
 		ListIterator<Stmt> bod_lst = body.listIterator();
 		while (bod_lst.hasNext()) {
 			bod_lst.next().accept(visitor);

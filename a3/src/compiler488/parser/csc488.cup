@@ -210,8 +210,8 @@ output
     ;
 
 inputs
-    ::= variable:var {: RESULT = new ASTList<Readable>((Readable) var); :} // list of variables being read into
-    |   inputs:list COMMA variable:var {: RESULT = list.append((Readable) var); :}
+    ::= variable:var {: RESULT = new ASTList<ReadableExpn>(var); :} // list of variables being read into
+    |   inputs:list COMMA variable:var {: RESULT = list.append(var); :}
     ;
 
 arguments

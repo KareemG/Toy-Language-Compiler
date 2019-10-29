@@ -8,22 +8,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
-import compiler488.ast.BaseAST;
-import compiler488.ast.decl.ArrayDeclPart;
-import compiler488.ast.decl.DeclarationPart;
-import compiler488.ast.decl.MultiDeclarations;
-import compiler488.ast.decl.RoutineDecl;
-import compiler488.ast.decl.ScalarDeclPart;
-import compiler488.ast.stmt.AssignStmt;
-import compiler488.ast.stmt.ExitStmt;
-import compiler488.ast.stmt.IfStmt;
-import compiler488.ast.stmt.LoopingStmt;
-import compiler488.ast.stmt.ProcedureCallStmt;
-import compiler488.ast.stmt.Program;
-import compiler488.ast.stmt.ReturnStmt;
-import compiler488.ast.stmt.Scope;
-import compiler488.ast.type.BooleanType;
-import compiler488.ast.type.IntegerType;
+import compiler488.ast.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.decl.*;
 import compiler488.symbol.SymbolTable;
 
 /**
@@ -191,9 +180,16 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	@Override
-	public void visitEnter(LoopingStmt loopStmt) {
-		if(loopStmt.getExpn() != null) {
-			semanticAction(30, loopStmt.getExpn());
+	public void visitEnter(WhileDoStmt whileStmt) {
+		if(whileStmt.getExpn() != null) {
+			semanticAction(30, whileStmt.getExpn());
+		}
+	}
+
+	@Override
+	public void visitLeave(RepeatUntilStmt repeatStmt) {
+		if(repeatStmt.getExpn() != null) {
+			semanticAction(30, repeatStmt.getExpn());
 		}
 	}
 
@@ -242,6 +238,20 @@ public class Semantics extends AST_Visitor.Default {
 	@Override
 	public void visit(IntegerType intType) {
 		semanticAction(21, intType);
+	}
+
+	@Override
+	public void visit(IdentExpn ident) {
+		semanticAction(37, ident);
+		semanticAction(26, ident);
+	}
+	@Override
+	public void visit(SubsExpn subs) {
+		semanticAction(31, subs.getSubscript1());
+		if (subs.getSubscript2() != null) {
+			semanticAction(31, subs.getSubscript2());
+		}
+		semanticAction(27, subs);
 	}
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE

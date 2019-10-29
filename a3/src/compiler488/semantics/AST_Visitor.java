@@ -2,6 +2,7 @@ package compiler488.semantics;
 
 import compiler488.ast.*;
 import compiler488.ast.decl.*;
+import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.ast.type.BooleanType;
 import compiler488.ast.type.IntegerType;
@@ -30,12 +31,12 @@ public interface AST_Visitor
     public void visitLeave(AssignStmt assign);
     public void visitEnter(ProcedureCallStmt procStmt);
     public void visitLeave(ProcedureCallStmt procStmt);
-    public void visitEnter(LoopingStmt loopStmt);
-    public void visitLeave(LoopingStmt loopStmt);
     public void visitEnter(WhileDoStmt whileStmt);
     public void visitLeave(WhileDoStmt whileStmt);
     public void visitEnter(RepeatUntilStmt repeatStmt);
     public void visitLeave(RepeatUntilStmt repeatStmt);
+    public void visitEnter(ReadStmt readStmt);
+    public void visitLeave(ReadStmt readStmt);
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
 
@@ -47,6 +48,8 @@ public interface AST_Visitor
     public void visit(ReturnStmt node);
     public void visit(BooleanType boolType);
     public void visit(IntegerType intType);
+    public void visit(IdentExpn ident);
+    public void visit(SubsExpn subs);
 
     public static class Default implements AST_Visitor {
         // ===== DEFAULT ACTIONS ===== //
@@ -112,12 +115,6 @@ public interface AST_Visitor
         public void visitLeave(ProcedureCallStmt procStmt) {
             defaultVisitLeave(procStmt);
         }
-        public void visitEnter(LoopingStmt loopStmt) {
-            defaultVisitEnter(loopStmt);
-        }
-        public void visitLeave(LoopingStmt loopStmt) {
-            defaultVisitLeave(loopStmt);
-        }
         public void visitEnter(WhileDoStmt whileStmt) {
             defaultVisitEnter(whileStmt);
         }
@@ -129,6 +126,12 @@ public interface AST_Visitor
         }
         public void visitLeave(RepeatUntilStmt repeatStmt) {
             defaultVisitLeave(repeatStmt);
+        }
+        public void visitEnter(ReadStmt readStmt) {
+            defaultVisitEnter(readStmt);
+        }
+        public void visitLeave(ReadStmt readStmt) {
+            defaultVisitLeave(readStmt);
         }
         public void visitEnter(IfStmt ifStmt) {
             defaultVisitEnter(ifStmt);
@@ -161,6 +164,12 @@ public interface AST_Visitor
         }
         public void visit(IntegerType intType) {
             defaultVisitForLeaf(intType);
+        }
+        public void visit(IdentExpn ident) {
+            defaultVisitForLeaf(ident);
+        }
+        public void visit(SubsExpn subs) {
+            defaultVisitForLeaf(subs);
         }
     }
 }
