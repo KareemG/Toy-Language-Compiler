@@ -1,0 +1,12 @@
+{
+    function abc(a : integer, b : integer) : integer
+    {
+        var abc : integer
+
+        abc := 1
+
+        return 0
+    }
+
+    abc
+}
