@@ -8,12 +8,20 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
+<<<<<<< HEAD
 import compiler488.ast.*;
 import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.decl.*;
 import compiler488.symbol.*;
+=======
+import compiler488.ast.BaseAST;
+import compiler488.ast.decl.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
+import compiler488.symbol.SymbolTable;
+>>>>>>> a3-scopes-declarations
 
 /**
  * Implement semantic analysis for compiler 488
@@ -54,11 +62,156 @@ public class Semantics extends AST_Visitor.Default {
 
 		this.symTable.Initialize();
 
+		// Start program scope.
+		analyzers.put(0, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+		});
+
+		// End program scope.
+		analyzers.put(1, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+		});
+
+		// Associate declaration(s) with scope.
+		analyzers.put(2, (s, self) -> {
+			assert(s.get(0) instanceof Scope);
+			
+			Scope scope = (Scope) s.get(0);
+			ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
+			while (decl_it.hasNext()) {
+				Declaration decl = decl_it.next();
+				if (decl instanceof MultiDeclarations) {
+					MultiDeclarations multi_decl = (MultiDeclarations) decl;
+					
+					ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
+					while (part_it.hasNext()) {
+						DeclarationPart part = part_it.next();
+						self.symTable.Put(part.getName(), part);
+					}
+				} else if (decl instanceof RoutineDecl) {
+					RoutineDecl routine = (RoutineDecl) decl;
+					self.symTable.Put(routine.getName(), routine);
+				} else {
+					assert(false);
+				}
+			}
+		});
+
+		// Start function scope.
+		analyzers.put(4, (s, self) -> { self.EnterScope(s); });
+
+		// End function scope.
+		analyzers.put(5, (s, self) -> { self.ExitScope(s);  });
+
+		// Start ordinary scope.
+		analyzers.put(6, (s, self) -> { self.EnterScope(s); });
+
+		// End ordinary scope.
+		analyzers.put(7, (s, self) -> { self.ExitScope(s);  });
+
+		// Start procedure scope.
+		analyzers.put(8, (s, self) -> { self.EnterScope(s); });
+
+		// End procedure scope.
+		analyzers.put(9, (s, self) -> { self.ExitScope(s);  });
+
+		// Declare scalar variable.
+		analyzers.put(10, (s, self) -> {
+			assert(s.get(0) instanceof ScalarDeclPart);
+
+			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
+			self.symTable.Put(decl.getName(), decl);
+		});
+
+		// Declare function with no parameters and specified type.
+		analyzers.put(11, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			self.symTable.Put(decl.getName(), decl);
+
+			// TODO(golaubka): Record scope type.
+
+		});
+
+		// Declare function with parameters and specified type.
+		analyzers.put(12, analyzers.get(11));
+
+		// Associate scope with function/procedure.
+		analyzers.put(13, (s, self) -> { self.EnterScope(s); });
+
+		// Set parameter count to zero.
+		analyzers.put(14, (s, self) -> {
+			// TODO(golaubka): y tho? codegen?
+		});
+
+		// Declare parameter with specified type.
+		analyzers.put(15, analyzers.get(10));
+
+		// Increment parameter count by one.
+		analyzers.put(16, (s, self) -> {
+			// TODO(golaubka): y tho? codegen?
+		});
+
+		// Declare procedure with no parameters.
+		analyzers.put(17, (s, self) -> analyzers.get(11));
+
+		// Declare procedure with parameters.
+		analyzers.put(18, (s, self) -> analyzers.get(12));
+
+		// Declare array variable with specified lower and upper bounds.
+		analyzers.put(19, (s, self) -> {
+			assert(s.get(0) instanceof ArrayDeclPart);
+
+			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
+			self.symTable.Put(decl.getName(), decl);
+		});
+
+		// Check that lower bound is <= upper bound.
+		analyzers.put(46, (s, self) -> {
+			assert(s.get(0) instanceof ArrayDeclPart);
+
+			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
+
+			assert(decl.lb1 <= decl.ub1);
+			assert(!decl.isTwoDimensional || (decl.lb2 <= decl.ub2));
+		});
+
+		// Associate type with variables.
+		analyzers.put(47, (s, self) -> {
+			// TODO(golaubka): Seems like the type is already stored in the associated Decl class.
+		});
+		
+		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
+		analyzers.put(40, (s, self) -> {
+			assert(s.get(0) instanceof FunctionCallExpn);
+			FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
+			assert(symTable.Get(funcExpn.getIdent()) instanceof RoutineDecl);
+			RoutineDecl routine = (RoutineDecl) symTable.Get(funcExpn.getIdent());
+			assert(routine.getType() != null);
+		});
+		analyzers.put(41, (s, self) -> {
+
+		});
+		analyzers.put(42, (s, self) -> {
+
+		});
+		analyzers.put(43, (s, self) -> {
+
+		});
+		analyzers.put(44, (s, self) -> {
+
+		});
+		analyzers.put(45, (s, self) -> {
+
+		});
+		
 		// Custom semantic action -- new loop. Need to create a new context
 		analyzers.put(98, (s, self) -> {
 			Context newContext = new Context(this.context, ContextType.LOOP);
 			this.context = newContext;
 		});
+		
 		// Custom semantic action -- exit context. Need to switch to previous context
 		analyzers.put(99, (s, self) -> {
 			this.context = this.context.GetPrev();
@@ -283,6 +436,7 @@ public class Semantics extends AST_Visitor.Default {
 	}
 	@Override
 	public void visitEnter(FunctionCallExpn funcExpn) {
+		semanticAction(40, funcExpn);
 		if(funcExpn.getArguments() != null) {
 			semanticAction(44, funcExpn);
 		}
@@ -371,4 +525,15 @@ public class Semantics extends AST_Visitor.Default {
 	public void visit(IntConstExpn intExpn) {
 		semanticAction(21);
 	}
+
+	public void EnterScope(List<BaseAST> s)
+	{
+		symTable.EnterScope();
+	}
+
+	public void ExitScope(List<BaseAST> s)
+	{
+		symTable.ExitScope();
+	}
+	
 }
