@@ -1,0 +1,9 @@
+
+{
+    function foo (var a : integer, var b : boolean) : integer
+    {
+        return with (b ? a * 2 : a)
+    }
+
+    foo(true, false)
+}
