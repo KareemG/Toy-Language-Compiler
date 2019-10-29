@@ -1,0 +1,17 @@
+
+{
+    function foo : integer
+    {
+        var a : integer
+
+        {
+            var b : integer
+
+            {
+                return a + b
+            }
+        }
+    }
+
+    foo
+}
