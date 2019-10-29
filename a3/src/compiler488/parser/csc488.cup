@@ -144,7 +144,7 @@ matchedStatement
     |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
     |   READ inputs:args {: RESULT = new ReadStmt(args); :}
     |   procedureCall:call {: RESULT = call; :} // procedure call
-    |   scope:scp {: RESULT = scp; :} // embedded scope
+    |   scope:scp {: RESULT = new ScopeStmt(scp); :} // embedded scope
     ;
 
 unmatchedStatement

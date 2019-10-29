@@ -1,7 +1,5 @@
 package compiler488.semantics;
 
-import java.util.function.Function;
-
 import compiler488.ast.*;
 import compiler488.ast.decl.*;
 import compiler488.ast.expn.*;
@@ -21,8 +19,6 @@ public interface AST_Visitor
 
     public void visitEnter(RoutineDecl routine);
     public void visitLeave(RoutineDecl routine);
-    public void visitEnter(Declaration decl);
-    public void visitLeave(Declaration decl);
     public void visitEnter(MultiDeclarations decl);
     public void visitLeave(MultiDeclarations decl);
     public void visitEnter(ScalarDecl decl);
@@ -38,11 +34,17 @@ public interface AST_Visitor
     public void visitLeave(RepeatUntilStmt repeatStmt);
     public void visitEnter(ReadStmt readStmt);
     public void visitLeave(ReadStmt readStmt);
+    public void visitEnter(ScopeStmt scopeStmt);
+    public void visitLeave(ScopeStmt scopeStmt);
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
 
     public void visitEnter(ArithExpn arith);
     public void visitLeave(ArithExpn arith);
+    public void visitEnter(BoolExpn boolExpn);
+    public void visitLeave(BoolExpn boolExpn);
+    public void visitEnter(CompareExpn compExpn);
+    public void visitLeave(CompareExpn compExpn);
     public void visitEnter(ConditionalExpn condExpn);
     public void visitLeave(ConditionalExpn condExpn);
     public void visitEnter(EqualsExpn equalExpn);
@@ -55,7 +57,6 @@ public interface AST_Visitor
     public void visitLeave(UnaryMinusExpn minusExpn);
 
     // ===== LEAF NODES ===== //
-    public void visit(DeclarationPart declPart);
     public void visit(ArrayDeclPart arrPart);
     public void visit(ScalarDeclPart scaPart);
     public void visit(ExitStmt node);
@@ -96,12 +97,6 @@ public interface AST_Visitor
             defaultVisitLeave(scope);
         }
 
-        public void visitEnter(Declaration decl) {
-            defaultVisitEnter(decl);
-        }
-        public void visitLeave(Declaration decl) {
-            defaultVisitLeave(decl);
-        }
         public void visitEnter(RoutineDecl routine) {
             defaultVisitEnter(routine);
         }
@@ -151,6 +146,12 @@ public interface AST_Visitor
         public void visitLeave(ReadStmt readStmt) {
             defaultVisitLeave(readStmt);
         }
+        public void visitEnter(ScopeStmt scopeStmt) {
+            defaultVisitEnter(scopeStmt);
+        }
+        public void visitLeave(ScopeStmt scopeStmt) {
+            defaultVisitLeave(scopeStmt);
+        }
         public void visitEnter(IfStmt ifStmt) {
             defaultVisitEnter(ifStmt);
         }
@@ -163,6 +164,18 @@ public interface AST_Visitor
         }
         public void visitLeave(ArithExpn arith) {
             defaultVisitLeave(arith);
+        }
+        public void visitEnter(BoolExpn boolExpn) {
+            defaultVisitEnter(boolExpn);
+        }
+        public void visitLeave(BoolExpn boolExpn) {
+            defaultVisitLeave(boolExpn);
+        }
+        public void visitEnter(CompareExpn compExpn) {
+            defaultVisitEnter(compExpn);
+        }
+        public void visitLeave(CompareExpn compExpn) {
+            defaultVisitLeave(compExpn);
         }
         public void visitEnter(ConditionalExpn condExpn) {
             defaultVisitEnter(condExpn);
@@ -196,9 +209,6 @@ public interface AST_Visitor
         }
 
         // ===== LEAF NODES ===== //
-        public void visit(DeclarationPart declPart) {
-            defaultVisitForLeaf(declPart);
-        }
         public void visit(ArrayDeclPart arrPart) {
             defaultVisitForLeaf(arrPart);
         }

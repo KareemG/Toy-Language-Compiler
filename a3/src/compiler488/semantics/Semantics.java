@@ -186,7 +186,17 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visitEnter(ProcedureCallStmt procStmt) {
-		semanticAction(42, procStmt);
+		if(procStmt.getArguments() != null) {
+			semanticAction(44, procStmt);
+		}
+	}
+	@Override
+	public void visitLeave(ProcedureCallStmt procStmt) {
+		if(procStmt.getArguments() != null) {
+			semanticAction(43, procStmt);
+		} else {
+			semanticAction(42, procStmt);
+		}
 	}
 
 	@Override
@@ -212,6 +222,18 @@ public class Semantics extends AST_Visitor.Default {
 		}
 		semanticAction(99);
 	}
+	@Override
+	public void visitEnter(ScopeStmt scopeStmt) {
+		semanticAction(6);
+	}
+	@Override
+	public void visitLeave(ScopeStmt scopeStmt) {
+		semanticAction(7);
+	}
+	@Override
+	public void visitEnter(IfStmt ifStmt) {
+		semanticAction(30, ifStmt.getCondition());
+	}
 
 	// ===== EXPRESSIONS ===== //
 	@Override
@@ -222,6 +244,24 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(ArithExpn arith) {
 		semanticAction(31, arith.getRight());
 		semanticAction(21, arith);
+	}
+	@Override
+	public void visitEnter(BoolExpn boolExpn) {
+		semanticAction(30, boolExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(BoolExpn boolExpn) {
+		semanticAction(30, boolExpn.getRight());
+		semanticAction(20, boolExpn);
+	}
+	@Override
+	public void visitEnter(CompareExpn compExpn) {
+		semanticAction(31, compExpn.getLeft());
+	}
+	@Override
+	public void visitLeave(CompareExpn compExpn) {
+		semanticAction(31, compExpn.getRight());
+		semanticAction(20, compExpn);
 	}
 	@Override
 	public void visitEnter(ConditionalExpn condExpn) {
@@ -270,12 +310,8 @@ public class Semantics extends AST_Visitor.Default {
 	// ===== NON LEAF NODES ===== //
 
 	@Override
-	public void visitEnter(IfStmt ifStmt) {
-		semanticAction(30, ifStmt.getCondition());
-	}
-
-	@Override
 	public void visit(ArrayDeclPart arrPart) {
+		semanticAction(46, arrPart);
 		semanticAction(19, arrPart);
 	}
 
@@ -335,7 +371,4 @@ public class Semantics extends AST_Visitor.Default {
 	public void visit(IntConstExpn intExpn) {
 		semanticAction(21);
 	}
-
-	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE
-
 }

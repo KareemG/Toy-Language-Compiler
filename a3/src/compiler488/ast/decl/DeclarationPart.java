@@ -19,9 +19,4 @@ public abstract class DeclarationPart extends BaseAST {
 	public String getName() {
 		return name;
 	}
-
-	@Override
-	public void accept(AST_Visitor visitor) {
-		visitor.visit(this);
-	}
 }

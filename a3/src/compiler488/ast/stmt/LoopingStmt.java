@@ -1,11 +1,7 @@
 package compiler488.ast.stmt;
 
-import java.util.ListIterator;
-
 import compiler488.ast.ASTList;
 import compiler488.ast.expn.Expn;
-
-import compiler488.semantics.AST_Visitor;
 
 /**
  * Represents the common parts of loops.
