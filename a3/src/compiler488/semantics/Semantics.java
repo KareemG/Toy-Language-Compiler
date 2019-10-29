@@ -182,6 +182,18 @@ public class Semantics extends AST_Visitor.Default {
 			// TODO(golaubka): Seems like the type is already stored in the associated Decl class.
 		});
 
+		// ===== EXPRESSION TYPE CHECKING ===== //
+		analyzers.put(30, (s, self) -> {});
+		analyzers.put(31, (s, self) -> {});
+		analyzers.put(32, (s, self) -> {});
+		analyzers.put(33, (s, self) -> {});
+		analyzers.put(34, (s, self) -> {});
+		analyzers.put(35, (s, self) -> {});
+		analyzers.put(36, (s, self) -> {});
+		analyzers.put(37, (s, self) -> {});
+		analyzers.put(38, (s, self) -> {});
+		analyzers.put(39, (s, self) -> {});
+
 		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
 		analyzers.put(40, (s, self) -> {
 			assert(s.get(0) instanceof FunctionCallExpn);
