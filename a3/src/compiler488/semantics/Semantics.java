@@ -560,5 +560,5 @@ public class Semantics extends AST_Visitor.Default {
 	{
 		symTable.ExitScope();
 	}
-	
+
 }
