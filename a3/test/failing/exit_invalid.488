@@ -1,0 +1,11 @@
+
+{
+    while true do
+    {
+        while true do
+        {
+            write "loop"
+            exit 3
+        }
+    }
+}

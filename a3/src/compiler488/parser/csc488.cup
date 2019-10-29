@@ -52,7 +52,7 @@ terminal String     TEXTCONST;
 
 nonterminal ASTList<DeclarationPart> variablenames;
 nonterminal DeclarationPart variablename;
-nonterminal ASTList<Readable> inputs;
+nonterminal ASTList<ReadableExpn> inputs;
 
 nonterminal Program program;
 nonterminal Scope scope;

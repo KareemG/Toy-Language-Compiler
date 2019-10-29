@@ -12,5 +12,8 @@ public class NotExpn extends UnaryExpn {
 
     @Override
     public void accept(AST_Visitor visitor) {
+        visitor.visitEnter(this);
+        this.getOperand().accept(visitor);
+        visitor.visitLeave(this);
     }
 }
