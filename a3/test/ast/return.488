@@ -1,0 +1,18 @@
+
+{
+    var v : integer
+
+    function a : integer
+    {
+        return with 1
+    }
+
+    procedure foo
+    {
+        v := a
+        return
+    }
+
+    foo
+    write c
+}

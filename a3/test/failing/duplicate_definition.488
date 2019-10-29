@@ -1,0 +1,11 @@
+
+{
+    function abc : integer
+    {
+        return with 2
+    }
+
+    var abc : integer
+
+    abc
+}

@@ -1,0 +1,14 @@
+
+{
+    procedure abc
+    {
+        return
+    }
+
+    function abc : integer
+    {
+        return with 2
+    }
+
+    abc
+}
