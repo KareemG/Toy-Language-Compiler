@@ -9,21 +9,9 @@ import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
 import compiler488.ast.BaseAST;
-import compiler488.ast.decl.ArrayDeclPart;
-import compiler488.ast.decl.DeclarationPart;
-import compiler488.ast.decl.MultiDeclarations;
-import compiler488.ast.decl.RoutineDecl;
-import compiler488.ast.decl.ScalarDeclPart;
-import compiler488.ast.stmt.AssignStmt;
-import compiler488.ast.stmt.ExitStmt;
-import compiler488.ast.stmt.IfStmt;
-import compiler488.ast.stmt.LoopingStmt;
-import compiler488.ast.stmt.ProcedureCallStmt;
-import compiler488.ast.stmt.Program;
-import compiler488.ast.stmt.ReturnStmt;
-import compiler488.ast.stmt.Scope;
-import compiler488.ast.type.BooleanType;
-import compiler488.ast.type.IntegerType;
+import compiler488.ast.decl.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
 import compiler488.symbol.SymbolTable;
 
 /**
@@ -64,6 +52,54 @@ public class Semantics extends AST_Visitor.Default {
 		this.symTable.Initialize();
 
 		// TODO: We should add bunch of semantics actions here maybe?
+
+		// semantic action 0 - start program scope
+		analyzers.put(0, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+		});
+
+		// semantic action 1 - end program scope
+		analyzers.put(1, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+		});
+
+		analyzers.put(2, (s, self) -> {
+			assert(s.get(0) instanceof Scope);
+			
+			Scope scope = (Scope) s.get(0);
+			ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
+			while(decl_it.hasNext())
+			{
+				Declaration decl = decl_it.next();
+				if(decl instanceof MultiDeclarations)
+				{
+					MultiDeclarations multi_decl = (MultiDeclarations) decl;
+					
+					ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
+					while(part_it.hasNext())
+					{
+						DeclarationPart part = part_it.next();
+						self.symTable.Put(part.getName(), part);
+					}
+				}
+				else if(decl instanceof RoutineDecl)
+				{
+					RoutineDecl routine = (RoutineDecl) decl;
+					self.symTable.Put(routine.getName(), routine);
+				}
+				else
+				{
+					assert(false);
+				}
+			}
+		});
+
+		analyzers.put(4, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(5, (s, self) -> { self.ExitScope(s);  });
+		analyzers.put(6, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(7, (s, self) -> { self.ExitScope(s);  });
+		analyzers.put(8, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(9, (s, self) -> { self.ExitScope(s);  });
 	}
 
 	/** semanticsFinalize - called by the parser once at the */
@@ -246,4 +282,14 @@ public class Semantics extends AST_Visitor.Default {
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE
 
+	public void EnterScope(List<BaseAST> s)
+	{
+		symTable.EnterScope();
+	}
+
+	public void ExitScope(List<BaseAST> s)
+	{
+		symTable.ExitScope();
+	}
+	
 }
