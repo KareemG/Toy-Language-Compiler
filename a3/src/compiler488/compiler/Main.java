@@ -386,8 +386,6 @@ public class Main {
 	private static void semanticAnalysis(Program programAST) {
 		try
 		{
-			StatementChecker checker = new StatementChecker();
-			programAST.accept(checker);
 		}
 		catch (Exception e)
 		{
