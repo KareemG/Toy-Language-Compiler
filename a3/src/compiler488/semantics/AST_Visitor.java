@@ -118,6 +118,18 @@ public interface AST_Visitor
         public void visitLeave(LoopingStmt loopStmt) {
             defaultVisitLeave(loopStmt);
         }
+        public void visitEnter(WhileDoStmt whileStmt) {
+            defaultVisitEnter(whileStmt);
+        }
+        public void visitLeave(WhileDoStmt whileStmt) {
+            defaultVisitLeave(whileStmt);
+        }
+        public void visitEnter(RepeatUntilStmt repeatStmt) {
+            defaultVisitEnter(repeatStmt);
+        }
+        public void visitLeave(RepeatUntilStmt repeatStmt) {
+            defaultVisitLeave(repeatStmt);
+        }
         public void visitEnter(IfStmt ifStmt) {
             defaultVisitEnter(ifStmt);
         }
