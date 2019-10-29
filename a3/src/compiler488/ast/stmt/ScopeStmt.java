@@ -1,5 +1,7 @@
 package compiler488.ast.stmt;
 
+import compiler488.ast.PrettyPrinter;
+
 import compiler488.semantics.*;
 
 /**
@@ -22,5 +24,10 @@ public class ScopeStmt extends Stmt {
                 visitor.visitEnter(this);
                 this.scope.accept(visitor);
                 visitor.visitEnter(this);
+        }
+
+        @Override
+	public void prettyPrint(PrettyPrinter p) {
+                this.scope.prettyPrint(p);
         }
 }
