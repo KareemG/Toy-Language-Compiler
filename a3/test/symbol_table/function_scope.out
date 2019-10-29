@@ -1,17 +1,12 @@
-
 {
-    function foo : integer
+    foo
     {
-        var a : integer
-
+        a
         {
-            var b : integer
-
+            b
             {
-                return a + b
             }
         }
     }
-
-    foo
 }
+

@@ -1,11 +1,16 @@
 {
-    foo
+    function foo : integer
     {
-        a
+        var a : integer
+
         {
-            b
+            var b : integer
+
             {
+                return a + b
             }
         }
     }
+
+    foo
 }
