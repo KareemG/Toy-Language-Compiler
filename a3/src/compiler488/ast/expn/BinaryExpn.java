@@ -51,12 +51,4 @@ public abstract class BinaryExpn extends Expn {
 		right.prettyPrint(p);
 		p.print(")");
 	}
-
-	@Override
-	public void accept(AST_Visitor visitor) {
-		visitor.visitEnter(this);
-		this.left.accept(visitor);
-		this.right.accept(visitor);
-		visitor.visitLeave(this);
-	}
 }

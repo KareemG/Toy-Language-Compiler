@@ -40,6 +40,9 @@ public interface AST_Visitor
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
 
+    public void visitEnter(ArithExpn arith);
+    public void visitLeave(ArithExpn arith);
+
     // ===== LEAF NODES ===== //
     public void visit(DeclarationPart declPart);
     public void visit(ArrayDeclPart arrPart);
@@ -50,6 +53,7 @@ public interface AST_Visitor
     public void visit(IntegerType intType);
     public void visit(IdentExpn ident);
     public void visit(SubsExpn subs);
+    public void visit(BoolConstExpn boolExpn);
 
     public static class Default implements AST_Visitor {
         // ===== DEFAULT ACTIONS ===== //
@@ -140,6 +144,13 @@ public interface AST_Visitor
             defaultVisitLeave(ifStmt);
         }
 
+        public void visitEnter(ArithExpn arith) {
+            defaultVisitEnter(arith);
+        }
+        public void visitLeave(ArithExpn arith) {
+            defaultVisitLeave(arith);
+        }
+
         // ===== LEAF NODES ===== //
         public void visit(DeclarationPart declPart) {
             defaultVisitForLeaf(declPart);
@@ -170,6 +181,9 @@ public interface AST_Visitor
         }
         public void visit(SubsExpn subs) {
             defaultVisitForLeaf(subs);
+        }
+        public void visit(BoolConstExpn boolExpn) {
+            defaultVisitForLeaf(boolExpn);
         }
     }
 }

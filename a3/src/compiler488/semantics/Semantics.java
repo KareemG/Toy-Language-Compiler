@@ -213,6 +213,17 @@ public class Semantics extends AST_Visitor.Default {
 		semanticAction(99);
 	}
 
+	// ===== EXPRESSIONS ===== //
+	@Override
+	public void visitEnter(ArithExpn arith) {
+		semanticAction(31, arith.getLeft());
+	}
+	@Override
+	public void visitLeave(ArithExpn arith) {
+		semanticAction(31, arith.getRight());
+		semanticAction(21, arith);
+	}
+
 	// ===== NON LEAF NODES ===== //
 
 	@Override
@@ -272,6 +283,10 @@ public class Semantics extends AST_Visitor.Default {
 			semanticAction(31, subs.getSubscript2());
 		}
 		semanticAction(27, subs);
+	}
+	@Override
+	public void visit(BoolConstExpn boolExpn) {
+		semanticAction(20);
 	}
 
 	// ADDITIONAL FUNCTIONS TO IMPLEMENT SEMANTIC ANALYSIS GO HERE
