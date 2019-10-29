@@ -1,0 +1,6 @@
+Parameters & Arguments counter:
+    Instead of counting number of parameters and/or arguments of a given
+    procedure/function declaration and call, we have decided to embed counter
+    variable within ASTList (which is what parameters and arguments are).
+    As such, we have omitted S14, S16, S44, and S45. Instead, we can simply
+    just compare the counter of ASTList of parameters and arguments.

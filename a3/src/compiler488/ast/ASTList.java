@@ -20,11 +20,14 @@ import java.util.LinkedList;
 public class ASTList<E extends AST> extends LinkedList<E> implements AST {
 	private static final long serialVersionUID = 1L;
 
+	private int count;
+
 	/**
 	 * Create an empty AST list
 	 */
 	public ASTList() {
 		super();
+		this.count = 0;
 	}
 
 	/**
@@ -37,6 +40,7 @@ public class ASTList<E extends AST> extends LinkedList<E> implements AST {
 		this();
 
 		append(elem);
+		this.count = 1;
 	}
 
 	/**
@@ -54,6 +58,7 @@ public class ASTList<E extends AST> extends LinkedList<E> implements AST {
 	 */
 	public ASTList<E> append(E elem) {
 		addLast(elem);
+		this.count++;
 
 		return this;
 	}
@@ -86,6 +91,10 @@ public class ASTList<E extends AST> extends LinkedList<E> implements AST {
 
 			first = false;
 		}
+	}
+
+	public int getCounter() {
+		return this.count;
 	}
 
 	/**

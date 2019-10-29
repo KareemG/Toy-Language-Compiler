@@ -181,7 +181,7 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(47, (s, self) -> {
 			// TODO(golaubka): Seems like the type is already stored in the associated Decl class.
 		});
-		
+
 		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
 		analyzers.put(40, (s, self) -> {
 			assert(s.get(0) instanceof FunctionCallExpn);
@@ -191,13 +191,38 @@ public class Semantics extends AST_Visitor.Default {
 			assert(routine.getType() != null);
 		});
 		analyzers.put(41, (s, self) -> {
-
+			assert(s.get(0) instanceof ProcedureCallStmt);
+			ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
+			assert(symTable.Get(procStmt.getName()) instanceof RoutineDecl);
+			RoutineDecl routine = (RoutineDecl) symTable.Get(procStmt.getName());
+			assert(routine.getType() == null);
 		});
 		analyzers.put(42, (s, self) -> {
-
+			if(s.get(0) instanceof FunctionCallExpn) {
+				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
+				assert(funcExpn.getArguments() == null);
+			} else if(s.get(0) instanceof ProcedureCallStmt) {
+				ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
+				assert(procStmt.getArguments() == null);
+			} else {
+				assert(false);
+			}
 		});
 		analyzers.put(43, (s, self) -> {
-
+			RoutineDecl routine;
+			if(s.get(0) instanceof FunctionCallExpn) {
+				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
+				routine = (RoutineDecl) symTable.Get(funcExpn.getIdent());
+				assert(routine.getParameters().getCounter()
+						!= funcExpn.getArguments().getCounter());
+			} else if(s.get(0) instanceof ProcedureCallStmt) {
+				ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
+				routine = (RoutineDecl) symTable.Get(procStmt.getName());
+				assert(routine.getParameters().getCounter()
+						!= procStmt.getArguments().getCounter());
+			} else {
+				assert(false);
+			}
 		});
 		analyzers.put(44, (s, self) -> {
 
@@ -205,13 +230,13 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(45, (s, self) -> {
 
 		});
-		
+
 		// Custom semantic action -- new loop. Need to create a new context
 		analyzers.put(98, (s, self) -> {
 			Context newContext = new Context(this.context, ContextType.LOOP);
 			this.context = newContext;
 		});
-		
+
 		// Custom semantic action -- exit context. Need to switch to previous context
 		analyzers.put(99, (s, self) -> {
 			this.context = this.context.GetPrev();
