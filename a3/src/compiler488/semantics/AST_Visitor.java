@@ -32,6 +32,10 @@ public interface AST_Visitor
     public void visitLeave(ProcedureCallStmt procStmt);
     public void visitEnter(LoopingStmt loopStmt);
     public void visitLeave(LoopingStmt loopStmt);
+    public void visitEnter(WhileDoStmt whileStmt);
+    public void visitLeave(WhileDoStmt whileStmt);
+    public void visitEnter(RepeatUntilStmt repeatStmt);
+    public void visitLeave(RepeatUntilStmt repeatStmt);
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
 

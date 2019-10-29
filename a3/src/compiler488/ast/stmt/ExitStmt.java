@@ -72,10 +72,9 @@ public class ExitStmt extends Stmt {
 	@Override
 	public void accept(AST_Visitor visitor)
 	{
-		visitor.visitEnter(this);
 		if (this.expn != null) {
 			this.expn.accept(visitor);
 		}
-		visitor.visitLeave(this);
+		visitor.visit(this);
 	}
 }
