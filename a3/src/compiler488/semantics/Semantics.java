@@ -13,7 +13,7 @@ import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.decl.*;
-import compiler488.symbol.SymbolTable;
+import compiler488.symbol.*;
 
 /**
  * Implement semantic analysis for compiler 488
@@ -30,6 +30,7 @@ public class Semantics extends AST_Visitor.Default {
 	public File f;
 
 	private SymbolTable symTable;
+	private Context context;
 	private Map<Integer, BiConsumer<List<BaseAST>, Semantics>> analyzers;
 
 	/** SemanticAnalyzer constructor */
@@ -47,12 +48,21 @@ public class Semantics extends AST_Visitor.Default {
 		/* GOES HERE */
 		/*********************************************/
 
+		this.context = new Context(null, ContextType.MAIN);
 		this.symTable = new SymbolTable();
 		this.analyzers = new HashMap<>();
 
 		this.symTable.Initialize();
 
-		// TODO: We should add bunch of semantics actions here maybe?
+		// Custom semantic action -- new loop. Need to create a new context
+		analyzers.put(98, (s, self) -> {
+			Context newContext = new Context(this.context, ContextType.LOOP);
+			this.context = newContext;
+		});
+		// Custom semantic action -- exit context. Need to switch to previous context
+		analyzers.put(99, (s, self) -> {
+			this.context = this.context.GetPrev();
+		});
 	}
 
 	/** semanticsFinalize - called by the parser once at the */
@@ -70,7 +80,7 @@ public class Semantics extends AST_Visitor.Default {
 
 	/**
 	 * Perform one semantic analysis action
-	 * 
+	 *
 	 * @param actionNumber semantic analysis action number
 	 */
 	void semanticAction(int actionNumber, BaseAST... nodes) {
@@ -184,13 +194,23 @@ public class Semantics extends AST_Visitor.Default {
 		if(whileStmt.getExpn() != null) {
 			semanticAction(30, whileStmt.getExpn());
 		}
+		semanticAction(98);
+	}
+	@Override
+	public void visitLeave(WhileDoStmt whileStmt) {
+		semanticAction(99);
 	}
 
+	@Override
+	public void visitEnter(RepeatUntilStmt repeatStmt) {
+		semanticAction(98);
+	}
 	@Override
 	public void visitLeave(RepeatUntilStmt repeatStmt) {
 		if(repeatStmt.getExpn() != null) {
 			semanticAction(30, repeatStmt.getExpn());
 		}
+		semanticAction(99);
 	}
 
 	// ===== NON LEAF NODES ===== //
