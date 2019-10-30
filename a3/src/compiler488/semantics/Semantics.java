@@ -33,7 +33,8 @@ public class Semantics extends AST_Visitor.Default {
 	private SymbolTable symTable;
 	private Context context;
 	private Map<Integer, BiConsumer<List<BaseAST>, Semantics>> analyzers;
-	private ArrayList<DeclarationPart> tmpDecls;
+
+	private boolean err;
 
 	/** SemanticAnalyzer constructor */
 	public Semantics() {
@@ -44,6 +45,15 @@ public class Semantics extends AST_Visitor.Default {
 		Initialize();
 		this.traceSemantics = true;
 		this.traceFile = traceFile;
+	}
+
+	private void printError(String str) {
+		System.err.println("ERROR:" + str);
+		this.err = true;
+	}
+
+	public boolean didError() {
+		return this.err;
 	}
 
 	/** semanticsInitialize - called once by the parser at the */
@@ -59,7 +69,7 @@ public class Semantics extends AST_Visitor.Default {
 		this.context = new Context(null, ContextType.MAIN);
 		this.symTable = new SymbolTable();
 		this.analyzers = new HashMap<>();
-		this.tmpDecls = new ArrayList<>();
+		this.err = false;
 
 		this.symTable.Initialize();
 
@@ -74,29 +84,30 @@ public class Semantics extends AST_Visitor.Default {
 		});
 
 		// Associate declaration(s) with scope.
-		analyzers.put(2, (s, self) -> {
-			assert(s.get(0) instanceof Scope);
+		// We already do this currently
+		// analyzers.put(2, (s, self) -> {
+		// 	assert(s.get(0) instanceof Scope);
 
-			Scope scope = (Scope) s.get(0);
-			ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
-			while (decl_it.hasNext()) {
-				Declaration decl = decl_it.next();
-				if (decl instanceof MultiDeclarations) {
-					MultiDeclarations multi_decl = (MultiDeclarations) decl;
+		// 	Scope scope = (Scope) s.get(0);
+		// 	ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
+		// 	while (decl_it.hasNext()) {
+		// 		Declaration decl = decl_it.next();
+		// 		if (decl instanceof MultiDeclarations) {
+		// 			MultiDeclarations multi_decl = (MultiDeclarations) decl;
 
-					ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
-					while (part_it.hasNext()) {
-						DeclarationPart part = part_it.next();
-						self.symTable.Put(part.getName(), part);
-					}
-				} else if (decl instanceof RoutineDecl) {
-					RoutineDecl routine = (RoutineDecl) decl;
-					self.symTable.Put(routine.getName(), routine);
-				} else {
-					assert(false);
-				}
-			}
-		});
+		// 			ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
+		// 			while (part_it.hasNext()) {
+		// 				DeclarationPart part = part_it.next();
+		// 				self.symTable.Put(part.getName(), part);
+		// 			}
+		// 		} else if (decl instanceof RoutineDecl) {
+		// 			RoutineDecl routine = (RoutineDecl) decl;
+		// 			self.symTable.Put(routine.getName(), routine);
+		// 		} else {
+		// 			assert(false);
+		// 		}
+		// 	}
+		// });
 
 		// Start function scope.
 		analyzers.put(4, (s, self) -> {
@@ -139,7 +150,8 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(0) instanceof ScalarDeclPart);
 			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
 			Record newRec = new Record(decl.getName(), RecordType.SCALAR);
-			this.symTable.put(newRec.getIdent(), newRec);
+			if(this.symTable.put(newRec.getIdent(), newRec) == 1)
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Declare function with no parameters and specified type.
@@ -148,7 +160,8 @@ public class Semantics extends AST_Visitor.Default {
 			RoutineDecl decl = (RoutineDecl) s.get(0);
 			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
 			newRec.setResult(decl.getType());
-			this.symTable.put(newRec.getIdent(), newRec); // S11
+			if(this.symTable.put(newRec.getIdent(), newRec) == 1) // S11
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Declare function with parameters and specified type.
@@ -158,7 +171,8 @@ public class Semantics extends AST_Visitor.Default {
 			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
 			newRec.setResult(decl.getType());
 			newRec.setParam(symTable.getParams());
-			this.symTable.pPut(newRec.getIdent(), newRec); // S12
+			if(this.symTable.pPut(newRec.getIdent(), newRec) == 1) // S12
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Associate scope with function/procedure.
@@ -191,7 +205,8 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
 			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
-			this.symTable.put(newRec.getIdent(), newRec);
+			if(this.symTable.put(newRec.getIdent(), newRec) == 1)
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Declare procedure with parameters.
@@ -200,7 +215,8 @@ public class Semantics extends AST_Visitor.Default {
 			RoutineDecl decl = (RoutineDecl) s.get(0);
 			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
 			newRec.setParam(symTable.getParams());
-			this.symTable.pPut(newRec.getIdent(), newRec);
+			if(this.symTable.pPut(newRec.getIdent(), newRec) == 1)
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Declare array variable with specified lower and upper bounds.
@@ -208,7 +224,8 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(0) instanceof ArrayDeclPart);
 			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
 			Record newRec = new Record(decl.getName(), RecordType.ARRAY);
-			self.symTable.put(decl.getName(), newRec);
+			if(this.symTable.put(decl.getName(), newRec) == 1)
+				printError("Attempt to declare a variable more than once");
 		});
 
 		// Check that lower bound is <= upper bound.
@@ -217,9 +234,11 @@ public class Semantics extends AST_Visitor.Default {
 
 			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
 
-			assert(decl.getLowerBoundary1() <= decl.getUpperBoundary1());
-			assert(!decl.isTwoDimensional()
-					|| (decl.getLowerBoundary2() <= decl.getUpperBoundary2()));
+			if(decl.getLowerBoundary1() > decl.getUpperBoundary1())
+				printError("Lower boundary of first index is larger than upper boundary");
+			if(decl.isTwoDimensional() &&
+					decl.getLowerBoundary2() > decl.getUpperBoundary2())
+				printError("Lower boundary of second index is larger than upper boundary");
 		});
 
 		// Associate type with variables.
@@ -228,16 +247,7 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(1) instanceof Type);
 			Type type = (Type) s.get(1);
 			DeclarationPart declPart = (DeclarationPart) s.get(0);
-			// Record newRec = null;
-			// if (s.get(0) instanceof ArrayDeclPart) {
-			// 	newRec = new Record(declPart.getName(), RecordType.ARRAY);
-			// } else if (s.get(0) instanceof ScalarDeclPart) {
-			// 	newRec = new Record(declPart.getName(), RecordType.SCALAR);
-			// } else {
-			// 	assert(false);
-			// }
 			symTable.get(declPart.getName()).setResult(type);
-			//symTable.put(declPart.getName(), newRec);
 		});
 
 		// ===== EXPRESSION TYPES ===== //
@@ -278,49 +288,62 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(30, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
-			assert(expn.getType() instanceof BooleanType);
+			if(!(expn.getType() instanceof BooleanType))
+				printError("Expected expression type is boolean but it is not");
 		});
 		analyzers.put(31, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
-			assert(expn.getType() instanceof IntegerType);
+			if(!(expn.getType() instanceof IntegerType))
+				printError("Expected expression type is integer but it is not");
 		});
 		analyzers.put(32, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			assert(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+			if(!(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType())));
+				printError("Expressions type mismatch");
 		});
 		analyzers.put(33, (s, self) -> {
 			// TODO: Redundant perhaps?
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			assert(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+			if(!(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType())));
+				printError("Expressions type mismatch");
 		});
 		analyzers.put(34, (s, self) -> {
 			assert(s.get(0) instanceof ReadableExpn);
 			assert(s.get(1) instanceof Expn);
-			assert(((ReadableExpn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+			if(!((ReadableExpn)s.get(0)).getType().equals(((Expn)s.get(1)).getType()))
+				printError("Assignment type mismatch");
 		});
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
-			assert(symTable.GetType() != null);
-			assert(((ReturnStmt) s.get(0)).getValue().getType().equals(symTable.GetType()));
+			if(symTable.getType() == null
+				|| !(((ReturnStmt)s.get(0)).getValue().getType().equals(symTable.getType())))
+				printError("Return value type does not match function's return type");
 		});
 		analyzers.put(36, (s, self) -> {
 			assert(symTable.GetParams() != null);
 			// We have also checked the size of the params vs args here (S43)
 			assert(s.size() == symTable.GetParams().size());
-			ASTList<ScalarDecl> params = symTable.GetParams();
+			ArrayList<Record> param = symTable.getParams();
 			for(int i = 0; i < s.size(); i++) {
 				assert(s.get(i) instanceof Expn);
-				assert(((Expn) s.get(i)).getType().equals(params.get(i).getType()));
+				if(!(((Expn) s.get(i)).getType().equals(param.get(i).getResult())))
+					printError("Type of parameter and argument mismatch");
 			}
 		});
 		analyzers.put(37, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDecl);
+			Record rec = symTable.get(((ScalarDecl)s.get(0)).getName());
+			if(rec == null || rec.getType() != RecordType.SCALAR)
+				printError("Identifier not declared or is not a scalar");
 		});
 		analyzers.put(38, (s, self) -> {
 			assert(s.get(0) instanceof SubsExpn);
+			Record rec = symTable.get(((SubsExpn)s.get(0)).getVariable());
+			if(rec == null || rec.getType() != RecordType.ARRAY)
+				printError("Identifier not declared or is not an array");
 		});
 		// Probably not necessary. ScalarDecl is only used for parameter, so we
 		// can base it off of that
@@ -328,76 +351,82 @@ public class Semantics extends AST_Visitor.Default {
 
 		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
 		analyzers.put(40, (s, self) -> {
-			assert(s.get(0) instanceof FunctionCallExpn);
 			FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
-			assert(symTable.Get(funcExpn.getIdent()) instanceof RoutineDecl);
-			RoutineDecl routine = (RoutineDecl) symTable.Get(funcExpn.getIdent());
-			assert(routine.getType() != null);
+			Record rec = symTable.get(funcExpn.getIdent());
+			if(rec == null || rec.getType() != RecordType.FUNCTION)
+				printError("Calling identifier that is not a function");
 		});
 		analyzers.put(41, (s, self) -> {
-			assert(s.get(0) instanceof ProcedureCallStmt);
 			ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
-			assert(symTable.Get(procStmt.getName()) instanceof RoutineDecl);
-			RoutineDecl routine = (RoutineDecl) symTable.Get(procStmt.getName());
-			assert(routine.getType() == null);
+			Record rec = symTable.get(procStmt.getName());
+			if(rec == null || rec.getType() != RecordType.PROCEDURE)
+				printError("Calling identifier that is not a procedure");
 		});
 		analyzers.put(42, (s, self) -> {
 			if(s.get(0) instanceof FunctionCallExpn) {
 				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
-				assert(funcExpn.getArguments() == null);
+				if(funcExpn.getArguments() != null)
+					printError("Function with parameter called without arguments");
 			} else if(s.get(0) instanceof ProcedureCallStmt) {
 				ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
-				assert(procStmt.getArguments() == null);
+				if(procStmt.getArguments() != null)
+					printError("Procedure with parameter called without arguments");
 			} else {
 				assert(false);
 			}
 		});
 		analyzers.put(43, (s, self) -> {
-			RoutineDecl routine;
+			Record rec;
 			if(s.get(0) instanceof FunctionCallExpn) {
 				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
-				routine = (RoutineDecl) symTable.Get(funcExpn.getIdent());
-				assert(routine.getParameters().size()
-						!= funcExpn.getArguments().size());
+				rec = symTable.get(funcExpn.getIdent());
+				if(rec.getParamCount() != funcExpn.getArguments().size())
+					printError("Number of arguments does not equal number of parameters");
 			} else if(s.get(0) instanceof ProcedureCallStmt) {
 				ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
-				routine = (RoutineDecl) symTable.Get(procStmt.getName());
-				assert(routine.getParameters().size()
-						!= procStmt.getArguments().size());
+				rec = symTable.get(procStmt.getName());
+				if (rec.getParamCount() != procStmt.getArguments().size())
+					printError("Number of arguments does not equal number of parameters");
 			} else {
-				assert(false);
+				printError("Number of arguments does not equal number of parameters");
 			}
 		});
 		analyzers.put(44, (s, self) -> {});
 		analyzers.put(45, (s, self) -> {});
 
 		analyzers.put(50, (s, self) -> {
-			assert(this.context.GetType() == ContextType.LOOP);
+			if(this.context.GetType() != ContextType.LOOP)
+				printError("Exit statemetn is not directly inside a loop");
 		});
 		analyzers.put(51, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() == ContextType.LOOP) {
 				tmp = tmp.GetPrev();
 			}
-			assert(this.context.GetType() == ContextType.FUNCTION);
+			if(this.context.GetType() != ContextType.FUNCTION)
+				printError("Return statement is not directly inside a function");
 		});
 		analyzers.put(52, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() == ContextType.LOOP) {
 				tmp = tmp.GetPrev();
 			}
-			assert(this.context.GetType() == ContextType.PROCEDURE);
+			if(this.context.GetType() != ContextType.PROCEDURE)
+				printError("Return statement is not directly inside a procedure");
 		});
 		analyzers.put(53, (s, self) -> {
-			assert(((ExitStmt) s.get(0)).getLevel() > 0);
-			assert(((ExitStmt) s.get(0)).getLevel() <= context.GetLoopCount());
+			int lvl = ((ExitStmt) s.get(0)).getLevel();
+			if(lvl <= 0 || lvl > context.GetLoopCount())
+				printError("Exit value is greater than number of loops");
 		});
 		analyzers.put(54, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() != ContextType.FUNCTION) {
 				tmp = tmp.GetPrev();
 			}
-			assert(this.context.GetRetCount() > 0);
+			if(this.context.GetRetCount() > 0) {
+				printError("Function does not contain return statement");
+			}
 		});
 
 		// Custom semantic action -- new loop. Need to create a new context
@@ -481,7 +510,7 @@ public class Semantics extends AST_Visitor.Default {
 	@Override
 	public void visitEnter(Scope scope) {
 		if (scope.getDeclarations() != null) {
-			semanticAction(2, scope);
+			// semanticAction(2, scope);
 		}
 	}
 
@@ -718,15 +747,4 @@ public class Semantics extends AST_Visitor.Default {
 	public void visit(IntConstExpn intExpn) {
 		semanticAction(21, intExpn);
 	}
-
-	public void EnterScope(List<BaseAST> s)
-	{
-		symTable.EnterScope();
-	}
-
-	public void ExitScope(List<BaseAST> s)
-	{
-		symTable.ExitScope();
-	}
-
 }

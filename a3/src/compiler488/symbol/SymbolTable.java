@@ -62,18 +62,6 @@ public class SymbolTable implements PrettyPrintable {
 	 *  If not present, asserts
 	 *  @param key variable name of interest
 	 */
-	public BaseAST Get(String key) {
-		ScopeNode traverse = root;
-		while (traverse != null) {
-			BaseAST value = traverse.Get(key);
-			if (value != null) {
-				return value;
-			}
-			traverse = traverse.GetParent();
-		}
-		assert(false);
-		return null;
-	}
 	public Record get(String key) {
 		ScopeNode traverse = root;
 		while (traverse != null) {
@@ -99,41 +87,21 @@ public class SymbolTable implements PrettyPrintable {
 	 *  @param key variable name binded to the val
 	 *  @param val actual object that has been declared
 	 */
-	public void Put(String key, BaseAST val) {
-		assert(this.root.Put(key, val) == 0);
+	public int put(String key, Record val) {
+		return this.root.put(key, val);
 	}
 
-	public void put(String key, Record val) {
-		int ret = this.root.put(key, val);
-		assert(ret == 0);
-	}
-
-	public void pPut(String key, Record val) {
-		int ret = this.root.GetParent().put(key, val);
-		assert(ret == 0);
+	public int pPut(String key, Record val) {
+		return this.root.GetParent().put(key, val);
 	}
 
 	/** Call when entering a new scope.
 	 *  Creates another hashtable/ScopeNode, and pushes it on top of
 	 *  stack of nodes.
 	 */
-	public void EnterScope() {
-		ScopeNode newScope = new ScopeNode(this.root);
-		this.root = newScope;
-	}
 
 	public void enterScope() {
 		ScopeNode newScope = new ScopeNode(this.root);
-		this.root = newScope;
-	}
-
-	public void enterScope(String label, Type type) {
-		ScopeNode newScope = new ScopeNode(this.root, label);
-		this.root = newScope;
-		this.root.type = type;
-	}
-	public void enterScope(String label) {
-		ScopeNode newScope = new ScopeNode(this.root, label);
 		this.root = newScope;
 	}
 
@@ -141,9 +109,10 @@ public class SymbolTable implements PrettyPrintable {
 	 * Enter procedure scope.
 	 * @param label name of the procedure
 	 */
-	public void EnterScope(String label, ASTList<ScalarDecl> params) {
-		ScopeNode newScope = new ScopeNode(this.root, label, params);
+	public void enterScope(String label, Type type) {
+		ScopeNode newScope = new ScopeNode(this.root, label);
 		this.root = newScope;
+		this.root.type = type;
 	}
 
 	/**
@@ -152,8 +121,8 @@ public class SymbolTable implements PrettyPrintable {
 	 * @param type return type of the function
 	 * @param params parameters of the function
 	 */
-	public void EnterScope(String label, Type type, ASTList<ScalarDecl> params) {
-		ScopeNode newScope = new ScopeNode(this.root, label, type, params);
+	public void enterScope(String label) {
+		ScopeNode newScope = new ScopeNode(this.root, label);
 		this.root = newScope;
 	}
 
@@ -166,14 +135,6 @@ public class SymbolTable implements PrettyPrintable {
 	 *  we need to create a symbol file or something like that.
 	 *  Can always be removed if deemed unnecessary
 	 */
-	public void ExitScope() {
-		// Only exit if you are not the main scope
-		if (this.root != null) {
-			ScopeNode tmp = this.root;
-			this.root = root.GetParent();
-			this.root.AddArchive(tmp);
-		}
-	}
 	public void exitScope() {
 		// Only exit if you are not the main scope
 		if (this.root != null) {
@@ -183,11 +144,11 @@ public class SymbolTable implements PrettyPrintable {
 		}
 	}
 
-	public String GetLabel() {
+	public String getLabel() {
 		return this.root.label;
 	}
 
-	public Type GetType() {
+	public Type getType() {
 		return this.root.type;
 	}
 

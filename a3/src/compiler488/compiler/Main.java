@@ -406,6 +406,8 @@ public class Main {
 		{
 			Semantics analyzer = new Semantics();
 			programAST.accept(analyzer);
+			if(analyzer.didError())
+				throw new Exception("Semantic error");
 			return analyzer.getSymbolTable();
 		}
 		catch (Exception e)
