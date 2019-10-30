@@ -547,7 +547,7 @@ public class Main {
 			System.out.println("Processing Terminated due to errors during code generation");
 			return;
 		} else {
-			System.out.println("End of Compilation");
+			System.out.println("\nEnd of Compilation");
 		}
 
 		if (traceStream != null && traceStream != saveSysOut) {
