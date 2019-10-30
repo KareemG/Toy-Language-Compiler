@@ -379,7 +379,14 @@ public class Main {
 
 	private static void dumpSymbolTable(SymbolTable symTable) {
 		try {
-
+			if (compilerDumpFileName.length() > 0) {
+				dumpFile = new File(compilerDumpFileName);
+				dumpStream = new PrintStream(new FileOutputStream(dumpFile));
+				symTable.prettyPrint(new BasePrettyPrinter(dumpStream));
+				dumpStream.close();
+			} else {
+				symTable.prettyPrint(new BasePrettyPrinter(saveSysOut));
+			}
 		} catch (Exception e) {
 			System.err.println("Exception while dumping Symbol Table");
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());

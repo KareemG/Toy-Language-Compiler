@@ -14,7 +14,7 @@ import compiler488.ast.type.*;
  *  @author  KyoKeun Park
  */
 
-public class SymbolTable {
+public class SymbolTable implements PrettyPrintable {
 	private ScopeNode root;
 
 	/** Symbol Table  constructor
@@ -121,10 +121,12 @@ public class SymbolTable {
 	 *  Can always be removed if deemed unnecessary
 	 */
 	public void ExitScope() {
-		assert(this.root != null);
-		ScopeNode tmp = this.root;
-		this.root = root.GetParent();
-		this.root.AddArchive(tmp);
+		// Only exit if you are not the main scope
+		if (this.root != null) {
+			ScopeNode tmp = this.root;
+			this.root = root.GetParent();
+			this.root.AddArchive(tmp);
+		}
 	}
 
 	public String GetLabel() {
@@ -137,5 +139,11 @@ public class SymbolTable {
 
 	public ASTList<ScalarDecl> GetParams() {
 		return this.root.params;
+	}
+
+	@Override
+	public void prettyPrint(PrettyPrinter p) {
+		assert(this.root != null);
+		this.root.prettyPrint(p);
 	}
 }

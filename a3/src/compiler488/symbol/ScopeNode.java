@@ -16,7 +16,7 @@ import compiler488.ast.type.*;
  *
  * @author  KyoKeun Park
  */
-class ScopeNode {
+class ScopeNode implements PrettyPrintable {
     private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
     private ArrayList<ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
@@ -71,5 +71,42 @@ class ScopeNode {
 
     public ScopeNode GetParent() {
         return this.parent;
+    }
+
+    @Override
+    public void prettyPrint(PrettyPrinter p) {
+        // Print out all of the metadata (if applicable)
+        if(label != null) {
+            p.print(label);
+        }
+        if(type != null) {
+            p.print(" : " + type.toString());
+        }
+        if(params != null) {
+            p.print("(");
+            params.prettyPrintCommas(p);
+            p.print(")");
+        }
+        p.println("{");
+        p.enterBlock();
+
+        // Print all of the symbols
+        p.println("Symbols:");
+        p.enterBlock();
+        Set<String> keys = symbols.keySet();
+        for (String key:keys) {
+            if (!key.equals(label)) {
+                symbols.get(key).prettyPrint(p);
+            }
+        }
+        p.exitBlock();
+
+        // Print children ScopeNodes
+        for(ScopeNode child : archive) {
+            child.prettyPrint(p);
+        }
+
+        p.exitBlock();
+        p.println("}");
     }
 }
