@@ -62,11 +62,12 @@ public class SubsExpn extends ReadableExpn {
 
 	@Override
 	public void accept(AST_Visitor visitor) {
+		visitor.visitEnter(this);
 		this.subscript1.accept(visitor);
 		if (this.subscript2 != null) {
 			this.subscript2.accept(visitor);
 		}
-		visitor.visit(this);
+		visitor.visitLeave(this);
 	}
 
 }

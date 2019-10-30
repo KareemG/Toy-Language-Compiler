@@ -165,8 +165,9 @@ public class Semantics extends AST_Visitor.Default {
 
 			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
 
-			assert(decl.lb1 <= decl.ub1);
-			assert(!decl.isTwoDimensional || (decl.lb2 <= decl.ub2));
+			assert(decl.getLowerBoundary1() <= decl.getUpperBoundary1());
+			assert(!decl.isTwoDimensional()
+					|| (decl.getLowerBoundary2() <= decl.getUpperBoundary2()));
 		});
 
 		// Associate type with variables.
