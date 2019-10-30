@@ -28,8 +28,8 @@ duplicate_definition.488      : test that duplicating a definition fail
 duplicate_function.488        : test that redeclaring a function/procedure fail
 duplicate_variable.488        : test that redeclaring a variable fail
 excessive_parameters.488      : test that too many arguments to a function fail
-exit_invalid.488              : test that using the exit <integer> statement not in a integer loop fail
-exit_zero.488                 : test that using the exit <integer> statement not in a integer loop fail
+exit_invalid.488              : test that using the exit statement to break out more loops than they currently exist fail
+exit_zero.488                 : test that using the exit statement to break out of 0 loops fail
 external_exit.488             : test that using the exit statement outside of a loop fail
 external_return.488           : test that using the return statement outside of a function fail
 missing_parameters.488        : test that calling a function with missing arguments fail
