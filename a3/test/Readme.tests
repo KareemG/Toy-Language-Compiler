@@ -55,3 +55,5 @@ shadow_global_scope.488       : test that the symbol table can handle variables 
 procedures.488                : test that the symbol table can handle a function and procedure with the same named parameters
 shadow_parameters.488         : test that the symbol table can handle shadowing global variables in a function's parameters
 shadow_local_variables.488    : test that the symbol table can handle shadowing global variables from a function's local variables
+shadow_functions.488          : test that the symbol table can handle shadowing a function with another function in another scope
+shadow_procedures.488         : test that the symbol table can handle shadowing a procedure with another procedure in another scope

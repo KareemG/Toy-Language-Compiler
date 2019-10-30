@@ -1,0 +1,22 @@
+{
+    procedure test
+    {
+        write "Test"
+    }
+
+    function test2 : integer
+    {
+        procedure test
+        {
+            write "Test2"
+        }
+
+        test
+        
+        return 5
+    }
+
+    var x : integer
+
+    x := test2
+}
