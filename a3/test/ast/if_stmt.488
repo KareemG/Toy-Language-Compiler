@@ -15,4 +15,15 @@
     }
     else
         write "invalid"
+    
+    if 5 + 7 > 11 then
+        if 9 - 3 < 7 then
+            if a + b = c then
+                write "valid"
+            else
+                write "valid"
+        else
+            write "invalid"
+    else
+        write "invalid"
 }
