@@ -377,17 +377,29 @@ public class Main {
 		}
 	}
 
+	private static void dumpSymbolTable(SymbolTable symTable) {
+		try {
+
+		} catch (Exception e) {
+			System.err.println("Exception while dumping Symbol Table");
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			e.printStackTrace();
+			System.exit(100);
+		}
+	}
+
 	/**
 	 * function to perform semantic analysis on the scanned and parsed program
 	 *
 	 * @param programAST
 	 *            the Abstract Syntax Tree produced during parsing
 	 */
-	private static void semanticAnalysis(Program programAST) {
+	private static SymbolTable semanticAnalysis(Program programAST) {
 		try
 		{
-			StatementChecker checker = new StatementChecker();
-			programAST.accept(checker);
+			Semantics analyzer = new Semantics();
+			programAST.accept(analyzer);
+			return analyzer.getSymbolTable();
 		}
 		catch (Exception e)
 		{
@@ -395,6 +407,7 @@ public class Main {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			e.printStackTrace();
 			errorOccurred = true;
+			return null;
 		}
 	}
 
@@ -480,6 +493,7 @@ public class Main {
 	private static void compileOneProgram(Machine machine, String sourceFileName) {
 		Object parserResult = null ; // the result of parsing and AST building
 		Program programAST = null;
+		SymbolTable symTable = null;
 
 		errorOccurred = false;
 
@@ -530,11 +544,15 @@ public class Main {
 		}
 
 		/* Do semantic analysis on the program */
-		semanticAnalysis(programAST);
+		symTable = semanticAnalysis(programAST);
 
 		if (errorOccurred) {
 			System.out.println("Processing Terminated due to errors during semantic analysis");
 			return;
+		}
+
+		if (dumpSymbolTable) {
+			dumpSymbolTable(symTable);
 		}
 
 		// Dump AST after semantic analysis if requested

@@ -35,7 +35,13 @@ public class Semantics extends AST_Visitor.Default {
 
 	/** SemanticAnalyzer constructor */
 	public Semantics() {
+		Initialize();
+	}
 
+	public Semantics(String traceFile) {
+		Initialize();
+		this.traceSemantics = true;
+		this.traceFile = traceFile;
 	}
 
 	/** semanticsInitialize - called once by the parser at the */
@@ -299,6 +305,10 @@ public class Semantics extends AST_Visitor.Default {
 		/**********************************************/
 		this.symTable.Finalize();
 
+	}
+
+	public SymbolTable getSymbolTable() {
+		return this.symTable;
 	}
 
 	/**
