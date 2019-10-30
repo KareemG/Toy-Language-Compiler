@@ -1,0 +1,9 @@
+ { 
+ function a : integer { 
+ return with 1
+ } 
+ function b(offset : integer) : integer { 
+ return with (a) + (offset)
+ } 
+ write b(b(10), 100)
+ }

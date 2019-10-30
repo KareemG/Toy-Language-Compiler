@@ -1,0 +1,31 @@
+ { 
+ var a : integer
+ var b, c, d, e : integer
+ var f, g, h : boolean
+ read a, b, c
+ d : = ((-((a) + (b))) * (a)) + ((b) * (c))
+ e : = (a) - (-((b) / (d)))
+ f : = (d) < (e)
+ g : = not(((d) * (2)) > (e))
+ h : = (null ? null : null)
+ if h then
+ write "less than 10000"end
+ if (d) not = (e) then
+ write "not equal"end
+ if (d) < (e) then
+ write "<"end
+ if (d) <= (e) then
+ write "<="end
+ if (d) > (e) then
+ write ">"end
+ if (d) >= (e) then
+ write ">="end
+ if (f) and (g) then
+ write "f and g"end
+ if (f) or (g) then
+ write "f or g"end
+ if (not(f)) and (g) then
+ write "not f and g"end
+ if (f) or (not(g)) then
+ write "f or not g"end
+ }
