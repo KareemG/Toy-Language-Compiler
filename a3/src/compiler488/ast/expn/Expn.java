@@ -10,11 +10,11 @@ import compiler488.ast.type.*;
 public abstract class Expn extends BaseAST implements Printable {
     Type resultingType = null;
 
-    public void SetResult(Type result) {
+    public void setType(Type result) {
         this.resultingType = result;
     }
 
-    public Type GetResult() {
+    public Type getType() {
         return this.resultingType;
     }
 }

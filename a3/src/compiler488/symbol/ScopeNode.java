@@ -3,6 +3,8 @@ package compiler488.symbol;
 import java.io.*;
 import java.util.*;
 import compiler488.ast.*;
+import compiler488.ast.decl.*;
+import compiler488.ast.type.*;
 
 /** Scope Node
  *  This will represent a single instance of a scope.
@@ -18,14 +20,30 @@ class ScopeNode {
     private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
     private ArrayList<ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
+    protected String label = null; // scope node label (functions and procedures)
+    protected Type type = null; // return type of the scope (for functions)
+    protected ASTList<ScalarDecl> params = null; // params (for functions)
 
-    ScopeNode() {
+    public ScopeNode() {
         Initialize();
     }
 
-    ScopeNode(ScopeNode parent) {
+    public ScopeNode(ScopeNode parent) {
         Initialize();
         this.parent = parent;
+    }
+
+    public ScopeNode(ScopeNode parent, String label) {
+        this.label = label;
+    }
+
+    public ScopeNode(ScopeNode parent, String label,
+                        Type type, ASTList<ScalarDecl> params) {
+        Initialize();
+        this.parent = parent;
+        this.label = label;
+        this.type = type;
+        this.params = params;
     }
 
     private void Initialize() {

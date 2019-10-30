@@ -8,20 +8,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
-<<<<<<< HEAD
 import compiler488.ast.*;
 import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
 import compiler488.ast.expn.*;
 import compiler488.ast.decl.*;
 import compiler488.symbol.*;
-=======
-import compiler488.ast.BaseAST;
-import compiler488.ast.decl.*;
-import compiler488.ast.stmt.*;
-import compiler488.ast.type.*;
-import compiler488.symbol.SymbolTable;
->>>>>>> a3-scopes-declarations
 
 /**
  * Implement semantic analysis for compiler 488
@@ -75,14 +67,14 @@ public class Semantics extends AST_Visitor.Default {
 		// Associate declaration(s) with scope.
 		analyzers.put(2, (s, self) -> {
 			assert(s.get(0) instanceof Scope);
-			
+
 			Scope scope = (Scope) s.get(0);
 			ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
 			while (decl_it.hasNext()) {
 				Declaration decl = decl_it.next();
 				if (decl instanceof MultiDeclarations) {
 					MultiDeclarations multi_decl = (MultiDeclarations) decl;
-					
+
 					ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
 					while (part_it.hasNext()) {
 						DeclarationPart part = part_it.next();
@@ -183,12 +175,37 @@ public class Semantics extends AST_Visitor.Default {
 		});
 
 		// ===== EXPRESSION TYPE CHECKING ===== //
-		analyzers.put(30, (s, self) -> {});
-		analyzers.put(31, (s, self) -> {});
-		analyzers.put(32, (s, self) -> {});
-		analyzers.put(33, (s, self) -> {});
-		analyzers.put(34, (s, self) -> {});
-		analyzers.put(35, (s, self) -> {});
+		analyzers.put(30, (s, self) -> {
+			assert(s.get(0) instanceof Expn);
+			Expn expn = (Expn) s.get(0);
+			assert(expn.getType() instanceof BooleanType);
+		});
+		analyzers.put(31, (s, self) -> {
+			assert(s.get(0) instanceof Expn);
+			Expn expn = (Expn) s.get(0);
+			assert(expn.getType() instanceof IntegerType);
+		});
+		analyzers.put(32, (s, self) -> {
+			assert(s.get(0) instanceof Expn);
+			assert(s.get(1) instanceof Expn);
+			assert(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+		});
+		analyzers.put(33, (s, self) -> {
+			// TODO: Redundant perhaps?
+			assert(s.get(0) instanceof Expn);
+			assert(s.get(1) instanceof Expn);
+			assert(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+		});
+		analyzers.put(34, (s, self) -> {
+			assert(s.get(0) instanceof IdentExpn);
+			assert(s.get(1) instanceof Expn);
+			assert(((IdentExpn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+		});
+		analyzers.put(35, (s, self) -> {
+			assert(s.get(0) instanceof ReturnStmt);
+			assert(symTable.GetType() != null);
+			assert(((ReturnStmt) s.get(0)).getValue().getType().equals(symTable.GetType()));
+		});
 		analyzers.put(36, (s, self) -> {});
 		analyzers.put(37, (s, self) -> {});
 		analyzers.put(38, (s, self) -> {});
@@ -225,13 +242,13 @@ public class Semantics extends AST_Visitor.Default {
 			if(s.get(0) instanceof FunctionCallExpn) {
 				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
 				routine = (RoutineDecl) symTable.Get(funcExpn.getIdent());
-				assert(routine.getParameters().getCounter()
-						!= funcExpn.getArguments().getCounter());
+				assert(routine.getParameters().size()
+						!= funcExpn.getArguments().size());
 			} else if(s.get(0) instanceof ProcedureCallStmt) {
 				ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
 				routine = (RoutineDecl) symTable.Get(procStmt.getName());
-				assert(routine.getParameters().getCounter()
-						!= procStmt.getArguments().getCounter());
+				assert(routine.getParameters().size()
+						!= procStmt.getArguments().size());
 			} else {
 				assert(false);
 			}
