@@ -18,6 +18,7 @@ import compiler488.ast.type.*;
  */
 class ScopeNode implements PrettyPrintable {
     private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
+    private Hashtable<String, Type> syms;
     private ArrayList<ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
     protected String label = null; // scope node label (functions and procedures)

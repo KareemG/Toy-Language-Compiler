@@ -275,11 +275,36 @@ public class Semantics extends AST_Visitor.Default {
 				assert(false);
 			}
 		});
-		analyzers.put(44, (s, self) -> {
+		analyzers.put(44, (s, self) -> {});
+		analyzers.put(45, (s, self) -> {});
 
+		analyzers.put(50, (s, self) -> {
+			assert(this.context.GetType() == ContextType.LOOP);
 		});
-		analyzers.put(45, (s, self) -> {
-
+		analyzers.put(51, (s, self) -> {
+			Context tmp = this.context;
+			while(tmp.GetType() == ContextType.LOOP) {
+				tmp = tmp.GetPrev();
+			}
+			assert(this.context.GetType() == ContextType.FUNCTION);
+		});
+		analyzers.put(52, (s, self) -> {
+			Context tmp = this.context;
+			while(tmp.GetType() == ContextType.LOOP) {
+				tmp = tmp.GetPrev();
+			}
+			assert(this.context.GetType() == ContextType.PROCEDURE);
+		});
+		analyzers.put(53, (s, self) -> {
+			assert(((ExitStmt) s.get(0)).getLevel() > 0);
+			assert(((ExitStmt) s.get(0)).getLevel() <= context.GetLoopCount());
+		});
+		analyzers.put(54, (s, self) -> {
+			Context tmp = this.context;
+			while(tmp.GetType() != ContextType.FUNCTION) {
+				tmp = tmp.GetPrev();
+			}
+			assert(this.context.GetRetCount() > 0);
 		});
 
 		// Custom semantic action -- new loop. Need to create a new context
