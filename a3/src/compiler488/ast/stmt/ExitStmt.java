@@ -1,6 +1,7 @@
 package compiler488.ast.stmt;
 
 import compiler488.ast.expn.*;
+import compiler488.ast.PrettyPrinter;
 
 import compiler488.semantics.AST_Visitor;
 
@@ -51,6 +52,21 @@ public class ExitStmt extends Stmt {
 		}
 
 		return stmt;
+	}
+
+	@Override
+	public void prettyPrint(PrettyPrinter p)
+	{
+		p.print("exit");
+
+		if(level >= 0) {
+			p.print(" " + level);
+		}
+
+		if(expn != null) {
+			p.print(" when ");
+			expn.prettyPrint(p);
+		}
 	}
 
 	public Expn getExpn() {

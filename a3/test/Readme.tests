@@ -1,0 +1,52 @@
+AST Test Cases: 
+
+array_1D.488                  : test that the AST for 1D arrays is valid
+array_2D.488                  : test that the AST for 2D arrays is valid
+exit.488                      : test that the AST for the exit statements is valid
+expressions.488               : test that the AST for all the expressions is valid
+functions.488                 : test that the AST for functions is valid
+if_stmt.488                   : test that the AST for if statements is valid
+loops.488                     : test that the AST for loops is valid
+procedures.488                : test that the AST for procedures is valid
+return.488                    : test that the AST for return statements is valid
+scope_statements_only.488     : test that the AST for scopes is valid
+
+Failing Test Cases: 
+
+add_bools.488                 : test that adding two booleans fail
+add_int_and_bool.488          : test that adding an integer and boolean fail
+array_type_mismatch.488       : test that inserting a value of a wrong type in an array fail
+assign_bool_to_int.488        : test that assigning a boolean to an integer fail
+assign_int_to_bool.488        : test that assigning an integer to a boolean fail
+assign_undeclared_var.488     : test that assigning a value to an undeclared variable fail
+bad_array.488                 : test that inserting value of a non-existent index in an array fail
+call_undeclared_function.488  : test that calling an undeclared function fail
+call_undeclared_procedure.488 : test that calling an undeclared procedure fail
+call_variable.488             : test that calling a variable fail
+different_parameter_type.488  : test that passing an argument with the wrong type fail
+duplicate_definition.488      : test that duplicating a definition fail
+duplicate_function.488        : test that redeclaring a function/procedure fail
+duplicate_variable.488        : test that redeclaring a variable fail
+excessive_parameters.488      : test that too many arguments to a function fail
+exit_invalid.488              : test that using the exit statement to break out more loops than they currently exist fail
+exit_zero.488                 : test that using the exit statement to break out of 0 loops fail
+external_exit.488             : test that using the exit statement outside of a loop fail
+external_return.488           : test that using the return statement outside of a function fail
+missing_parameters.488        : test that calling a function with missing arguments fail
+no_parameters.488             : test that passing arguments to a function that has no parameters fail
+no_return_stmt.488            : test that declaring function without a return statement fail
+out_of_scope_function.488     : test that calling a function outside of scope fail
+out_of_scope_variable.488     : test that using a variable outside of scope fail
+return_from_func.488          : test that returning without a value from a function fail
+return_with_proc.488          : test that returning with a value in a procedure fail
+sub_int_and_bool_expr.488     : test that subtraction between an integer and boolean fail
+var_same_name_as_function.488 : test that declaring a variable with the same name of a declared function fail
+var_same_name_as_param.488    : test that declaring a variable with the same name of a parameter fail
+
+Symbol Table Test Cases: 
+
+function_scope.488            : test that the symbol table can handle function scopes
+global_scope.488              : test that the symbol table can handle global scopes
+loop_scope.488                : test that the symbol table can handle loop scopes
+nested_scopes.488             : test that the symbol table can handle nested scopes
+shadow_global_scope.488       : test that the symbol table can handle variables shadowing global scope

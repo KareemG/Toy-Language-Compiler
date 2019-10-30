@@ -4,6 +4,11 @@
 
     while true do
     {
+        exit
+    }
+
+    while true do
+    {
         while true do
         {
             read a
