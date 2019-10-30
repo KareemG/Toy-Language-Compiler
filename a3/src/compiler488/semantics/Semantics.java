@@ -197,9 +197,9 @@ public class Semantics extends AST_Visitor.Default {
 			assert(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
 		});
 		analyzers.put(34, (s, self) -> {
-			assert(s.get(0) instanceof IdentExpn);
+			assert(s.get(0) instanceof ReadableExpn);
 			assert(s.get(1) instanceof Expn);
-			assert(((IdentExpn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
+			assert(((ReadableExpn) s.get(0)).getType().equals(((Expn) s.get(1)).getType()));
 		});
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
@@ -219,7 +219,11 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(37, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDecl);
 		});
-		analyzers.put(38, (s, self) -> {});
+		analyzers.put(38, (s, self) -> {
+			assert(s.get(0) instanceof SubsExpn);
+		});
+		// Probably not necessary. ScalarDecl is only used for parameter, so we
+		// can base it off of that
 		analyzers.put(39, (s, self) -> {});
 
 		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
@@ -585,7 +589,6 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visit(IdentExpn ident) {
-		semanticAction(37, ident);
 		semanticAction(26, ident);
 	}
 	@Override
