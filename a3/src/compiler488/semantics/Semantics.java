@@ -206,8 +206,19 @@ public class Semantics extends AST_Visitor.Default {
 			assert(symTable.GetType() != null);
 			assert(((ReturnStmt) s.get(0)).getValue().getType().equals(symTable.GetType()));
 		});
-		analyzers.put(36, (s, self) -> {});
-		analyzers.put(37, (s, self) -> {});
+		analyzers.put(36, (s, self) -> {
+			assert(symTable.GetParams() != null);
+			// We have also checked the size of the params vs args here (S43)
+			assert(s.size() == symTable.GetParams().size());
+			ASTList<ScalarDecl> params = symTable.GetParams();
+			for(int i = 0; i < s.size(); i++) {
+				assert(s.get(i) instanceof Expn);
+				assert(((Expn) s.get(i)).getType().equals(params.get(i).getType()));
+			}
+		});
+		analyzers.put(37, (s, self) -> {
+			assert(s.get(0) instanceof ScalarDecl);
+		});
 		analyzers.put(38, (s, self) -> {});
 		analyzers.put(39, (s, self) -> {});
 
@@ -401,6 +412,7 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(ProcedureCallStmt procStmt) {
 		if(procStmt.getArguments() != null) {
 			semanticAction(43, procStmt);
+			semanticAction(36, (Expn []) procStmt.getArguments().toArray());
 		} else {
 			semanticAction(42, procStmt);
 		}
@@ -499,6 +511,7 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(FunctionCallExpn funcExpn) {
 		if(funcExpn.getArguments() != null) {
 			semanticAction(43, funcExpn);
+			semanticAction(36, (Expn []) funcExpn.getArguments().toArray());
 		} else {
 			semanticAction(42, funcExpn);
 		}
@@ -508,6 +521,18 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(NotExpn notExpn) {
 		semanticAction(30, notExpn.getOperand());
 		semanticAction(20, notExpn);
+	}
+	@Override
+	public void visitEnter(SubsExpn subExpn) {
+		semanticAction(38, subExpn);
+	}
+	@Override
+	public void visitLeave(SubsExpn subExpn) {
+		semanticAction(31, subExpn.getSubscript1());
+		if (subExpn.getSubscript2() != null) {
+			semanticAction(31, subExpn.getSubscript2());
+		}
+		semanticAction(27, subExpn);
 	}
 	@Override
 	public void visitLeave(UnaryMinusExpn minusExpn) {
@@ -562,14 +587,6 @@ public class Semantics extends AST_Visitor.Default {
 	public void visit(IdentExpn ident) {
 		semanticAction(37, ident);
 		semanticAction(26, ident);
-	}
-	@Override
-	public void visit(SubsExpn subs) {
-		semanticAction(31, subs.getSubscript1());
-		if (subs.getSubscript2() != null) {
-			semanticAction(31, subs.getSubscript2());
-		}
-		semanticAction(27, subs);
 	}
 	@Override
 	public void visit(BoolConstExpn boolExpn) {

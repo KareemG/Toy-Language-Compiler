@@ -33,8 +33,10 @@ class ScopeNode {
         this.parent = parent;
     }
 
-    public ScopeNode(ScopeNode parent, String label) {
+    public ScopeNode(ScopeNode parent, String label, ASTList<ScalarDecl> params) {
+        this.parent = parent;
         this.label = label;
+        this.params = params;
     }
 
     public ScopeNode(ScopeNode parent, String label,

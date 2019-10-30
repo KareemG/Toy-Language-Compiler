@@ -95,8 +95,8 @@ public class SymbolTable {
 	 * Enter procedure scope.
 	 * @param label name of the procedure
 	 */
-	public void EnterScope(String label) {
-		ScopeNode newScope = new ScopeNode(this.root, label);
+	public void EnterScope(String label, ASTList<ScalarDecl> params) {
+		ScopeNode newScope = new ScopeNode(this.root, label, params);
 		this.root = newScope;
 	}
 

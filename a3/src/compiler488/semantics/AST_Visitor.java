@@ -53,6 +53,8 @@ public interface AST_Visitor
     public void visitLeave(FunctionCallExpn funcExpn);
     public void visitEnter(NotExpn notExpn);
     public void visitLeave(NotExpn notExpn);
+    public void visitEnter(SubsExpn subExpn);
+    public void visitLeave(SubsExpn subExpn);
     public void visitEnter(UnaryMinusExpn minusExpn);
     public void visitLeave(UnaryMinusExpn minusExpn);
 
@@ -64,7 +66,6 @@ public interface AST_Visitor
     public void visit(BooleanType boolType);
     public void visit(IntegerType intType);
     public void visit(IdentExpn ident);
-    public void visit(SubsExpn subs);
     public void visit(BoolConstExpn boolExpn);
     public void visit(IntConstExpn intExpn);
     public void visit(SkipConstExpn skipExpn);
@@ -201,6 +202,12 @@ public interface AST_Visitor
         public void visitLeave(NotExpn notExpn) {
             defaultVisitLeave(notExpn);
         }
+        public void visitEnter(SubsExpn subExpn) {
+            defaultVisitEnter(subExpn);
+        }
+        public void visitLeave(SubsExpn subExpn) {
+            defaultVisitLeave(subExpn);
+        }
         public void visitEnter(UnaryMinusExpn minusExpn) {
             defaultVisitEnter(minusExpn);
         }
@@ -232,9 +239,6 @@ public interface AST_Visitor
         }
         public void visit(IdentExpn ident) {
             defaultVisitForLeaf(ident);
-        }
-        public void visit(SubsExpn subs) {
-            defaultVisitForLeaf(subs);
         }
         public void visit(BoolConstExpn boolExpn) {
             defaultVisitForLeaf(boolExpn);
