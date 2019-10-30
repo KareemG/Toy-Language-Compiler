@@ -1,18 +1,5 @@
-AST Test Cases: 
 
-array_1D.488                  : test that the AST for 1D arrays is valid
-array_2D.488                  : test that the AST for 2D arrays is valid
-exit.488                      : test that the AST for the exit statements is valid
-expressions.488               : test that the AST for all the expressions is valid
-functions.488                 : test that the AST for functions is valid
-if_stmt.488                   : test that the AST for if statements is valid
-loops.488                     : test that the AST for loops is valid
-procedures.488                : test that the AST for procedures is valid
-return.488                    : test that the AST for return statements is valid
-scope_statements_only.488     : test that the AST for scopes is valid
-
-Failing Test Cases: 
-
+Failing Cases: These cases contain syntactically correct programs with semantic errors which must be caught by the semantic analyzer step
 add_bools.488                 : test that adding two booleans fail
 add_int_and_bool.488          : test that adding an integer and boolean fail
 array_type_mismatch.488       : test that inserting a value of a wrong type in an array fail
@@ -43,8 +30,22 @@ sub_int_and_bool_expr.488     : test that subtraction between an integer and boo
 var_same_name_as_function.488 : test that declaring a variable with the same name of a declared function fail
 var_same_name_as_param.488    : test that declaring a variable with the same name of a parameter fail
 
-Symbol Table Test Cases: 
 
+Passing tests: These are split into 2 categories - AST and Symbol Table
+
+AST Test Cases: These programs are both syntactically and semantically correct, and the AST printed into the output must match with the verified one in the out files
+array_1D.488                  : test that the AST for 1D arrays is valid
+array_2D.488                  : test that the AST for 2D arrays is valid
+exit.488                      : test that the AST for the exit statements is valid
+expressions.488               : test that the AST for all the expressions is valid
+functions.488                 : test that the AST for functions is valid
+if_stmt.488                   : test that the AST for if statements is valid
+loops.488                     : test that the AST for loops is valid
+procedures.488                : test that the AST for procedures is valid
+return.488                    : test that the AST for return statements is valid
+scope_statements_only.488     : test that the AST for scopes is valid
+
+Symbol Table Test Cases: Thsee programs are both syntactically and semantically correct, and the symbol table must match the expected symbol table in the out files
 function_scope.488            : test that the symbol table can handle function scopes
 global_scope.488              : test that the symbol table can handle global scopes
 loop_scope.488                : test that the symbol table can handle loop scopes
