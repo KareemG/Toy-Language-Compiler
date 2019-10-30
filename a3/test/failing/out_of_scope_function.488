@@ -1,14 +1,14 @@
 
 {
    function a : integer
-   {
-       function b : integer
-       {
-           return 1
-       }
+    {
+        function b : integer
+        {
+            return 1
+        }
 
        return b
-   }
+    }
 
     b
 }

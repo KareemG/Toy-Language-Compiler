@@ -1,17 +1,17 @@
 
 {
-   function a : integer
-   {
-       function b : integer
-       {
-           var c : integer
-           c := 1
+    function a : integer
+    {
+        function b : integer
+        {
+            var c : integer
+            c := 1
 
-           return c
-       }
+            return with c
+        }
 
-       return c
-   }
+        return with c
+    }
 
     a
 }

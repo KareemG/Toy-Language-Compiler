@@ -1,0 +1,15 @@
+
+{
+    procedure foo(a : integer, b : integer)
+    {
+        return
+    }
+
+    function fee(a : integer, b : integer) : integer
+    {
+        return with a + b
+    }
+
+    foo(2,3)
+    fee(2,3)
+}
