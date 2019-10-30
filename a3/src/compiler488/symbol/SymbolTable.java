@@ -1,5 +1,7 @@
 package compiler488.symbol;
 
+import java.util.ArrayList;
+
 import compiler488.ast.*;
 import compiler488.ast.decl.ScalarDecl;
 import compiler488.ast.type.*;
@@ -72,6 +74,25 @@ public class SymbolTable implements PrettyPrintable {
 		assert(false);
 		return null;
 	}
+	public Record get(String key) {
+		ScopeNode traverse = root;
+		while (traverse != null) {
+			Record value = traverse.get(key);
+			if (value != null) {
+				return value;
+			}
+			traverse = traverse.GetParent();
+		}
+		if (root.param != null) {
+			for (Record p : root.param) {
+				if (p.getIdent() == key) {
+					return p;
+				}
+			}
+		}
+		assert(false);
+		return null;
+	}
 
 	/** Put a given key - value combination into the symbol table
 	 *  Asserts if the key is already present
@@ -82,12 +103,37 @@ public class SymbolTable implements PrettyPrintable {
 		assert(this.root.Put(key, val) == 0);
 	}
 
+	public void put(String key, Record val) {
+		int ret = this.root.put(key, val);
+		assert(ret == 0);
+	}
+
+	public void pPut(String key, Record val) {
+		int ret = this.root.GetParent().put(key, val);
+		assert(ret == 0);
+	}
+
 	/** Call when entering a new scope.
 	 *  Creates another hashtable/ScopeNode, and pushes it on top of
 	 *  stack of nodes.
 	 */
 	public void EnterScope() {
 		ScopeNode newScope = new ScopeNode(this.root);
+		this.root = newScope;
+	}
+
+	public void enterScope() {
+		ScopeNode newScope = new ScopeNode(this.root);
+		this.root = newScope;
+	}
+
+	public void enterScope(String label, Type type) {
+		ScopeNode newScope = new ScopeNode(this.root, label);
+		this.root = newScope;
+		this.root.type = type;
+	}
+	public void enterScope(String label) {
+		ScopeNode newScope = new ScopeNode(this.root, label);
 		this.root = newScope;
 	}
 
@@ -128,6 +174,14 @@ public class SymbolTable implements PrettyPrintable {
 			this.root.AddArchive(tmp);
 		}
 	}
+	public void exitScope() {
+		// Only exit if you are not the main scope
+		if (this.root != null) {
+			ScopeNode tmp = this.root;
+			this.root = root.GetParent();
+			this.root.AddArchive(tmp);
+		}
+	}
 
 	public String GetLabel() {
 		return this.root.label;
@@ -139,6 +193,22 @@ public class SymbolTable implements PrettyPrintable {
 
 	public ASTList<ScalarDecl> GetParams() {
 		return this.root.params;
+	}
+
+	public void initParams() {
+		this.root.param = new ArrayList<Record>();
+	}
+
+	public void addParams(Record p) {
+		this.root.param.add(p);
+	}
+
+	public ArrayList<Record> getParams() {
+		return this.root.param;
+	}
+
+	public ScopeNode getParent() {
+		return this.root.GetParent();
 	}
 
 	@Override

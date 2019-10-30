@@ -2,6 +2,7 @@ package compiler488.semantics;
 
 import java.io.*;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ public class Semantics extends AST_Visitor.Default {
 	private SymbolTable symTable;
 	private Context context;
 	private Map<Integer, BiConsumer<List<BaseAST>, Semantics>> analyzers;
+	private ArrayList<DeclarationPart> tmpDecls;
 
 	/** SemanticAnalyzer constructor */
 	public Semantics() {
@@ -57,6 +59,7 @@ public class Semantics extends AST_Visitor.Default {
 		this.context = new Context(null, ContextType.MAIN);
 		this.symTable = new SymbolTable();
 		this.analyzers = new HashMap<>();
+		this.tmpDecls = new ArrayList<>();
 
 		this.symTable.Initialize();
 
@@ -96,51 +99,83 @@ public class Semantics extends AST_Visitor.Default {
 		});
 
 		// Start function scope.
-		analyzers.put(4, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(4, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			symTable.enterScope(decl.getName(), decl.getType());
+			this.context = new Context(this.context, ContextType.FUNCTION);
+		});
 
 		// End function scope.
-		analyzers.put(5, (s, self) -> { self.ExitScope(s);  });
+		analyzers.put(5, (s, self) -> {
+			symTable.exitScope();
+		});
 
 		// Start ordinary scope.
-		analyzers.put(6, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(6, (s, self) -> {
+			symTable.enterScope();
+		});
 
 		// End ordinary scope.
-		analyzers.put(7, (s, self) -> { self.ExitScope(s);  });
+		analyzers.put(7, (s, self) -> {
+			symTable.exitScope();
+		});
 
 		// Start procedure scope.
-		analyzers.put(8, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(8, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			symTable.enterScope(decl.getName());
+			this.context = new Context(this.context, ContextType.PROCEDURE);
+		});
 
 		// End procedure scope.
-		analyzers.put(9, (s, self) -> { self.ExitScope(s);  });
+		analyzers.put(9, (s, self) -> {
+			symTable.exitScope();
+		 });
 
 		// Declare scalar variable.
 		analyzers.put(10, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDeclPart);
-
 			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
-			self.symTable.Put(decl.getName(), decl);
+			Record newRec = new Record(decl.getName(), RecordType.SCALAR);
+			this.symTable.put(newRec.getIdent(), newRec);
 		});
 
 		// Declare function with no parameters and specified type.
 		analyzers.put(11, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
-
 			RoutineDecl decl = (RoutineDecl) s.get(0);
-			self.symTable.Put(decl.getName(), decl);
-
-			// TODO(golaubka): Record scope type.
-
+			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
+			newRec.setResult(decl.getType());
+			this.symTable.put(newRec.getIdent(), newRec); // S11
 		});
 
 		// Declare function with parameters and specified type.
-		analyzers.put(12, analyzers.get(11));
+		analyzers.put(12, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
+			newRec.setResult(decl.getType());
+			newRec.setParam(symTable.getParams());
+			this.symTable.pPut(newRec.getIdent(), newRec); // S12
+		});
 
 		// Associate scope with function/procedure.
-		analyzers.put(13, (s, self) -> { self.EnterScope(s); });
+		analyzers.put(13, (s, self) -> {  });
 
-		// Set parameter count to zero.
+		// S14, S15, S16 all included
 		analyzers.put(14, (s, self) -> {
-			// TODO(golaubka): y tho? codegen?
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			assert(decl.getParameters() != null);
+
+			symTable.initParams();
+			for (ScalarDecl p : decl.getParameters()) {
+				Record pRec = new Record(p.getName(), RecordType.PARAMETER);
+				pRec.setResult(decl.getType());
+				symTable.addParams(pRec);
+			}
 		});
 
 		// Declare parameter with specified type.
@@ -152,17 +187,28 @@ public class Semantics extends AST_Visitor.Default {
 		});
 
 		// Declare procedure with no parameters.
-		analyzers.put(17, (s, self) -> analyzers.get(11));
+		analyzers.put(17, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
+			this.symTable.put(newRec.getIdent(), newRec);
+		});
 
 		// Declare procedure with parameters.
-		analyzers.put(18, (s, self) -> analyzers.get(12));
+		analyzers.put(18, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
+			newRec.setParam(symTable.getParams());
+			this.symTable.pPut(newRec.getIdent(), newRec);
+		});
 
 		// Declare array variable with specified lower and upper bounds.
 		analyzers.put(19, (s, self) -> {
 			assert(s.get(0) instanceof ArrayDeclPart);
-
 			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
-			self.symTable.Put(decl.getName(), decl);
+			Record newRec = new Record(decl.getName(), RecordType.ARRAY);
+			self.symTable.put(decl.getName(), newRec);
 		});
 
 		// Check that lower bound is <= upper bound.
@@ -178,7 +224,54 @@ public class Semantics extends AST_Visitor.Default {
 
 		// Associate type with variables.
 		analyzers.put(47, (s, self) -> {
-			// TODO(golaubka): Seems like the type is already stored in the associated Decl class.
+			assert(s.get(0) instanceof DeclarationPart);
+			assert(s.get(1) instanceof Type);
+			Type type = (Type) s.get(1);
+			DeclarationPart declPart = (DeclarationPart) s.get(0);
+			// Record newRec = null;
+			// if (s.get(0) instanceof ArrayDeclPart) {
+			// 	newRec = new Record(declPart.getName(), RecordType.ARRAY);
+			// } else if (s.get(0) instanceof ScalarDeclPart) {
+			// 	newRec = new Record(declPart.getName(), RecordType.SCALAR);
+			// } else {
+			// 	assert(false);
+			// }
+			symTable.get(declPart.getName()).setResult(type);
+			//symTable.put(declPart.getName(), newRec);
+		});
+
+		// ===== EXPRESSION TYPES ===== //
+		analyzers.put(20, (s, self) -> {
+			assert(s.get(0) instanceof Expn);
+			((Expn) s.get(0)).setType(new BooleanType());
+		});
+		analyzers.put(21, (s, self) -> {
+			assert(s.get(0) instanceof Expn);
+			((Expn) s.get(0)).setType(new IntegerType());
+		});
+		analyzers.put(23, (s, self) -> {});
+		analyzers.put(24, (s, self) -> {
+			assert(s.get(0) instanceof ConditionalExpn);
+			ConditionalExpn condExpn = (ConditionalExpn) s.get(0);
+			condExpn.setType(condExpn.getTrueValue().getType());
+		});
+		analyzers.put(25, (s, self) -> {
+			assert(s.get(0) instanceof IdentExpn);
+			IdentExpn ident = (IdentExpn) s.get(0);
+			assert(symTable.get(ident.getIdent()) != null);
+			ident.setType(symTable.get(ident.getIdent()).getResult());
+		});
+		analyzers.put(27, (s, self) -> {
+			assert(s.get(0) instanceof SubsExpn);
+			SubsExpn subsExpn = (SubsExpn) s.get(0);
+			assert(symTable.get(subsExpn.getVariable()) != null);
+			subsExpn.setType(symTable.get(subsExpn.getVariable()).getResult());
+		});
+		analyzers.put(28, (s, self) -> {
+			assert(s.get(0) instanceof FunctionCallExpn);
+			FunctionCallExpn func = (FunctionCallExpn) s.get(0);
+			assert(symTable.get(func.getIdent()) != null);
+			func.setType(symTable.get(func.getIdent()).getResult());
 		});
 
 		// ===== EXPRESSION TYPE CHECKING ===== //
@@ -400,7 +493,6 @@ public class Semantics extends AST_Visitor.Default {
 			if(routine.getParameters() != null) {
 				semanticAction(4, routine);
 				semanticAction(14, routine);
-				semanticAction(15, routine);
 			} else {
 				semanticAction(11, routine);
 				semanticAction(4, routine);
@@ -424,7 +516,7 @@ public class Semantics extends AST_Visitor.Default {
 		} else {
 			semanticAction(9, routine);
 		}
-		semanticAction(13, routine);
+		semanticAction(99);
 	}
 
 	@Override
@@ -615,25 +707,16 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	@Override
-	public void visit(BooleanType boolType) {
-		semanticAction(20, boolType);
-	}
-	@Override
-	public void visit(IntegerType intType) {
-		semanticAction(21, intType);
-	}
-
-	@Override
 	public void visit(IdentExpn ident) {
-		semanticAction(26, ident);
+		semanticAction(25, ident);
 	}
 	@Override
 	public void visit(BoolConstExpn boolExpn) {
-		semanticAction(20);
+		semanticAction(20, boolExpn);
 	}
 	@Override
 	public void visit(IntConstExpn intExpn) {
-		semanticAction(21);
+		semanticAction(21, intExpn);
 	}
 
 	public void EnterScope(List<BaseAST> s)

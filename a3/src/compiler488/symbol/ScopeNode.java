@@ -18,18 +18,24 @@ import compiler488.ast.type.*;
  */
 class ScopeNode implements PrettyPrintable {
     private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
-    private Hashtable<String, Type> syms;
+    private Hashtable<String, Record> syms;
     private ArrayList<ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
     protected String label = null; // scope node label (functions and procedures)
     protected Type type = null; // return type of the scope (for functions)
     protected ASTList<ScalarDecl> params = null; // params (for functions)
+    protected ArrayList<Record> param = null;
 
     public ScopeNode() {
         Initialize();
     }
 
     public ScopeNode(ScopeNode parent) {
+        Initialize();
+        this.parent = parent;
+    }
+
+    public ScopeNode(ScopeNode parent, String label) {
         Initialize();
         this.parent = parent;
     }
@@ -52,6 +58,7 @@ class ScopeNode implements PrettyPrintable {
     private void Initialize() {
         this.symbols = new Hashtable<String, BaseAST>();
         this.archive = new ArrayList<ScopeNode>();
+        this.syms = new Hashtable<>();
     }
 
     public int Put(String key, BaseAST value) {
@@ -62,8 +69,23 @@ class ScopeNode implements PrettyPrintable {
         return 0;
     }
 
+    public int put(String key, Record value) {
+        if (this.syms.containsKey(key)) {
+            return 1;
+        }
+        this.syms.put(key, value);
+        return 0;
+    }
+
     public BaseAST Get(String key) {
         return this.symbols.get(key);
+    }
+
+    public Record get(String key) {
+        return this.syms.get(key);
+    }
+
+    public void addParam(Record rec) {
     }
 
     public void AddArchive(ScopeNode node) {
@@ -94,12 +116,19 @@ class ScopeNode implements PrettyPrintable {
         // Print all of the symbols
         p.println("Symbols:");
         p.enterBlock();
-        Set<String> keys = symbols.keySet();
-        for (String key:keys) {
-            if (!key.equals(label)) {
-                symbols.get(key).prettyPrint(p);
+        Set<String> keys = syms.keySet();
+        for (String key : keys) {
+            Record toPrint = syms.get(key);
+            if (toPrint.getType() != RecordType.PARAMETER) {
+                p.println(toPrint.getIdent() + ": " + toPrint.getResult().toString());
             }
         }
+        // Set<String> keys = symbols.keySet();
+        // for (String key:keys) {
+        //     if (!key.equals(label)) {
+        //         symbols.get(key).prettyPrint(p);
+        //     }
+        // }
         p.exitBlock();
 
         // Print children ScopeNodes
