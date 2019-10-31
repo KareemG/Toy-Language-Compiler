@@ -15,7 +15,7 @@
     {
         function f2(m : integer) : integer
         {
-            f2(m - 1)
+            m := f2(m - 1)
             return with m
         }
         var a : integer
@@ -26,7 +26,7 @@
     procedure proc3
     {
         write "hello world"
-        proc2
+        proc(3, 4)
 
         return
     }

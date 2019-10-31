@@ -7,5 +7,7 @@
             return with a
     }
 
-    test(2, true)
+    var i : integer
+
+    i := test(2, true)
 }

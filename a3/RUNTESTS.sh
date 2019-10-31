@@ -54,7 +54,7 @@ function ast_tests
 {
     path="./test/passing/ast"
 
-    printf "ast tests:\n"
+    printf "PASSING TESTS (AST):\n"
 
     for source in $path/*.488
     do
@@ -69,7 +69,7 @@ function semantic_tests
 {
     path="./test/failing"
 
-    printf "\n\nsemantic tests:\n"
+    printf "\n\nFAILING TESTS:\n"
 
     for source in $path/*.488
     do
@@ -84,7 +84,7 @@ function symbol_table_tests
 {
     path="./test/passing/symbol_table"
 
-    printf "\n\nsymbol table tests:\n"
+    printf "\n\nPASSING TESTS (SYMBOLTABLE):\n"
 
     for source in $path/*.488
     do
@@ -96,8 +96,8 @@ function symbol_table_tests
 }
 
 ast_tests
-semantic_tests
 symbol_table_tests
+semantic_tests
 
 printf "\n\nRESULT = "
 if [ "$STATUS" -eq 1 ]

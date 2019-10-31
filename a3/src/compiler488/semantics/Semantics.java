@@ -19,7 +19,7 @@ import compiler488.symbol.*;
 /**
  * Implement semantic analysis for compiler 488
  *
- * @author <B> Put your names here </B>
+ * @author KyoKeun Park, Jas Sidhu, Jasmeet Brar, Kareem Golaub
  */
 public class Semantics extends ASTVisitor.Default {
 
@@ -143,9 +143,6 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Attempt to declare a variable more than once");
 		});
 
-		// Associate scope with function/procedure.
-		analyzers.put(13, (s, self) -> {  });
-
 		// S14, S15, S16 all included
 		analyzers.put(14, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
@@ -158,14 +155,6 @@ public class Semantics extends ASTVisitor.Default {
 				pRec.setResult(p.getType());
 				symTable.addParams(pRec);
 			}
-		});
-
-		// Declare parameter with specified type.
-		analyzers.put(15, analyzers.get(10));
-
-		// Increment parameter count by one.
-		analyzers.put(16, (s, self) -> {
-			// TODO(golaubka): y tho? codegen?
 		});
 
 		// Declare procedure with no parameters.
@@ -275,20 +264,13 @@ public class Semantics extends ASTVisitor.Default {
 			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
-		analyzers.put(33, (s, self) -> {
-			// TODO: Redundant perhaps?
-			assert(s.get(0) instanceof Expn);
-			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
-				printError("Expressions type mismatch");
-		});
 		analyzers.put(34, (s, self) -> {
 			assert(s.get(0) instanceof ReadableExpn);
 			assert(s.get(1) instanceof Expn);
 			Record rec = symTable.get(((ReadableExpn)s.get(0)).getName());
 			if(!rec.getResult().getClass().equals(((Expn)s.get(1)).getType().getClass()))
-				printError("Assignment type mismatch: " + rec.getResult()
-					+ " : " + (((ReadableExpn)s.get(0)).getType()));
+				printError("Assignment type mismatch: expected " + rec.getResult()
+					+ ", but got " + (((ReadableExpn)s.get(0)).getType()));
 		});
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
@@ -338,9 +320,6 @@ public class Semantics extends ASTVisitor.Default {
 			if(rec == null || rec.getType() != RecordType.ARRAY)
 				printError("Identifier not declared or is not an array");
 		});
-		// Probably not necessary. ScalarDecl is only used for parameter, so we
-		// can base it off of that
-		analyzers.put(39, (s, self) -> {});
 
 		// ===== FUNCTIONS, PROCEDURES AND ARGUMENTS ===== //
 		analyzers.put(40, (s, self) -> {
@@ -389,7 +368,7 @@ public class Semantics extends ASTVisitor.Default {
 
 		analyzers.put(50, (s, self) -> {
 			if(this.context.GetType() != ContextType.LOOP)
-				printError("Exit statemetn is not directly inside a loop");
+				printError("Exit statement is not directly inside a loop");
 		});
 		analyzers.put(51, (s, self) -> {
 			Context tmp = this.context;

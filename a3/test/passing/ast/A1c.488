@@ -69,7 +69,9 @@
         return with true
     }
 
+    var i : boolean
+
     count_to_ten
     wait_for_numbers(1, 2, 3, 4)
-    break_out_of_loop
+    i := break_out_of_loop
 }
