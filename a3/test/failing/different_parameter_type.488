@@ -1,6 +1,6 @@
 
 {
-    function foo (var a : integer, var b : boolean) : integer
+    function foo (a : integer, b : boolean) : integer
     {
         return with (b ? a * 2 : a)
     }

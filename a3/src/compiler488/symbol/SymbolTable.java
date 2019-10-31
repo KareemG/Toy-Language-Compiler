@@ -55,7 +55,7 @@ public class SymbolTable implements PrettyPrintable {
 		}
 		if (root.param != null) {
 			for (Record p : root.param) {
-				if (p.getIdent() == key) {
+				if (p.getIdent().equals(key)) {
 					return p;
 				}
 			}

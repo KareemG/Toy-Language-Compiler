@@ -510,6 +510,7 @@ public class Semantics extends AST_Visitor.Default {
 			if(routine.getParameters() != null) {
 				semanticAction(4, routine);
 				semanticAction(14, routine);
+				semanticAction(12, routine);
 			} else {
 				semanticAction(11, routine);
 				semanticAction(4, routine);

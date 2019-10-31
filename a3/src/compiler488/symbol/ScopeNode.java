@@ -61,14 +61,6 @@ class ScopeNode implements PrettyPrintable {
         this.syms = new Hashtable<>();
     }
 
-    public int Put(String key, BaseAST value) {
-        if (this.symbols.containsKey(key)) {
-            return 1;
-        }
-        this.symbols.put(key, value);
-        return 0;
-    }
-
     public int put(String key, Record value) {
         if (this.syms.containsKey(key)) {
             return 1;
@@ -76,11 +68,6 @@ class ScopeNode implements PrettyPrintable {
         this.syms.put(key, value);
         return 0;
     }
-
-    public BaseAST Get(String key) {
-        return this.symbols.get(key);
-    }
-
     public Record get(String key) {
         return this.syms.get(key);
     }
