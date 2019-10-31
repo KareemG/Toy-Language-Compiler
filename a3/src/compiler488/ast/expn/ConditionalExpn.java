@@ -1,6 +1,7 @@
 package compiler488.ast.expn;
 
 import compiler488.semantics.ASTVisitor;
+import compiler488.ast.*;
 
 /** Represents a conditional expression (i.e., x>0?3:4). */
 public class ConditionalExpn extends Expn {
@@ -22,6 +23,18 @@ public class ConditionalExpn extends Expn {
 	@Override
 	public String toString() {
 		return "(" + condition + " ? " + trueValue + " : " + falseValue + ")";
+	}
+
+	@Override
+	public void prettyPrint(PrettyPrinter p)
+	{
+		p.print("(");
+		condition.prettyPrint(p);
+		p.print("?");
+		trueValue.prettyPrint(p);
+		p.print(":");
+		falseValue.prettyPrint(p);
+		p.print(")");
 	}
 
 	public Expn getCondition() {

@@ -1,9 +1,7 @@
 package compiler488.symbol;
 
-import java.io.*;
 import java.util.*;
 import compiler488.ast.*;
-import compiler488.ast.decl.*;
 import compiler488.ast.type.*;
 
 /** Scope Node
@@ -51,7 +49,7 @@ class ScopeNode implements PrettyPrintable {
         this.syms.put(key, value);
         return 0;
     }
-    
+
     public Record get(String key) {
         return this.syms.get(key);
     }
@@ -76,7 +74,7 @@ class ScopeNode implements PrettyPrintable {
         if(type != null) {
             p.print(" : " + type.toString());
         }
-        if(param != null) {
+        if(param != null && param.size() > 0) {
             p.print(" ( ");
             p.print(param.get(0).getIdent() + ": " + param.get(0).getResult());
             for(int i = 1; i < param.size(); i++) {

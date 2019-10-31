@@ -1,0 +1,6 @@
+ { 
+ procedure test { 
+ write "Hello World!"
+ } 
+ test
+ }

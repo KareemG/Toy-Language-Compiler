@@ -1,0 +1,7 @@
+% Ternary operator
+
+{
+    var x : integer
+
+    x := (5 > 4 ? 5 : 4)
+}

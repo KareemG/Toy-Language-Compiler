@@ -18,7 +18,7 @@ import compiler488.symbol.*;
 
 /**
  * Implement semantic analysis for compiler 488
- * 
+ *
  * @author <B> Put your names here </B>
  */
 public class Semantics extends ASTVisitor.Default {
@@ -59,12 +59,6 @@ public class Semantics extends ASTVisitor.Default {
 	/** semanticsInitialize - called once by the parser at the */
 	/* start of compilation */
 	void Initialize() {
-
-		/*********************************************/
-		/* Additional initialization code for the */
-		/* semantic analysis module */
-		/* GOES HERE */
-		/*********************************************/
 
 		this.context = new Context(null, ContextType.MAIN);
 		this.symTable = new SymbolTable();
@@ -278,14 +272,14 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(32, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())));
+			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
 		analyzers.put(33, (s, self) -> {
 			// TODO: Redundant perhaps?
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType())));
+			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
 		analyzers.put(34, (s, self) -> {
@@ -414,7 +408,7 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Return statement is not directly inside a procedure");
 		});
 		analyzers.put(53, (s, self) -> {
-			int lvl = ((ExitStmt) s.get(0)).getLevel();
+			int lvl = ((ExitStmt)s.get(0)).getLevel();
 			if(lvl <= 0 || lvl > context.GetLoopCount())
 				printError("Exit value is greater than number of loops");
 		});
@@ -478,7 +472,6 @@ public class Semantics extends ASTVisitor.Default {
 
 		}
 
-		//System.out.println("Semantic Action: S" + actionNumber);
 		this.analyzers.get(actionNumber).accept(Arrays.asList(nodes), this);
 		return;
 	}
@@ -545,6 +538,7 @@ public class Semantics extends ASTVisitor.Default {
 
 	@Override
 	public void visitEnter(ProcedureCallStmt procStmt) {
+		semanticAction(41, procStmt);
 		if(procStmt.getArguments() != null) {
 			semanticAction(44, procStmt);
 		}
@@ -629,7 +623,7 @@ public class Semantics extends ASTVisitor.Default {
 	}
 	@Override
 	public void visitLeave(ConditionalExpn condExpn) {
-		semanticAction(33, condExpn.getTrueValue(), condExpn.getFalseValue());
+		semanticAction(32, condExpn.getTrueValue(), condExpn.getFalseValue());
 		semanticAction(24, condExpn);
 	}
 	@Override

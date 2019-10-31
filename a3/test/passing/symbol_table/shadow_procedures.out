@@ -1,0 +1,15 @@
+{
+ Symbols:
+ x: integer
+ test2: integer
+ test: null
+ test{
+ Symbols:
+ }
+ test2 : integer{
+ Symbols:
+ test: null
+ test{
+ Symbols:
+ }
+ }

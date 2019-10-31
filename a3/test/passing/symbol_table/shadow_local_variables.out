@@ -1,10 +1,10 @@
-
 {
-a
-b
-foo
-{
-a
-b
-}
-}
+ Symbols:
+ b: integer
+ a: integer
+ foo: integer
+ foo : integer{
+ Symbols:
+ b: integer
+ a: integer
+ }

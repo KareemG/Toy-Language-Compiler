@@ -1,7 +1,6 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.PrettyPrinter;
-import compiler488.semantics.ASTVisitor;
 
 /**
  * The common features of binary expressions.

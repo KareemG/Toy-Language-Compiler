@@ -1,13 +1,14 @@
-
 {
-a
-{
-a
-b
-{
-a
-b
-c
-}
-}
-}
+ Symbols:
+ a: integer
+ {
+ Symbols:
+ b: integer
+ a: integer
+ {
+ Symbols:
+ b: integer
+ a: integer
+ c: integer
+ }
+ }
