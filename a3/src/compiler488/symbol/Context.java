@@ -1,7 +1,5 @@
 package compiler488.symbol;
 
-import java.io.*;
-
 import compiler488.ast.type.Type;
 
 public class Context {

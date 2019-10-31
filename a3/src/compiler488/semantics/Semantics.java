@@ -83,32 +83,6 @@ public class Semantics extends ASTVisitor.Default {
 			assert(s.get(0) instanceof Program);
 		});
 
-		// Associate declaration(s) with scope.
-		// We already do this currently
-		// analyzers.put(2, (s, self) -> {
-		// 	assert(s.get(0) instanceof Scope);
-
-		// 	Scope scope = (Scope) s.get(0);
-		// 	ListIterator<Declaration> decl_it = scope.getDeclarations().listIterator();
-		// 	while (decl_it.hasNext()) {
-		// 		Declaration decl = decl_it.next();
-		// 		if (decl instanceof MultiDeclarations) {
-		// 			MultiDeclarations multi_decl = (MultiDeclarations) decl;
-
-		// 			ListIterator<DeclarationPart> part_it = multi_decl.getParts().listIterator();
-		// 			while (part_it.hasNext()) {
-		// 				DeclarationPart part = part_it.next();
-		// 				self.symTable.Put(part.getName(), part);
-		// 			}
-		// 		} else if (decl instanceof RoutineDecl) {
-		// 			RoutineDecl routine = (RoutineDecl) decl;
-		// 			self.symTable.Put(routine.getName(), routine);
-		// 		} else {
-		// 			assert(false);
-		// 		}
-		// 	}
-		// });
-
 		// Start function scope.
 		analyzers.put(4, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
