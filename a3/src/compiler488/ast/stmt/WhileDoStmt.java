@@ -5,7 +5,7 @@ import java.util.ListIterator;
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents a loop in which the exit condition is evaluated before each pass.
@@ -24,7 +24,7 @@ public class WhileDoStmt extends LoopingStmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		this.expn.accept(visitor);
 		visitor.visitEnter(this);
 		ListIterator<Stmt> bod_lst = body.listIterator();

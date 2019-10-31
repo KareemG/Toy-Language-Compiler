@@ -20,7 +20,7 @@ public class ScopeStmt extends Stmt {
         }
 
         @Override
-        public void accept(AST_Visitor visitor) {
+        public void accept(ASTVisitor visitor) {
                 visitor.visitEnter(this);
                 this.scope.accept(visitor);
                 visitor.visitLeave(this);

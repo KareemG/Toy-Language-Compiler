@@ -1,7 +1,7 @@
 package compiler488.ast.expn;
 
 // import compiler488.ast.Readable;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * References to a scalar variable or function call without parameters.
@@ -30,7 +30,7 @@ public class IdentExpn extends ReadableExpn {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}
 

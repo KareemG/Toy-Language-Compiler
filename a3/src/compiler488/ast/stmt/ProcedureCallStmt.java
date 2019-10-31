@@ -5,7 +5,7 @@ import java.util.ListIterator;
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents calling a procedure.
@@ -55,7 +55,7 @@ public class ProcedureCallStmt extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		if(arguments != null) {
 			ListIterator<Expn> args = arguments.listIterator();

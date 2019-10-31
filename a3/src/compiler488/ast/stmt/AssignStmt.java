@@ -2,7 +2,7 @@ package compiler488.ast.stmt;
 
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Holds the assignment of an expression to a variable.
@@ -37,7 +37,7 @@ public class AssignStmt extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		this.lval.accept(visitor);
 		this.rval.accept(visitor);

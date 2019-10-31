@@ -1,6 +1,6 @@
 package compiler488.ast.expn;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /** Represents a conditional expression (i.e., x>0?3:4). */
 public class ConditionalExpn extends Expn {
@@ -49,7 +49,7 @@ public class ConditionalExpn extends Expn {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		this.condition.accept(visitor);
 		visitor.visitEnter(this);
 		this.trueValue.accept(visitor);

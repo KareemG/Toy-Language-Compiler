@@ -1,6 +1,6 @@
 package compiler488.ast.expn;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents the boolean negation of an expression.
@@ -11,7 +11,7 @@ public class NotExpn extends UnaryExpn {
     }
 
     @Override
-    public void accept(AST_Visitor visitor) {
+    public void accept(ASTVisitor visitor) {
         visitor.visitEnter(this);
         this.getOperand().accept(visitor);
         visitor.visitLeave(this);

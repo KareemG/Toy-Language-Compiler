@@ -5,7 +5,7 @@ import java.util.ListIterator;
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.type.Type;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Holds the declaration of multiple elements.
@@ -31,7 +31,7 @@ public class MultiDeclarations extends Declaration {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		ListIterator<DeclarationPart> elst = elements.listIterator();
 		while(elst.hasNext()) {

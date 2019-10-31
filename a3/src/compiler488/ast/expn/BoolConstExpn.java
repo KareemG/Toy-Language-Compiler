@@ -1,6 +1,6 @@
 package compiler488.ast.expn;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Boolean literal constants.
@@ -25,7 +25,7 @@ public class BoolConstExpn extends ConstExpn {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}
 }

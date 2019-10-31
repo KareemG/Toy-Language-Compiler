@@ -15,7 +15,7 @@ public class Program extends Scope
     // accept method simply calls scope method
     // here in case we want to add any special functionality to "Program" later on
     @Override
-    public void accept(AST_Visitor visitor)
+    public void accept(ASTVisitor visitor)
     {
         visitor.visitEnter(this);
         super.accept(visitor);

@@ -6,7 +6,7 @@ import compiler488.ast.expn.*;
 import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
 
-public interface AST_Visitor
+public interface ASTVisitor
 {
     public Semantics analyzer = new Semantics();
 
@@ -71,7 +71,7 @@ public interface AST_Visitor
     public void visit(SkipConstExpn skipExpn);
     public void visit(TextConstExpn textExpn);
 
-    public static class Default implements AST_Visitor {
+    public static class Default implements ASTVisitor {
         // ===== DEFAULT ACTIONS ===== //
         void defaultVisit(BaseAST node) {}
         void defaultVisitEnter(BaseAST node) {

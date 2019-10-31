@@ -1,6 +1,6 @@
 package compiler488.ast.expn;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Place holder for all ordered comparisons expression where both operands must
@@ -22,7 +22,7 @@ public class CompareExpn extends BinaryExpn {
     }
 
     @Override
-    public void accept(AST_Visitor visitor) {
+    public void accept(ASTVisitor visitor) {
         this.left.accept(visitor);
         visitor.visitEnter(this);
         this.right.accept(visitor);

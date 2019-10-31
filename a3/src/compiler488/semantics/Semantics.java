@@ -21,7 +21,7 @@ import compiler488.symbol.*;
  * 
  * @author <B> Put your names here </B>
  */
-public class Semantics extends AST_Visitor.Default {
+public class Semantics extends ASTVisitor.Default {
 
 	/** flag for tracing semantic analysis */
 	private boolean traceSemantics = false;
@@ -504,7 +504,7 @@ public class Semantics extends AST_Visitor.Default {
 
 		}
 
-		System.out.println("Semantic Action: S" + actionNumber);
+		//System.out.println("Semantic Action: S" + actionNumber);
 		this.analyzers.get(actionNumber).accept(Arrays.asList(nodes), this);
 		return;
 	}

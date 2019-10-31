@@ -2,7 +2,7 @@ package compiler488.ast.expn;
 
 import compiler488.ast.PrettyPrinter;
 // import compiler488.ast.Readable;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * References to an array element variable
@@ -62,7 +62,7 @@ public class SubsExpn extends ReadableExpn {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		this.subscript1.accept(visitor);
 		if (this.subscript2 != null) {

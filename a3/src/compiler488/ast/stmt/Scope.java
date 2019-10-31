@@ -62,24 +62,19 @@ public class Scope extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor)
-	{
-		if(declarations != null && declarations.size() > 0)
-		{
+	public void accept(ASTVisitor visitor) {
+		if (declarations != null && declarations.size() > 0) {
 			ListIterator<Declaration> decl_it = declarations.listIterator();
-			while(decl_it.hasNext())
-			{
+			while (decl_it.hasNext()) {
 				decl_it.next().accept(visitor);
 			}
 		}
 
 		visitor.visitEnter(this);
 
-		if(statements != null && statements.size() > 0)
-		{
+		if (statements != null && statements.size() > 0) {
 			ListIterator<Stmt> stmt_it = statements.listIterator();
-			while(stmt_it.hasNext())
-			{
+			while (stmt_it.hasNext()) {
 				stmt_it.next().accept(visitor);
 			}
 		}

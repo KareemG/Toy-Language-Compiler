@@ -1,6 +1,6 @@
 package compiler488.ast.type;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Used to declare objects that yield integers.
@@ -11,7 +11,7 @@ public class IntegerType extends Type {
     }
 
     @Override
-    public void accept(AST_Visitor visitor) {
+    public void accept(ASTVisitor visitor) {
         visitor.visit(this);
     }
 }

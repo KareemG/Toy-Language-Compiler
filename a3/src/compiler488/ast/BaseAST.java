@@ -1,6 +1,6 @@
 package compiler488.ast;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Base class implementation for the AST hierarchy.
@@ -32,7 +32,7 @@ public abstract class BaseAST implements AST {
 	}
 
 	// base method for visitors
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		// do nothing
 	}
 }

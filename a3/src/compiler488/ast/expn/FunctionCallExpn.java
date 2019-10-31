@@ -4,7 +4,7 @@ import java.util.ListIterator;
 
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents a function call with arguments.
@@ -42,7 +42,7 @@ public class FunctionCallExpn extends Expn {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		ListIterator<Expn> arg_lst = arguments.listIterator();
 		while(arg_lst.hasNext()) {

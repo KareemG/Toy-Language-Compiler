@@ -2,7 +2,7 @@ package compiler488.ast.stmt;
 
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.Expn;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents an if-then or an if-then-else construct.
@@ -62,7 +62,7 @@ public class IfStmt extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		this.condition.accept(visitor);
 		visitor.visitEnter(this);
 		this.whenTrue.accept(visitor);

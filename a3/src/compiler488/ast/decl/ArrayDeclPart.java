@@ -1,7 +1,7 @@
 package compiler488.ast.decl;
 
 import compiler488.ast.PrettyPrinter;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Holds the declaration part of an array.
@@ -106,7 +106,7 @@ public class ArrayDeclPart extends DeclarationPart {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}
 }

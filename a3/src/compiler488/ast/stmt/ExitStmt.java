@@ -3,7 +3,7 @@ package compiler488.ast.stmt;
 import compiler488.ast.expn.*;
 import compiler488.ast.PrettyPrinter;
 
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents the command to exit from a loop.
@@ -86,7 +86,7 @@ public class ExitStmt extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor)
+	public void accept(ASTVisitor visitor)
 	{
 		if (this.expn != null) {
 			this.expn.accept(visitor);

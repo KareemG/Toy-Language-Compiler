@@ -5,7 +5,7 @@ import java.util.ListIterator;
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.expn.ReadableExpn;
-import compiler488.semantics.AST_Visitor;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * The command to read data into one or more variables.
@@ -30,7 +30,7 @@ public class ReadStmt extends Stmt {
 	}
 
 	@Override
-	public void accept(AST_Visitor visitor) {
+	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
 		ListIterator<ReadableExpn> inps_lst = inputs.listIterator();
 		while (inps_lst.hasNext()) {
