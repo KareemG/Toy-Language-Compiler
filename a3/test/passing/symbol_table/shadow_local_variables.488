@@ -3,7 +3,7 @@
     var a : integer
     var b : integer
     
-    function foo : integer
+    function foo(a : integer, b : integer) : integer
     {
         var a : integer
         var b : integer

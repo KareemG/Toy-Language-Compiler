@@ -5,7 +5,7 @@
 
         a := 5
 
-        return a
+        return with a
     }
 
     var a : integer
