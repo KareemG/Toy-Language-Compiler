@@ -30,7 +30,8 @@ return_with_proc.488          : test that returning with a value in a procedure 
 sub_int_and_bool_expr.488     : test that subtraction between an integer and boolean fail
 var_same_name_as_function.488 : test that declaring a variable with the same name of the function it is defined in fail
 var_same_name_as_param.488    : test that declaring a variable with the same name of a parameter in its function fail
-
+conditional_operator_different_return_type : test that a conditional operator with different result types fails
+conditional_operator_different_types       : test that a conditional operator with different true and false return types fails
 
 Passing tests: These are split into 2 categories - AST and Symbol Table
 
