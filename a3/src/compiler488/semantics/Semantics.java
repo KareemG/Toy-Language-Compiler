@@ -252,11 +252,9 @@ public class Semantics extends AST_Visitor.Default {
 
 		// ===== EXPRESSION TYPES ===== //
 		analyzers.put(20, (s, self) -> {
-			assert(s.get(0) instanceof Expn);
 			((Expn) s.get(0)).setType(new BooleanType());
 		});
 		analyzers.put(21, (s, self) -> {
-			assert(s.get(0) instanceof Expn);
 			((Expn) s.get(0)).setType(new IntegerType());
 		});
 		analyzers.put(23, (s, self) -> {});
@@ -294,7 +292,7 @@ public class Semantics extends AST_Visitor.Default {
 			Expn expn = (Expn) s.get(0);
 			if(!(expn.getType() instanceof BooleanType))
 				printError("Expected expression type is boolean but it is not"
-					+ "Instead, it is: " + expn);
+					+ "Instead, it is: " + expn.getType());
 		});
 		analyzers.put(31, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
@@ -664,7 +662,7 @@ public class Semantics extends AST_Visitor.Default {
 	@Override
 	public void visitLeave(EqualsExpn equalExpn) {
 		semanticAction(31, equalExpn.getLeft());
-		semanticAction(21, equalExpn);
+		semanticAction(20, equalExpn);
 	}
 	@Override
 	public void visitEnter(FunctionCallExpn funcExpn) {

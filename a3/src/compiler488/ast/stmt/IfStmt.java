@@ -63,10 +63,11 @@ public class IfStmt extends Stmt {
 
 	@Override
 	public void accept(AST_Visitor visitor) {
-		visitor.visitEnter(this);
 		this.condition.accept(visitor);
+		visitor.visitEnter(this);
 		this.whenTrue.accept(visitor);
-		this.whenFalse.accept(visitor);
+		if(whenFalse != null)
+			this.whenFalse.accept(visitor);
 		visitor.visitLeave(this);
 	}
 }
