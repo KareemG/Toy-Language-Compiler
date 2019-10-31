@@ -75,7 +75,7 @@ class ScopeNode implements PrettyPrintable {
         if(type != null) {
             p.print(" : " + type.toString());
         }
-        if(param != null) {
+        if(param != null && param.size() > 0) {
             p.print(" ( ");
             p.print(param.get(0).getIdent() + ": " + param.get(0).getResult());
             for(int i = 1; i < param.size(); i++) {

@@ -10,6 +10,5 @@
         return with a + b
     }
 
-    foo(2,3)
-    fee(2,3)
+    foo(2,fee(2,3))
 }

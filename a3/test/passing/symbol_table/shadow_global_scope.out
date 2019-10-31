@@ -2,9 +2,8 @@
  Symbols:
  b: integer
  a: integer
- foo: integer
- foo : integer{
+ test: integer
+ test : integer{
  Symbols:
- b: integer
  a: integer
  }

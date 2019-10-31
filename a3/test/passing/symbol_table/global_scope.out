@@ -1,6 +1,5 @@
-
 {
-a
-b
-c
-}
+ Symbols:
+ b: integer
+ a: integer
+ c: integer

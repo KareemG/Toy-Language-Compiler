@@ -1,11 +1,15 @@
 {
-foo
-{
-a
-{
-b
-{
-}
-}
-}
-}
+ Symbols:
+ ret: integer
+ foo: integer
+ foo : integer{
+ Symbols:
+ a: integer
+ {
+ Symbols:
+ b: integer
+ {
+ Symbols:
+ }
+ }
+ }
