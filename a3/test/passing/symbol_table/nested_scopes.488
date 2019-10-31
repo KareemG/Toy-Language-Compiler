@@ -3,12 +3,17 @@
     var a : integer
 
     {
+        var a : integer
         var b : integer
 
         {
+            var a : integer
+            var b : integer
             var c : integer
 
-            c := 0
+            a := 0
+            b := 1
+            c := a + b
         }
     }
 }

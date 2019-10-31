@@ -1,0 +1,14 @@
+
+{
+    var a : integer
+    var b : integer
+    
+    function foo(a : integer, b : integer) : integer
+    {
+        return with a + b
+    }
+    
+    a := 2
+    b := 3
+    foo(a, b)
+}
