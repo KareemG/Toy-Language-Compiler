@@ -114,7 +114,7 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
 			symTable.enterScope(decl.getName(), decl.getType());
-			this.context = new Context(this.context, ContextType.FUNCTION);
+			this.context = new Context(this.context, ContextType.FUNCTION, decl.getType());
 		});
 
 		// End function scope.
@@ -324,8 +324,11 @@ public class Semantics extends AST_Visitor.Default {
 		});
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
-			if(symTable.getType() == null
-				|| !(((ReturnStmt)s.get(0)).getValue().getType().getClass().equals(symTable.getType().getClass())))
+			Context traverse = this.context;
+			while(traverse.GetType() != ContextType.FUNCTION)
+				traverse = traverse.GetPrev();
+			if(traverse.GetRetType() == null
+				|| !(((ReturnStmt)s.get(0)).getValue().getType().getClass().equals(traverse.GetRetType().getClass())))
 				printError("Return value type does not match function's return type");
 		});
 		analyzers.put(36, (s, self) -> {

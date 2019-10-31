@@ -162,6 +162,10 @@ public class SymbolTable implements PrettyPrintable {
 		return this.root.GetParent();
 	}
 
+	public ScopeNode getSN() {
+		return this.root;
+	}
+
 	@Override
 	public void prettyPrint(PrettyPrinter p) {
 		assert(this.root != null);
