@@ -1,0 +1,8 @@
+% Inequality operation
+
+{
+    if 5 not = 6 then
+        write "PASS"
+    else
+        write "FAIL"
+}

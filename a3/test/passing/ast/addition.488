@@ -1,0 +1,12 @@
+% Addition
+
+{
+    var a : integer
+    var b : integer
+
+    a := 4
+
+    b := 10
+
+    a := a + b
+}
