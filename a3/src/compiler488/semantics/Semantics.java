@@ -428,7 +428,7 @@ public class Semantics extends ASTVisitor.Default {
 			while(tmp.GetType() == ContextType.LOOP) {
 				tmp = tmp.GetPrev();
 			}
-			if(this.context.GetType() != ContextType.FUNCTION)
+			if(tmp.GetType() != ContextType.FUNCTION)
 				printError("Return statement is not directly inside a function");
 		});
 		analyzers.put(52, (s, self) -> {
@@ -436,7 +436,7 @@ public class Semantics extends ASTVisitor.Default {
 			while(tmp.GetType() == ContextType.LOOP) {
 				tmp = tmp.GetPrev();
 			}
-			if(this.context.GetType() != ContextType.PROCEDURE)
+			if(tmp.GetType() != ContextType.PROCEDURE)
 				printError("Return statement is not directly inside a procedure");
 		});
 		analyzers.put(53, (s, self) -> {
@@ -449,7 +449,7 @@ public class Semantics extends ASTVisitor.Default {
 			while(tmp.GetType() != ContextType.FUNCTION) {
 				tmp = tmp.GetPrev();
 			}
-			if(this.context.GetRetCount() > 0) {
+			if(tmp.GetRetCount() > 0) {
 				printError("Function does not contain return statement");
 			}
 		});

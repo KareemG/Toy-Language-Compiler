@@ -51,6 +51,7 @@ class ScopeNode implements PrettyPrintable {
         this.syms.put(key, value);
         return 0;
     }
+    
     public Record get(String key) {
         return this.syms.get(key);
     }
