@@ -304,14 +304,14 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(32, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())));
+			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
 		analyzers.put(33, (s, self) -> {
 			// TODO: Redundant perhaps?
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType())));
+			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
 		analyzers.put(34, (s, self) -> {
@@ -571,12 +571,14 @@ public class Semantics extends AST_Visitor.Default {
 
 	@Override
 	public void visitEnter(ProcedureCallStmt procStmt) {
+		semanticAction(41, procStmt);
 		if(procStmt.getArguments() != null) {
 			semanticAction(44, procStmt);
 		}
 	}
 	@Override
 	public void visitLeave(ProcedureCallStmt procStmt) {
+		semanticAction(41, procStmt);
 		if(procStmt.getArguments() != null) {
 			semanticAction(43, procStmt);
 			semanticAction(36, procStmt);

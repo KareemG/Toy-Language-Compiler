@@ -2,7 +2,7 @@
 
 function ast_test # test_name, test_source, expected_output
 {
-    output="$(java -jar ./dist/compiler488.jar -D b $2 2> /dev/null | tr -s ' \n')"
+    output="$(java -jar ./dist/compiler488.jar -D b $2 2> /dev/null | sed '/Semantic Action/d' | tr -s ' \n')"
     output="${output:18+${#2}:${#output}-54-${#2}}"
 
     expected="$(cat $3)"
