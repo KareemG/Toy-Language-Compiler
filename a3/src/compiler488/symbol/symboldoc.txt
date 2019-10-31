@@ -3,18 +3,18 @@ object and couple of functions which interacts with the aforementioned
 ScopeNode.
 
 The following are the four functions:
-- Get(String key) : given a key value, go through the ScopeNode and its parents
+- get(String key) : given a key value, go through the ScopeNode and its parents
                     to attempt to retrieve the value linked to the key.
                     If there are no reference to the key, then the program will
                     assert.
-- Put(String key, BaseAST value) : given a key and value, stores the combination
+- put(String key, BaseAST value) : given a key and value, stores the combination
                                    in the current ScopeNode's hash table. If
                                    there is a same key in the hash table
                                    already, then assert.
-- EnterScope() : Called everytime semantic analyzer notices a new scope. We will
+- enterScope() : Called everytime semantic analyzer notices a new scope. We will
                  create a new ScopeNode object and link the previous ScopeNode
                  as its parent.
-- ExitScope() : Called everytime semantic analyzer notices that it is leaving
+- exitScope() : Called everytime semantic analyzer notices that it is leaving
                 the scope. We will set current ScopeNode's parent as the new
                 current ScopeNode (root). Furthermore, we will store the
                 previous ScopeNode in archive. This may not be necessary at the

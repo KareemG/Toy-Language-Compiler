@@ -1,0 +1,7 @@
+% Read statement
+
+{
+    var x : integer
+
+    read x
+}

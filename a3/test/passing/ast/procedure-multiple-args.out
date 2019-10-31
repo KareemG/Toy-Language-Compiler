@@ -1,0 +1,6 @@
+ { 
+ procedure printAdd(a : integer, b : integer) { 
+ write (a) + (b)
+ } 
+ printAdd(2, 3)
+ }

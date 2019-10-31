@@ -1,16 +1,21 @@
 {
+    var ret : integer
+    
     function foo : integer
     {
         var a : integer
+        a := 1
 
         {
             var b : integer
 
             {
-                return with a + b
+                return with 2
             }
+
+            return with a + b
         }
     }
 
-    foo
+    ret := foo
 }

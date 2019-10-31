@@ -1,0 +1,13 @@
+% Declaring and calling a function that requires multiple arguments
+
+{
+    function test(a : integer, b : boolean) : integer
+    {
+        if b then
+            return with a
+    }
+
+    var i : integer
+
+    i := test(2, true)
+}

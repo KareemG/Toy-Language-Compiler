@@ -7,7 +7,7 @@
  e : = (a) - (-((b) / (d)))
  f : = (d) < (e)
  g : = not(((d) * (2)) > (e))
- h : = (null ? null : null)
+ h : = ((((d) * (d)) + ((e) * (e))) < (10000)?false:true)
  if h then
  write "less than 10000"end
  if (d) not = (e) then

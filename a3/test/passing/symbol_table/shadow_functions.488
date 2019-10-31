@@ -14,7 +14,7 @@
                 return with 10
         }
 
-        test
+        return with test
     }
 
     var x : integer

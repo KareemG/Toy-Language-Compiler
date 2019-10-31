@@ -1,7 +1,6 @@
 package compiler488.ast.decl;
 
 import compiler488.ast.BaseAST;
-import compiler488.semantics.ASTVisitor;
 
 /**
  * The common features of declarations' parts.

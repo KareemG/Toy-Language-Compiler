@@ -1,0 +1,22 @@
+ { 
+ procedure PrintHelloWorld { 
+ write "Hello World!"
+ write newline
+ } 
+ function GetStudentLevel : integer { 
+ return with 4
+ } 
+ function GetCourseCode(is_grad : boolean) : integer { 
+ if is_grad then
+ return with 2107 else
+ return with 488end
+ } 
+ procedure PrintCourseGreeting { 
+ write "Welcome to CSC", GetCourseCode(false)
+ write "/CSC", GetCourseCode(true), ", "
+ write "a ", GetStudentLevel, "th year course!"
+ write newline
+ } 
+ PrintHelloWorld
+ PrintCourseGreeting
+ }

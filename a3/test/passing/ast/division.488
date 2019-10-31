@@ -1,0 +1,12 @@
+% Division
+
+{
+    var a : integer
+    var b : integer
+
+    a := 10
+
+    b := 2
+
+    a := a / b
+}

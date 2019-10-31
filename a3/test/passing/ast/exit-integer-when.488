@@ -1,0 +1,14 @@
+% Exit integer when statement
+
+{
+    var x : integer
+
+    x := 0
+
+    while x < 10 do
+    {
+        x := x + 1
+
+        exit 1 when x = 5
+    }
+}

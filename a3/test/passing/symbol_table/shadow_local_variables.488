@@ -3,7 +3,7 @@
     var a : integer
     var b : integer
     
-    function foo(a : integer, b : integer) : integer
+    function foo : integer
     {
         var a : integer
         var b : integer
@@ -14,6 +14,5 @@
     }
     
     a := 2
-    b := 3
-    foo(a, b)
+    b := foo
 }
