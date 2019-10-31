@@ -24,6 +24,7 @@ public class SubsExpn extends ReadableExpn {
 		this.variable = variable;
 		this.subscript1 = subscript1;
 		this.subscript2 = subscript2;
+		this.name = variable;
 	}
 
 	/** Subscript 1 dimensional array */

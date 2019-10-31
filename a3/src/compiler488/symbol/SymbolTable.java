@@ -23,7 +23,7 @@ public class SymbolTable implements PrettyPrintable {
          *  Create and initialize a symbol table
 	 */
 	public SymbolTable(){
-		this.root = new ScopeNode(null);
+		Initialize();
 	}
 
 	/**  Initialize - called once by semantic analysis
@@ -32,31 +32,13 @@ public class SymbolTable implements PrettyPrintable {
  	 *                does all required initialization
 	 */
 	public void Initialize() {
-
-	   /**   Initialize the symbol table
-	    *	Any additional symbol table initialization
-	    *  GOES HERE
-		*/
-
+		this.root = new ScopeNode(null);
 	}
 
 	/**  Finalize - called once by Semantics at the end of compilation
 	 *              May be unnecessary
 	 */
-	public void Finalize(){
-
-	  /**  Additional finalization code for the
-	   *  symbol table  class GOES HERE.
-	   *
-	   */
-	}
-
-
-	/** The rest of Symbol Table
-	 *  Data structures, public and private functions
- 	 *  to implement the Symbol Table
-	 *  GO HERE.
-	 */
+	public void Finalize(){}
 
 	/** Get a given key - value combination from the symbol table.
 	 *  If not present, asserts
@@ -78,12 +60,12 @@ public class SymbolTable implements PrettyPrintable {
 				}
 			}
 		}
-		assert(false);
 		return null;
 	}
 
 	/** Put a given key - value combination into the symbol table
 	 *  Asserts if the key is already present
+	 *
 	 *  @param key variable name binded to the val
 	 *  @param val actual object that has been declared
 	 */
@@ -91,6 +73,15 @@ public class SymbolTable implements PrettyPrintable {
 		return this.root.put(key, val);
 	}
 
+	/**
+	 * Same as put function, but inserts key - value combination onto the
+	 * current scope's parent instead of itself. This is useful for the
+	 * function declaration.
+	 *
+	 * @param key variable name binded to the val
+	 * @param val actual object that has been declared
+	 * @return
+	 */
 	public int pPut(String key, Record val) {
 		return this.root.GetParent().put(key, val);
 	}
@@ -99,7 +90,6 @@ public class SymbolTable implements PrettyPrintable {
 	 *  Creates another hashtable/ScopeNode, and pushes it on top of
 	 *  stack of nodes.
 	 */
-
 	public void enterScope() {
 		ScopeNode newScope = new ScopeNode(this.root);
 		this.root = newScope;

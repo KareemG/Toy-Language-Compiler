@@ -48,7 +48,7 @@ public class Semantics extends AST_Visitor.Default {
 	}
 
 	private void printError(String str) {
-		System.err.println("ERROR:" + str);
+		System.err.println("ERROR: " + str);
 		this.err = true;
 	}
 
@@ -268,19 +268,23 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(25, (s, self) -> {
 			assert(s.get(0) instanceof IdentExpn);
 			IdentExpn ident = (IdentExpn) s.get(0);
-			assert(symTable.get(ident.getIdent()) != null);
+			if(symTable.get(ident.getName()) == null)
+				printError(ident.getName() + " not found");
 			ident.setType(symTable.get(ident.getIdent()).getResult());
 		});
 		analyzers.put(27, (s, self) -> {
 			assert(s.get(0) instanceof SubsExpn);
 			SubsExpn subsExpn = (SubsExpn) s.get(0);
-			assert(symTable.get(subsExpn.getVariable()) != null);
+			if(symTable.get(subsExpn.getVariable()) == null) {
+				printError(subsExpn.getName() + " not found");
+			}
 			subsExpn.setType(symTable.get(subsExpn.getVariable()).getResult());
 		});
 		analyzers.put(28, (s, self) -> {
 			assert(s.get(0) instanceof FunctionCallExpn);
 			FunctionCallExpn func = (FunctionCallExpn) s.get(0);
-			assert(symTable.get(func.getIdent()) != null);
+			if(symTable.get(func.getIdent()) == null)
+				printError(func.getIdent() + " not found");
 			func.setType(symTable.get(func.getIdent()).getResult());
 		});
 
@@ -289,18 +293,20 @@ public class Semantics extends AST_Visitor.Default {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
 			if(!(expn.getType() instanceof BooleanType))
-				printError("Expected expression type is boolean but it is not");
+				printError("Expected expression type is boolean but it is not"
+					+ "Instead, it is: " + expn);
 		});
 		analyzers.put(31, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
 			if(!(expn.getType() instanceof IntegerType))
-				printError("Expected expression type is integer but it is not");
+				printError("Expected expression type is integer but it is not. "
+					+ "Instead, it is: " + expn.getType());
 		});
 		analyzers.put(32, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
-			if(!(((Expn) s.get(0)).getType().equals(((Expn) s.get(1)).getType())));
+			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())));
 				printError("Expressions type mismatch");
 		});
 		analyzers.put(33, (s, self) -> {
@@ -313,13 +319,15 @@ public class Semantics extends AST_Visitor.Default {
 		analyzers.put(34, (s, self) -> {
 			assert(s.get(0) instanceof ReadableExpn);
 			assert(s.get(1) instanceof Expn);
-			if(!((ReadableExpn)s.get(0)).getType().equals(((Expn)s.get(1)).getType()))
-				printError("Assignment type mismatch");
+			Record rec = symTable.get(((ReadableExpn)s.get(0)).getName());
+			if(!rec.getResult().getClass().equals(((Expn)s.get(1)).getType().getClass()))
+				printError("Assignment type mismatch: " + rec.getResult()
+					+ " : " + (((ReadableExpn)s.get(0)).getType()));
 		});
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
 			if(symTable.getType() == null
-				|| !(((ReturnStmt)s.get(0)).getValue().getType().equals(symTable.getType())))
+				|| !(((ReturnStmt)s.get(0)).getValue().getType().getClass().equals(symTable.getType().getClass())))
 				printError("Return value type does not match function's return type");
 		});
 		analyzers.put(36, (s, self) -> {
@@ -329,7 +337,7 @@ public class Semantics extends AST_Visitor.Default {
 			ArrayList<Record> param = symTable.getParams();
 			for(int i = 0; i < s.size(); i++) {
 				assert(s.get(i) instanceof Expn);
-				if(!(((Expn) s.get(i)).getType().equals(param.get(i).getResult())))
+				if(!(((Expn) s.get(i)).getType().getClass().equals(param.get(i).getResult().getClass())))
 					printError("Type of parameter and argument mismatch");
 			}
 		});
@@ -444,14 +452,7 @@ public class Semantics extends AST_Visitor.Default {
 	/** semanticsFinalize - called by the parser once at the */
 	/* end of compilation */
 	void Finalize() {
-
-		/*********************************************/
-		/* Additional finalization code for the */
-		/* semantics analysis module */
-		/* GOES here. */
-		/**********************************************/
 		this.symTable.Finalize();
-
 	}
 
 	public SymbolTable getSymbolTable() {
@@ -486,13 +487,6 @@ public class Semantics extends AST_Visitor.Default {
 
 		}
 
-		/*************************************************************/
-		/* Code to implement each semantic action GOES HERE */
-		/* This stub semantic analyzer just prints the actionNumber */
-		/*                                                           */
-		/* FEEL FREE TO ignore or replace this procedure */
-		/*************************************************************/
-
 		System.out.println("Semantic Action: S" + actionNumber);
 		this.analyzers.get(actionNumber).accept(Arrays.asList(nodes), this);
 		return;
@@ -506,12 +500,6 @@ public class Semantics extends AST_Visitor.Default {
 	@Override
 	public void visitLeave(Program prog) {
 		semanticAction(1, prog);
-	}
-	@Override
-	public void visitEnter(Scope scope) {
-		if (scope.getDeclarations() != null) {
-			// semanticAction(2, scope);
-		}
 	}
 
 	// ===== DECLARATIONS ===== //

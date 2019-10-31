@@ -14,6 +14,7 @@ public class IdentExpn extends ReadableExpn {
 		super();
 
 		this.ident = ident;
+		this.name = ident;
 	}
 
 	public String getIdent() {
