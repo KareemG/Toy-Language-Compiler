@@ -187,7 +187,7 @@ public class Semantics extends AST_Visitor.Default {
 			symTable.initParams();
 			for (ScalarDecl p : decl.getParameters()) {
 				Record pRec = new Record(p.getName(), RecordType.PARAMETER);
-				pRec.setResult(decl.getType());
+				pRec.setResult(p.getType());
 				symTable.addParams(pRec);
 			}
 		});
@@ -331,13 +331,29 @@ public class Semantics extends AST_Visitor.Default {
 				printError("Return value type does not match function's return type");
 		});
 		analyzers.put(36, (s, self) -> {
-			assert(symTable.GetParams() != null);
 			// We have also checked the size of the params vs args here (S43)
-			assert(s.size() == symTable.GetParams().size());
-			ArrayList<Record> param = symTable.getParams();
+			Record rec = null;
+			Expn []args = null;
+			if(s.get(0) instanceof ProcedureCallStmt) {
+				ProcedureCallStmt tmp = (ProcedureCallStmt) s.get(0);
+				rec = symTable.get(tmp.getName());
+				args = tmp.getArguments().toArray(new Expn[tmp.getArguments().size()]);
+			} else if (s.get(0) instanceof FunctionCallExpn) {
+				FunctionCallExpn tmp = (FunctionCallExpn) s.get(0);
+				rec = symTable.get(((FunctionCallExpn)s.get(0)).getIdent());
+				args = tmp.getArguments().toArray(new Expn[tmp.getArguments().size()]);
+			} else {
+				printError("Call to something that is not a function or procedure");
+			}
+			if(rec == null)
+				printError("Call to function/procedure that does not exist");
+			else if(rec.getParamCount() != args.length)
+				printError("Argument and parameter size mismatch");
+
+			ArrayList<Record> param = rec.getParams();
 			for(int i = 0; i < s.size(); i++) {
 				assert(s.get(i) instanceof Expn);
-				if(!(((Expn) s.get(i)).getType().getClass().equals(param.get(i).getResult().getClass())))
+				if(!(args[i].getType().getClass().equals(param.get(i).getResult().getClass())))
 					printError("Type of parameter and argument mismatch");
 			}
 		});
@@ -522,7 +538,7 @@ public class Semantics extends AST_Visitor.Default {
 				semanticAction(18, routine);
 			} else {
 				semanticAction(17, routine);
-				semanticAction(18, routine);
+				semanticAction(8, routine);
 			}
 		}
 	}
@@ -562,7 +578,7 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(ProcedureCallStmt procStmt) {
 		if(procStmt.getArguments() != null) {
 			semanticAction(43, procStmt);
-			semanticAction(36, (Expn []) procStmt.getArguments().toArray());
+			semanticAction(36, procStmt);
 		} else {
 			semanticAction(42, procStmt);
 		}
@@ -661,7 +677,7 @@ public class Semantics extends AST_Visitor.Default {
 	public void visitLeave(FunctionCallExpn funcExpn) {
 		if(funcExpn.getArguments() != null) {
 			semanticAction(43, funcExpn);
-			semanticAction(36, (Expn []) funcExpn.getArguments().toArray());
+			semanticAction(36, funcExpn);
 		} else {
 			semanticAction(42, funcExpn);
 		}

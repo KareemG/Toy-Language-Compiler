@@ -51,14 +51,14 @@ public class SymbolTable implements PrettyPrintable {
 			if (value != null) {
 				return value;
 			}
-			traverse = traverse.GetParent();
-		}
-		if (root.param != null) {
-			for (Record p : root.param) {
-				if (p.getIdent().equals(key)) {
-					return p;
+			if (traverse.param != null) {
+				for (Record p : traverse.param) {
+					if (p.getIdent().equals(key)) {
+						return p;
+					}
 				}
 			}
+			traverse = traverse.GetParent();
 		}
 		return null;
 	}

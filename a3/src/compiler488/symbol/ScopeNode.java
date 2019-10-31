@@ -17,7 +17,6 @@ import compiler488.ast.type.*;
  * @author  KyoKeun Park
  */
 class ScopeNode implements PrettyPrintable {
-    private Hashtable<String, BaseAST> symbols; // declared stuff in curr scope
     private Hashtable<String, Record> syms;
     private ArrayList<ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
@@ -56,7 +55,6 @@ class ScopeNode implements PrettyPrintable {
     }
 
     private void Initialize() {
-        this.symbols = new Hashtable<String, BaseAST>();
         this.archive = new ArrayList<ScopeNode>();
         this.syms = new Hashtable<>();
     }
