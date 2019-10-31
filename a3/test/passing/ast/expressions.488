@@ -1,0 +1,27 @@
+{
+    var a : integer
+    var b, c, d, e : integer
+    var f, g, h : boolean
+
+    read a, b, c
+
+    d := -(a + b) * a + b * c
+    e := a - -(b / d)
+
+    f := d < e
+    g := not (d * 2 > e)
+    h := ((d*d + e*e < 10000) ? false : true)
+
+    if h then write "less than 10000"
+
+    if d not = e then write "not equal"
+    if d <  e then write "<"
+    if d <= e then write "<="
+    if d >  e then write ">"
+    if d >= e then write ">=" 
+
+    if f and g then write "f and g"
+    if f or g then write "f or g"
+    if not f and g then write "not f and g"
+    if f or not g then write "f or not g"
+}

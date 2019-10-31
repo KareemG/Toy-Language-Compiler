@@ -1,6 +1,9 @@
 package compiler488.ast.stmt;
 
 import compiler488.ast.expn.*;
+import compiler488.ast.PrettyPrinter;
+
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents the command to exit from a loop.
@@ -11,6 +14,26 @@ public class ExitStmt extends Stmt {
 
 	/** Number of levels to exit. */
 	private Integer level = -1;
+
+	public ExitStmt()
+	{
+	}
+
+	public ExitStmt(int i)
+	{
+		level = i;
+	}
+
+	public ExitStmt(Expn e)
+	{
+		expn = e;
+	}
+
+	public ExitStmt(Expn e, int i)
+	{
+		expn = e;
+		level = i;
+	}
 
 	/**
 	 * Returns the string <b>"exit"</b> or <b>"exit when e"</b>" or
@@ -31,6 +54,21 @@ public class ExitStmt extends Stmt {
 		return stmt;
 	}
 
+	@Override
+	public void prettyPrint(PrettyPrinter p)
+	{
+		p.print("exit");
+
+		if(level >= 0) {
+			p.print(" " + level);
+		}
+
+		if(expn != null) {
+			p.print(" when ");
+			expn.prettyPrint(p);
+		}
+	}
+
 	public Expn getExpn() {
 		return expn;
 	}
@@ -45,5 +83,14 @@ public class ExitStmt extends Stmt {
 
 	public void setLevel(Integer level) {
 		this.level = level;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor)
+	{
+		if (this.expn != null) {
+			this.expn.accept(visitor);
+		}
+		visitor.visit(this);
 	}
 }

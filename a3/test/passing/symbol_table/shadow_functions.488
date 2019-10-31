@@ -1,0 +1,23 @@
+{
+    function test : integer
+    {
+        return with 5
+    }
+
+    function test2 : integer
+    {
+        function test(a : integer, b : boolean) : integer
+        {
+            if b then
+                return with a
+            else
+                return with 10
+        }
+
+        test
+    }
+
+    var x : integer
+
+    x := test2
+}

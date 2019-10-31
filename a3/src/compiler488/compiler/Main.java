@@ -18,6 +18,8 @@ import compiler488.symbol.SymbolTable;
 import compiler488.codegen.CodeGen;
 import compiler488.runtime.*;
 
+import compiler488.semantics.*;
+
 /**
  * This class serves as the main driver for the CSC488S compiler.<BR>
  * It accepts user options and coordinates overall control flow. The main flow
@@ -375,32 +377,46 @@ public class Main {
 		}
 	}
 
+	private static void dumpSymbolTable(SymbolTable symTable) {
+		try {
+			if (compilerDumpFileName.length() > 0) {
+				dumpFile = new File(compilerDumpFileName);
+				dumpStream = new PrintStream(new FileOutputStream(dumpFile));
+				symTable.prettyPrint(new BasePrettyPrinter(dumpStream));
+				dumpStream.close();
+			} else {
+				symTable.prettyPrint(new BasePrettyPrinter(saveSysOut));
+			}
+		} catch (Exception e) {
+			System.err.println("Exception while dumping Symbol Table");
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			e.printStackTrace();
+			System.exit(100);
+		}
+	}
+
 	/**
 	 * function to perform semantic analysis on the scanned and parsed program
 	 *
 	 * @param programAST
 	 *            the Abstract Syntax Tree produced during parsing
 	 */
-	private static void semanticAnalysis(Program programAST) {
-		try {
-			// INSERT CODE HERE TO DO SEMANTIC ANALYSIS
-			// e.g.
-			//
-			// ASTVisitor visitor = new Semantics();
-			// programAST.accept(visitor);
-			//
-			// or
-			//
-			// programAST.doSemantics() ;
-			//
-			// or
-			//
-			// Semantics.doIt( programAST );
-		} catch (Exception e) {
+	private static SymbolTable semanticAnalysis(Program programAST) {
+		try
+		{
+			Semantics analyzer = new Semantics();
+			programAST.accept(analyzer);
+			if(analyzer.didError())
+				throw new Exception("Semantic error");
+			return analyzer.getSymbolTable();
+		}
+		catch (Exception e)
+		{
 			System.err.println("Exception during Semantic Analysis");
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			e.printStackTrace();
 			errorOccurred = true;
+			return null;
 		}
 	}
 
@@ -486,6 +502,7 @@ public class Main {
 	private static void compileOneProgram(Machine machine, String sourceFileName) {
 		Object parserResult = null ; // the result of parsing and AST building
 		Program programAST = null;
+		SymbolTable symTable = null;
 
 		errorOccurred = false;
 
@@ -536,11 +553,15 @@ public class Main {
 		}
 
 		/* Do semantic analysis on the program */
-		semanticAnalysis(programAST);
+		symTable = semanticAnalysis(programAST);
 
 		if (errorOccurred) {
 			System.out.println("Processing Terminated due to errors during semantic analysis");
 			return;
+		}
+
+		if (dumpSymbolTable) {
+			dumpSymbolTable(symTable);
 		}
 
 		// Dump AST after semantic analysis if requested
@@ -555,7 +576,7 @@ public class Main {
 			System.out.println("Processing Terminated due to errors during code generation");
 			return;
 		} else {
-			System.out.println("End of Compilation");
+			System.out.println("\nEnd of Compilation");
 		}
 
 		if (traceStream != null && traceStream != saveSysOut) {

@@ -1,11 +1,12 @@
 package compiler488.ast.expn;
 
-import compiler488.ast.Readable;
+// import compiler488.ast.Readable;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * References to a scalar variable or function call without parameters.
  */
-public class IdentExpn extends Expn implements Readable {
+public class IdentExpn extends ReadableExpn {
 	/** Name of the identifier. */
 	private String ident;
 
@@ -13,6 +14,7 @@ public class IdentExpn extends Expn implements Readable {
 		super();
 
 		this.ident = ident;
+		this.name = ident;
 	}
 
 	public String getIdent() {
@@ -25,6 +27,11 @@ public class IdentExpn extends Expn implements Readable {
 	@Override
 	public String toString() {
 		return ident;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

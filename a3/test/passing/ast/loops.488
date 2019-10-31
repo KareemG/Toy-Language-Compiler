@@ -1,0 +1,15 @@
+
+{
+    var a : integer
+    
+    while a not = 0 do
+    {
+        read a
+    }
+
+    repeat
+    {
+        read a
+    }
+    until a = 1
+}

@@ -1,5 +1,6 @@
 package compiler488.ast.expn;
 
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Place holder for all binary expression where both operands could be either
@@ -14,5 +15,13 @@ public class EqualsExpn extends BinaryExpn {
 
         assert ((opSymbol == OP_EQUAL) ||
                 (opSymbol == OP_NOT_EQUAL));
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        this.left.accept(visitor);
+        visitor.visitEnter(this);
+        this.right.accept(visitor);
+        visitor.visitLeave(this);
     }
 }

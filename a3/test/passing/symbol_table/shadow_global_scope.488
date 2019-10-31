@@ -1,0 +1,22 @@
+{
+    function test : integer
+    {
+        var a : integer
+
+        a := 5
+
+        return with a
+    }
+
+    var a : integer
+    var b : integer
+
+    a := 5
+
+    b := test
+
+    if b = 5 then
+        write "valid"
+    else
+        write "invalid"
+}

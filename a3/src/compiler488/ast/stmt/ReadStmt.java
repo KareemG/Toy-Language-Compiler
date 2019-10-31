@@ -1,17 +1,20 @@
 package compiler488.ast.stmt;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
-import compiler488.ast.Readable;
+import compiler488.ast.expn.ReadableExpn;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * The command to read data into one or more variables.
  */
 public class ReadStmt extends Stmt {
 	/** A list of locations to put the values read. */
-	private ASTList<Readable> inputs;
+	private ASTList<ReadableExpn> inputs;
 
-	public ReadStmt(ASTList<Readable> inputs) {
+	public ReadStmt(ASTList<ReadableExpn> inputs) {
 		super();
 		this.inputs = inputs;
 	}
@@ -22,7 +25,17 @@ public class ReadStmt extends Stmt {
 		inputs.prettyPrintCommas(p);
 	}
 
-	public ASTList<Readable> getInputs() {
+	public ASTList<ReadableExpn> getInputs() {
 		return inputs;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visitEnter(this);
+		ListIterator<ReadableExpn> inps_lst = inputs.listIterator();
+		while (inps_lst.hasNext()) {
+			inps_lst.next().accept(visitor);
+		}
+		visitor.visitEnter(this);
 	}
 }

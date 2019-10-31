@@ -1,6 +1,7 @@
 package compiler488.ast.decl;
 
 import compiler488.ast.PrettyPrinter;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Holds the declaration part of an array.
@@ -64,8 +65,7 @@ public class ArrayDeclPart extends DeclarationPart {
 	 * @return size of the array
 	 */
 	public int getSize() {
-		// FIXME: This is broken.
-		throw new UnsupportedOperationException();
+		return (ub2 - lb2) * (ub1 - lb1);
 	}
 
 	public Integer getLowerBoundary1() {
@@ -90,6 +90,10 @@ public class ArrayDeclPart extends DeclarationPart {
 		return ub2;
 	}
 
+	public boolean isTwoDimensional() {
+		return this.isTwoDimensional;
+	}
+
 	@Override
 	public void prettyPrint(PrettyPrinter p) {
 		p.print(name + "[" + lb1 + ".." + ub1);
@@ -99,5 +103,10 @@ public class ArrayDeclPart extends DeclarationPart {
 		}
 
 		p.print("]");
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -1,12 +1,13 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.PrettyPrinter;
-import compiler488.ast.Readable;
+// import compiler488.ast.Readable;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * References to an array element variable
  */
-public class SubsExpn extends Expn implements Readable {
+public class SubsExpn extends ReadableExpn {
 	/** Name of the array variable. */
 	private String variable;
 
@@ -23,6 +24,7 @@ public class SubsExpn extends Expn implements Readable {
 		this.variable = variable;
 		this.subscript1 = subscript1;
 		this.subscript2 = subscript2;
+		this.name = variable;
 	}
 
 	/** Subscript 1 dimensional array */
@@ -58,4 +60,15 @@ public class SubsExpn extends Expn implements Readable {
 
 		p.print("]");
 	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visitEnter(this);
+		this.subscript1.accept(visitor);
+		if (this.subscript2 != null) {
+			this.subscript2.accept(visitor);
+		}
+		visitor.visitLeave(this);
+	}
+
 }

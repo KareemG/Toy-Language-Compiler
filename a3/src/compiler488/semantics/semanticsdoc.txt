@@ -1,0 +1,7 @@
+Parameters & Arguments counter:
+    Counting number of parameters and arguements can simply be done by
+    taking the size of the ASTList. This way, we do not need to keep track of
+    additional counters.
+
+Lack of S02:
+    S02 was not necessary in our case since we store our declarations as we go.

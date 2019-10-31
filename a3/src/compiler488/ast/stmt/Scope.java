@@ -1,8 +1,12 @@
 package compiler488.ast.stmt;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.decl.Declaration;
+
+import compiler488.semantics.*;
 
 /**
  * Represents the declarations and statements of a scope construct.
@@ -13,8 +17,20 @@ public class Scope extends Stmt {
 	protected ASTList<Stmt> statements;
 
 	public Scope() {
-		declarations = new ASTList<Declaration>();
-		statements = new ASTList<Stmt>();
+		declarations = null;
+		statements = null;
+	}
+
+	public Scope(ASTList<Stmt> stmts)
+	{
+		declarations = null;
+		statements = stmts;
+	}
+
+	public Scope(ASTList<Declaration> decls, ASTList<Stmt> stmts)
+	{
+		declarations = decls;
+		statements = stmts;
 	}
 
 	public void setDeclarations(ASTList<Declaration> declarations) {
@@ -43,5 +59,26 @@ public class Scope extends Stmt {
 			statements.prettyPrintBlock(p);
 		}
 		p.print(" } ");
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		if (declarations != null && declarations.size() > 0) {
+			ListIterator<Declaration> decl_it = declarations.listIterator();
+			while (decl_it.hasNext()) {
+				decl_it.next().accept(visitor);
+			}
+		}
+
+		visitor.visitEnter(this);
+
+		if (statements != null && statements.size() > 0) {
+			ListIterator<Stmt> stmt_it = statements.listIterator();
+			while (stmt_it.hasNext()) {
+				stmt_it.next().accept(visitor);
+			}
+		}
+
+		visitor.visitLeave(this);
 	}
 }

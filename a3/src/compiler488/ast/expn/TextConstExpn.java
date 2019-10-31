@@ -1,6 +1,7 @@
 package compiler488.ast.expn;
 
 import compiler488.ast.Printable;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * Represents a literal text constant.
@@ -25,5 +26,10 @@ public class TextConstExpn extends ConstExpn implements Printable {
 	@Override
 	public String toString() {
 		return "\"" + value + "\"";
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

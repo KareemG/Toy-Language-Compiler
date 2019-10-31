@@ -5,6 +5,12 @@
 package compiler488.parser;
 
 // TODO: You can add Java import statements here as necessary
+import compiler488.ast.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.type.*;
+import compiler488.ast.decl.*;
+import compiler488.ast.Readable;
 
 /*
     SYMBOL LISTS
@@ -44,16 +50,34 @@ terminal String     TEXTCONST;
         nonterminal JavaType nameList;
 */
 
- 
-nonterminal	program,	statement,	declaration,	scope	;
-nonterminal	statements,	declarations,	matchedStatement, unmatchedStatement ;
-nonterminal	variablenames,		output			;
-nonterminal	type,  	arguments,	parameters,	variable	;
-nonterminal 	expression,	variablename 			;
-nonterminal	inputs, outputs, bound , generalBound ;
-nonterminal	procedureCall, parameter, conjunction, negation, compareExpn ;
-nonterminal	arithExpn, term, factor, primary, constant ;
- 
+nonterminal ASTList<DeclarationPart> variablenames;
+nonterminal DeclarationPart variablename;
+nonterminal ASTList<ReadableExpn> inputs;
+
+nonterminal Program program;
+nonterminal Scope scope;
+
+nonterminal Stmt statement, matchedStatement, unmatchedStatement;
+nonterminal ProcedureCallStmt procedureCall;
+nonterminal ASTList<Stmt> statements;
+
+nonterminal Declaration declaration;
+nonterminal ASTList<Declaration> declarations;
+nonterminal ScalarDecl parameter;
+nonterminal ASTList<ScalarDecl> parameters;
+
+nonterminal Expn expression, arithExpn, term, factor, primary, output;
+nonterminal Expn conjunction, negation, compareExpn;
+nonterminal ASTList<Expn> arguments;
+nonterminal ASTList<Printable> outputs;
+nonterminal ConstExpn constant;
+
+nonterminal ReadableExpn variable;
+
+nonterminal Type type;
+
+nonterminal Integer[] bound; // ???
+nonterminal Integer generalBound; // ???
 
 /*
     PLEASE NOTE: Your grammar may not use the 'precedence' feature of JCup to
@@ -82,179 +106,204 @@ start with program;
     will act on the production.
  */
 
-program ::= scope                           // the main program
+program ::= scope:scp {: RESULT = new Program(scp); :}                           // the main program
     ;
 
 scope
-    ::= L_CURLEY declarations statements R_CURLEY   // scope with declarations and statements
-    |   L_CURLEY statements R_CURLEY                // scope with statements only
-    |   L_CURLEY R_CURLEY                           // empty scope
+    ::= L_CURLEY declarations:decls statements:stmts R_CURLEY {: RESULT = new Scope(decls, stmts); :}  // scope with declarations and statements
+    |   L_CURLEY statements:stmts R_CURLEY {: RESULT = new Scope(stmts); :}                // scope with statements only
+    |   L_CURLEY R_CURLEY {: RESULT = new Scope(); :}                           // empty scope
     ;
 
 statements
-    ::= statement                       // sequence of statements
-    |   statements statement
+    ::= statement:stmt {: RESULT = new ASTList<Stmt>(stmt); :}                       // sequence of statements
+    |   statements:stmts statement:stmt {: RESULT = stmts.append(stmt); :}
     ;
 
 declarations
-    ::= declaration                     // sequence of declarations
-    |   declarations declaration
+    ::= declaration:decl {: RESULT = new ASTList<Declaration>(decl); :}                     // sequence of declarations
+    |   declarations:decls declaration:decl {: RESULT = decls.append(decl); :}
     ;
 
 statement
-    ::= matchedStatement
-    |   unmatchedStatement
+    ::= matchedStatement:stmt {: RESULT = stmt; :}
+    |   unmatchedStatement:stmt {: RESULT = stmt; :}
     ;
 
 matchedStatement
-    ::= variable COLON EQUAL expression                             // assignment statement
-    |   IF expression THEN matchedStatement ELSE matchedStatement   // if statements
-    |   WHILE expression DO statement                               // while statement
-    |   REPEAT statements UNTIL expression                           // repeat statement
-    |   EXIT                                                        // exit statements
-    |   EXIT INTCONST
-    |   EXIT WHEN expression
-    |   EXIT INTCONST WHEN expression
-    |   RETURN WITH expression
-    |   RETURN                                                      // return statements
-    |   WRITE outputs                                               // input/output statements
-    |   READ inputs
-    |   procedureCall                                               // procedure call
-    |   scope                                                       // embedded scope
+    ::= variable:lval COLON EQUAL expression:rval {: RESULT = new AssignStmt(lval, rval); :} // assignment statement
+    |   IF expression:cond THEN matchedStatement:if_body ELSE matchedStatement:else_body {: RESULT = new IfStmt(cond, if_body, else_body); :} // if statements
+    |   WHILE expression:cond DO statement:body {: RESULT = new WhileDoStmt(cond, new ASTList<Stmt>(body)); :} // while statement
+    |   REPEAT statements:body UNTIL expression:cond {: RESULT = new RepeatUntilStmt(cond, body); :} // repeat statement
+    |   EXIT {: RESULT = new ExitStmt(); :} // exit statements
+    |   EXIT INTCONST:level {: RESULT = new ExitStmt(level); :}
+    |   EXIT WHEN expression:expn {: RESULT = new ExitStmt(expn); :}
+    |   EXIT INTCONST:level WHEN expression:expn {: RESULT = new ExitStmt(expn, level); :}
+    |   RETURN WITH expression:expn {: RESULT = new ReturnStmt(expn); :}
+    |   RETURN {: RESULT = new ReturnStmt(); :} // return statements
+    |   WRITE outputs:args {: RESULT = new WriteStmt(args); :} // input/output statements
+    |   READ inputs:args {: RESULT = new ReadStmt(args); :}
+    |   procedureCall:call {: RESULT = call; :} // procedure call
+    |   scope:scp {: RESULT = new ScopeStmt(scp); :} // embedded scope
     ;
 
 unmatchedStatement
-    ::= IF expression THEN statement
-    |   IF expression THEN matchedStatement ELSE unmatchedStatement
+    ::= IF expression:expr THEN statement:stmt {: RESULT = new IfStmt(expr, stmt); :}
+    |   IF expression:expr THEN matchedStatement:matched ELSE unmatchedStatement:unmatched {: RESULT = new IfStmt(expr, matched, unmatched); :}
     ;
 
 procedureCall
-    ::= IDENT                                       // call procedure with no parameters
-    |   IDENT L_PAREN arguments R_PAREN             // call procedure with parameters
+    ::= IDENT:ident {: RESULT = new ProcedureCallStmt(ident); :}                           // call procedure with no parameters
+    |   IDENT:ident L_PAREN arguments:args R_PAREN {: RESULT = new ProcedureCallStmt(ident, args); :} // call procedure with parameters
     ;
 
 declaration
-    ::= VAR variablenames COLON type                                // declare scalar/array variables
-    | FUNCTION IDENT COLON type scope                               // declare function
-    | FUNCTION IDENT L_PAREN parameters R_PAREN COLON type scope
-    | PROCEDURE IDENT scope                                         // declare procedure
-    | PROCEDURE IDENT L_PAREN parameters R_PAREN scope
+    ::= VAR variablenames:names COLON type:t                                // declare scalar/array variables
+      {: RESULT = new MultiDeclarations(t, names); :}
+    | FUNCTION IDENT:ident COLON type:type scope:scope // declare function
+      {: RESULT = new RoutineDecl(ident, type, scope); :}
+    | FUNCTION IDENT:ident L_PAREN parameters:params R_PAREN COLON type:type scope:scope
+      {: RESULT = new RoutineDecl(ident, type, params, scope); :}
+    | PROCEDURE IDENT:ident scope:scope                // declare procedure
+      {: RESULT = new RoutineDecl(ident, scope); :}
+    | PROCEDURE IDENT:ident L_PAREN parameters:params R_PAREN scope:scope
+      {: RESULT = new RoutineDecl(ident, params, scope); :}
     ;
 
 variablenames
-    ::= variablename                                // list of variables being declared
-    |   variablenames COMMA variablename
+    ::= variablename:name                           {: RESULT = new ASTList<DeclarationPart>(name); :} // list of variables being declared
+    |   variablenames:names COMMA variablename:name {: RESULT = names.append(name); :}
     ;
 
 variablename
-    ::= IDENT                                       // scalar variable
-    |   IDENT L_SQUARE bound R_SQUARE               // 1-dimension array variable
-    |   IDENT L_SQUARE bound COMMA bound R_SQUARE   // 2-dimensional array variable
+    ::= IDENT:name                                           {: RESULT = new ScalarDeclPart(name); :} // scalar variable
+    |   IDENT:name L_SQUARE bound:b R_SQUARE                 {: RESULT = new ArrayDeclPart(name, b); :} // 1-dimension array variable
+    |   IDENT:name L_SQUARE bound:b1 COMMA bound:b2 R_SQUARE {: RESULT = new ArrayDeclPart(name, b1, b2); :} // 2-dimensional array variable
     ;
 
 bound
-    ::= INTCONST                                    // positive array bound
-    |   generalBound DOT DOT generalBound           // upper and lower bounds
+    ::= INTCONST:b                              {: Integer[] bnd = new Integer[2]; bnd[0] =  1; bnd[1] =  b; RESULT = bnd; :} // positive array bound
+    |   generalBound:b1 DOT DOT generalBound:b2 {: Integer[] bnd = new Integer[2]; bnd[0] = b1; bnd[1] = b2; RESULT = bnd; :} // upper and lower bounds
     ;
 
 generalBound
-    ::= INTCONST                    // positive integer bounds
-    |   MINUS INTCONST              // negative integer bounds
+    ::= INTCONST:b       {: RESULT =  b; :} // positive integer bounds
+    |   MINUS INTCONST:b {: RESULT = -b; :} // negative integer bounds
     ;
 
 type
-    ::= INTEGER                     // integer type
-    |   BOOLEAN                     // boolean type
+    ::= INTEGER {: RESULT = new IntegerType(); :} // integer type
+    |   BOOLEAN {: RESULT = new BooleanType(); :} // boolean type
     ;
 
 outputs
-    ::= output                      // list of output expressions
-    |   outputs COMMA output
+    // list of output expressions
+    ::= output:output {: RESULT = new ASTList<Printable>(output); :}
+    |   outputs:outputs COMMA output:output
+        {: RESULT = outputs.append(output); :}
     ;
 
 output
-    ::= expression                  // integer expression
-    |   TEXTCONST                   // text constant
-    |   NEWLINE                     // newline constant
+    ::= expression:expr {: RESULT = expr; :}     // integer expression
+    |   TEXTCONST:txt {: RESULT = new TextConstExpn(txt); :} // text constant
+    |   NEWLINE {: RESULT = new SkipConstExpn(); :}    // newline constant
     ;
 
 inputs
-    ::= variable                    // list of variables being read into
-    |   inputs COMMA variable
+    ::= variable:var {: RESULT = new ASTList<ReadableExpn>(var); :} // list of variables being read into
+    |   inputs:list COMMA variable:var {: RESULT = list.append(var); :}
     ;
 
 arguments
-    ::= expression                  // list of function/procedure arguments
-    |   arguments COMMA expression
+    ::= expression:expr {: RESULT = new ASTList<Expn>(expr); :} // list of function/procedure arguments
+    |   arguments:args COMMA expression:expr {: RESULT = args.append(expr); :}
     ;
 
 parameters
-    ::= parameter                   // list of function/procedure formal parameters
-    |   parameters COMMA parameter
+    // list of function/procedure formal parameters
+    ::= parameter:param {: RESULT = new ASTList<ScalarDecl>(param); :}
+    |   parameters:params COMMA parameter:param {: RESULT = params.append(param); :}
     ;
 
 parameter
-    ::= IDENT COLON type            // declare one parameter
+    ::= IDENT:ident COLON type:type {: RESULT = new ScalarDecl(ident, type); :}// declare one parameter
     ;
 
 expression
-    ::= conjunction                 // disjunctions, associate left-to-right
-    |   expression OR conjunction
+    ::= conjunction:conj {: RESULT = conj; :}               // disjunctions, associate left-to-right
+    |   expression:left OR conjunction:right
+        {: RESULT = new BoolExpn("or", left, right); :}
     ;
 
 conjunction
-    ::= negation                    // conjunctions, associate left-to-right
-    |   conjunction AND negation
+    ::= negation:neg {: RESULT = neg; :}                // conjunctions, associate left-to-right
+    |   conjunction:left AND negation:right
+        {: RESULT = new BoolExpn("and", left, right); :}
     ;
 
 negation
-    ::= compareExpn                 // negations
-    |   NOT negation
+    ::= compareExpn:compexpn {: RESULT = compexpn; :}          // negations
+    |   NOT negation:neg {: RESULT = new NotExpn(neg); :}
     ;
 
 compareExpn
-    ::= arithExpn                                   // comparisons, do not associate
-    |   arithExpn EQUAL arithExpn
-    |   arithExpn NOT EQUAL arithExpn
-    |   arithExpn LESS arithExpn
-    |   arithExpn LESS EQUAL arithExpn
-    |   arithExpn GREATER arithExpn
-    |   arithExpn GREATER EQUAL arithExpn
+    ::= arithExpn:arith {: RESULT = arith; :}  // comparisons, do not associate
+    |   arithExpn:left EQUAL arithExpn:right
+        {: RESULT = new EqualsExpn("=", left, right); :}
+    |   arithExpn:left NOT EQUAL arithExpn:right
+        {: RESULT = new EqualsExpn("not =", left, right); :}
+    |   arithExpn:left LESS arithExpn:right
+        {: RESULT = new CompareExpn("<", left, right); :}
+    |   arithExpn:left LESS EQUAL arithExpn:right
+        {: RESULT = new CompareExpn("<=", left, right); :}
+    |   arithExpn:left GREATER arithExpn:right
+        {: RESULT = new CompareExpn(">", left, right); :}
+    |   arithExpn:left GREATER EQUAL arithExpn:right
+        {: RESULT = new CompareExpn(">=", left, right); :}
     ;
 
 arithExpn
-    ::= term                        // expressions, associate + , - left-to-right
-    |   arithExpn PLUS term
-    |   arithExpn MINUS term
+    ::= term:term {: RESULT = term; :} // expressions, associate + , - left-to-right
+    |   arithExpn:left PLUS term:right
+        {: RESULT = new ArithExpn("+", left, right); :}
+    |   arithExpn:left MINUS term:right
+        {: RESULT = new ArithExpn("-", left, right); :}
     ;
 
 term
-    ::= factor                      // terms, associate * , / left-to-right
-    |   term TIMES factor
-    |   term DIVIDE factor
+    ::= factor:fact {: RESULT = fact; :}  // terms, associate * , / left-to-right
+    |   term:left TIMES factor:right
+        {: RESULT = new ArithExpn("*", left, right); :}
+    |   term:left DIVIDE factor:right
+        {: RESULT = new ArithExpn("/", left, right); :}
     ;
 
 factor
-    ::= primary                     // unary minus
-    |   MINUS factor
+    ::= primary:primary {: RESULT = primary; :}                     // unary minus
+    |   MINUS factor:fact {: RESULT = new UnaryMinusExpn(fact); :}
     ;
 
 primary
-    ::= constant                                                            // integer or boolean constant
-    |   variable                                                            // scalar, array variable or function call
-    |   IDENT L_PAREN arguments R_PAREN                                     // function call
-    |   L_PAREN expression R_PAREN                                          // parenthesized expression
-    |   L_PAREN expression QUESTION expression COLON expression R_PAREN     // conditional expression
+    ::= constant:constant {: RESULT = constant; :}                          // integer or boolean constant
+    |   variable:variable {: RESULT = variable; :}                          // scalar, array variable or function call
+    |   IDENT:ident L_PAREN arguments:args R_PAREN                          // function call
+        {: RESULT = new FunctionCallExpn(ident, args); :}
+    |   L_PAREN expression:expr R_PAREN {: RESULT = expr; :}                // parenthesized expression
+    |   L_PAREN expression:cond QUESTION expression:tval COLON expression:fval R_PAREN {: RESULT = new ConditionalExpn(cond, tval, fval); :} // conditional expression
+        {: RESULT = new ConditionalExpn(cond, tval, fval); :}
     ;
 
 constant
-    ::= INTCONST                    // integer constant
-    |   TRUE                        // constant true
-    |   FALSE                       // constant false
+    ::= INTCONST:integer {: RESULT = new IntConstExpn(integer); :} // integer constant
+    |   TRUE {: RESULT = new BoolConstExpn(true); :} // constant true
+    |   FALSE {: RESULT = new BoolConstExpn(false); :} // constant false
     ;
 
 variable
-    ::= IDENT                                                               // scalar variable or function call
-    |   IDENT L_SQUARE expression R_SQUARE                                  // element of 1-dimensional array
-    |   IDENT L_SQUARE expression COMMA expression R_SQUARE                 // element of 2-dimensional array;
+    ::= IDENT:ident              // scalar variable or function call
+        {: RESULT = new IdentExpn(ident); :}
+    |   IDENT:ident L_SQUARE expression:sub1 R_SQUARE                       // element of 1-dimensional array
+        {: RESULT = new SubsExpn(ident, sub1); :}
+    |   IDENT:ident L_SQUARE expression:sub1 COMMA expression:sub2 R_SQUARE // element of 2-dimensional array;
+        {: RESULT = new SubsExpn(ident, sub1, sub2); :}
     ;

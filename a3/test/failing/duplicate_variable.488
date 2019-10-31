@@ -1,0 +1,7 @@
+
+{
+    var abc : boolean
+    var abc : integer
+
+    abc := false
+}

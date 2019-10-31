@@ -1,0 +1,5 @@
+
+{
+    write "testing"
+    return with 0
+}

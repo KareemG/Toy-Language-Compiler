@@ -1,5 +1,7 @@
 package compiler488.ast.decl;
 
+import compiler488.semantics.ASTVisitor;
+
 /**
  * Represents the declaration of a simple variable.
  */
@@ -14,5 +16,10 @@ public class ScalarDeclPart extends DeclarationPart {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -1,5 +1,6 @@
 package compiler488.ast.expn;
 
+import compiler488.semantics.ASTVisitor;
 
 /** Represents a conditional expression (i.e., x>0?3:4). */
 public class ConditionalExpn extends Expn {
@@ -8,6 +9,14 @@ public class ConditionalExpn extends Expn {
 	private Expn trueValue; // The value is this when the condition is true.
 
 	private Expn falseValue; // Otherwise, the value is this.
+
+	public ConditionalExpn(Expn condition, Expn trueValue, Expn falseValue) {
+		super();
+
+		this.condition = condition;
+		this.trueValue = trueValue;
+		this.falseValue = falseValue;
+	}
 
 	/** Returns a string that describes the conditional expression. */
 	@Override
@@ -37,5 +46,14 @@ public class ConditionalExpn extends Expn {
 
 	public void setTrueValue(Expn trueValue) {
 		this.trueValue = trueValue;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		this.condition.accept(visitor);
+		visitor.visitEnter(this);
+		this.trueValue.accept(visitor);
+		this.falseValue.accept(visitor);
+		visitor.visitLeave(this);
 	}
 }

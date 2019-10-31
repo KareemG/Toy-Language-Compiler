@@ -1,0 +1,32 @@
+
+{
+    var a : integer
+
+    while true do
+    {
+        exit
+    }
+
+    while true do
+    {
+        while true do
+        {
+            read a
+
+            if a = 1 then exit
+            exit 2 when a = 2
+        }
+    }
+
+    repeat
+    {
+        repeat
+        {
+            read a
+            exit when a = 1
+            if a = 2 then exit 2
+        }
+        until true
+    }
+    until true
+}
