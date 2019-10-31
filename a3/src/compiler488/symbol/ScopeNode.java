@@ -22,7 +22,6 @@ class ScopeNode implements PrettyPrintable {
     private ScopeNode parent = null; // reference to parent
     protected String label = null; // scope node label (functions and procedures)
     protected Type type = null; // return type of the scope (for functions)
-    protected ASTList<ScalarDecl> params = null; // params (for functions)
     protected ArrayList<Record> param = null;
 
     public ScopeNode() {
@@ -37,21 +36,7 @@ class ScopeNode implements PrettyPrintable {
     public ScopeNode(ScopeNode parent, String label) {
         Initialize();
         this.parent = parent;
-    }
-
-    public ScopeNode(ScopeNode parent, String label, ASTList<ScalarDecl> params) {
-        this.parent = parent;
         this.label = label;
-        this.params = params;
-    }
-
-    public ScopeNode(ScopeNode parent, String label,
-                        Type type, ASTList<ScalarDecl> params) {
-        Initialize();
-        this.parent = parent;
-        this.label = label;
-        this.type = type;
-        this.params = params;
     }
 
     private void Initialize() {
@@ -85,15 +70,19 @@ class ScopeNode implements PrettyPrintable {
     public void prettyPrint(PrettyPrinter p) {
         // Print out all of the metadata (if applicable)
         if(label != null) {
-            p.print(label);
+            p.print(this.label);
         }
         if(type != null) {
             p.print(" : " + type.toString());
         }
-        if(params != null) {
-            p.print("(");
-            params.prettyPrintCommas(p);
-            p.print(")");
+        if(param != null) {
+            p.print(" ( ");
+            p.print(param.get(0).getIdent() + ": " + param.get(0).getResult());
+            for(int i = 1; i < param.size(); i++) {
+                p.print(", " + param.get(i).getIdent().toString() +
+                        ": " + param.get(i).getResult().toString());
+            }
+            p.print(" ) ");
         }
         p.println("{");
         p.enterBlock();
@@ -105,15 +94,9 @@ class ScopeNode implements PrettyPrintable {
         for (String key : keys) {
             Record toPrint = syms.get(key);
             if (toPrint.getType() != RecordType.PARAMETER) {
-                p.println(toPrint.getIdent() + ": " + toPrint.getResult().toString());
+                p.println(toPrint.getIdent() + ": " + toPrint.getResult());
             }
         }
-        // Set<String> keys = symbols.keySet();
-        // for (String key:keys) {
-        //     if (!key.equals(label)) {
-        //         symbols.get(key).prettyPrint(p);
-        //     }
-        // }
         p.exitBlock();
 
         // Print children ScopeNodes

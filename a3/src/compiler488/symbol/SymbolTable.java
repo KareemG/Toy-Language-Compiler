@@ -142,10 +142,6 @@ public class SymbolTable implements PrettyPrintable {
 		return this.root.type;
 	}
 
-	public ASTList<ScalarDecl> GetParams() {
-		return this.root.params;
-	}
-
 	public void initParams() {
 		this.root.param = new ArrayList<Record>();
 	}
