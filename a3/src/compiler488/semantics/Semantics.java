@@ -211,15 +211,17 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(20, (s, self) -> {
 			((Expn) s.get(0)).setType(new BooleanType());
 		});
+
 		analyzers.put(21, (s, self) -> {
 			((Expn) s.get(0)).setType(new IntegerType());
 		});
-		analyzers.put(23, (s, self) -> {});
+
 		analyzers.put(24, (s, self) -> {
 			assert(s.get(0) instanceof ConditionalExpn);
 			ConditionalExpn condExpn = (ConditionalExpn) s.get(0);
 			condExpn.setType(condExpn.getTrueValue().getType());
 		});
+
 		analyzers.put(25, (s, self) -> {
 			assert(s.get(0) instanceof IdentExpn);
 			IdentExpn ident = (IdentExpn) s.get(0);
@@ -227,6 +229,7 @@ public class Semantics extends ASTVisitor.Default {
 				printError(ident.getName() + " not found");
 			ident.setType(symTable.get(ident.getIdent()).getResult());
 		});
+
 		analyzers.put(27, (s, self) -> {
 			assert(s.get(0) instanceof SubsExpn);
 			SubsExpn subsExpn = (SubsExpn) s.get(0);
@@ -235,6 +238,7 @@ public class Semantics extends ASTVisitor.Default {
 			}
 			subsExpn.setType(symTable.get(subsExpn.getVariable()).getResult());
 		});
+
 		analyzers.put(28, (s, self) -> {
 			assert(s.get(0) instanceof FunctionCallExpn);
 			FunctionCallExpn func = (FunctionCallExpn) s.get(0);
@@ -251,6 +255,7 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Expected expression type is boolean but it is not"
 					+ "Instead, it is: " + expn.getType());
 		});
+
 		analyzers.put(31, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
@@ -258,12 +263,14 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Expected expression type is integer but it is not. "
 					+ "Instead, it is: " + expn.getType());
 		});
+
 		analyzers.put(32, (s, self) -> {
 			assert(s.get(0) instanceof Expn);
 			assert(s.get(1) instanceof Expn);
 			if(!(((Expn) s.get(0)).getType().getClass().equals(((Expn) s.get(1)).getType().getClass())))
 				printError("Expressions type mismatch");
 		});
+
 		analyzers.put(34, (s, self) -> {
 			assert(s.get(0) instanceof ReadableExpn);
 			assert(s.get(1) instanceof Expn);
@@ -272,6 +279,7 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Assignment type mismatch: expected " + rec.getResult()
 					+ ", but got " + (((ReadableExpn)s.get(0)).getType()));
 		});
+
 		analyzers.put(35, (s, self) -> {
 			assert(s.get(0) instanceof ReturnStmt);
 			Context traverse = this.context;
@@ -281,6 +289,7 @@ public class Semantics extends ASTVisitor.Default {
 				|| !(((ReturnStmt)s.get(0)).getValue().getType().getClass().equals(traverse.GetRetType().getClass())))
 				printError("Return value type does not match function's return type");
 		});
+
 		analyzers.put(36, (s, self) -> {
 			// We have also checked the size of the params vs args here (S43)
 			Record rec = null;
@@ -308,12 +317,14 @@ public class Semantics extends ASTVisitor.Default {
 					printError("Type of parameter and argument mismatch");
 			}
 		});
+
 		analyzers.put(37, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDecl);
 			Record rec = symTable.get(((ScalarDecl)s.get(0)).getName());
 			if(rec == null || rec.getType() != RecordType.SCALAR)
 				printError("Identifier not declared or is not a scalar");
 		});
+
 		analyzers.put(38, (s, self) -> {
 			assert(s.get(0) instanceof SubsExpn);
 			Record rec = symTable.get(((SubsExpn)s.get(0)).getVariable());
@@ -328,12 +339,14 @@ public class Semantics extends ASTVisitor.Default {
 			if(rec == null || rec.getType() != RecordType.FUNCTION)
 				printError("Calling identifier that is not a function");
 		});
+
 		analyzers.put(41, (s, self) -> {
 			ProcedureCallStmt procStmt = (ProcedureCallStmt) s.get(0);
 			Record rec = symTable.get(procStmt.getName());
 			if(rec == null || rec.getType() != RecordType.PROCEDURE)
 				printError("Calling identifier that is not a procedure");
 		});
+
 		analyzers.put(42, (s, self) -> {
 			if(s.get(0) instanceof FunctionCallExpn) {
 				FunctionCallExpn funcExpn = (FunctionCallExpn) s.get(0);
@@ -347,6 +360,7 @@ public class Semantics extends ASTVisitor.Default {
 				assert(false);
 			}
 		});
+
 		analyzers.put(43, (s, self) -> {
 			Record rec;
 			if(s.get(0) instanceof FunctionCallExpn) {
@@ -363,13 +377,12 @@ public class Semantics extends ASTVisitor.Default {
 				printError("Number of arguments does not equal number of parameters");
 			}
 		});
-		analyzers.put(44, (s, self) -> {});
-		analyzers.put(45, (s, self) -> {});
 
 		analyzers.put(50, (s, self) -> {
 			if(this.context.GetType() != ContextType.LOOP)
 				printError("Exit statement is not directly inside a loop");
 		});
+
 		analyzers.put(51, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() == ContextType.LOOP) {
@@ -378,6 +391,7 @@ public class Semantics extends ASTVisitor.Default {
 			if(tmp.GetType() != ContextType.FUNCTION)
 				printError("Return statement is not directly inside a function");
 		});
+
 		analyzers.put(52, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() == ContextType.LOOP) {
@@ -386,11 +400,13 @@ public class Semantics extends ASTVisitor.Default {
 			if(tmp.GetType() != ContextType.PROCEDURE)
 				printError("Return statement is not directly inside a procedure");
 		});
+
 		analyzers.put(53, (s, self) -> {
 			int lvl = ((ExitStmt)s.get(0)).getLevel();
 			if(lvl <= 0 || lvl > context.GetLoopCount())
 				printError("Exit value is greater than number of loops");
 		});
+
 		analyzers.put(54, (s, self) -> {
 			Context tmp = this.context;
 			while(tmp.GetType() != ContextType.FUNCTION) {
@@ -518,9 +534,6 @@ public class Semantics extends ASTVisitor.Default {
 	@Override
 	public void visitEnter(ProcedureCallStmt procStmt) {
 		semanticAction(41, procStmt);
-		if(procStmt.getArguments() != null) {
-			semanticAction(44, procStmt);
-		}
 	}
 	@Override
 	public void visitLeave(ProcedureCallStmt procStmt) {
@@ -617,9 +630,6 @@ public class Semantics extends ASTVisitor.Default {
 	@Override
 	public void visitEnter(FunctionCallExpn funcExpn) {
 		semanticAction(40, funcExpn);
-		if(funcExpn.getArguments() != null) {
-			semanticAction(44, funcExpn);
-		}
 	}
 	@Override
 	public void visitLeave(FunctionCallExpn funcExpn) {

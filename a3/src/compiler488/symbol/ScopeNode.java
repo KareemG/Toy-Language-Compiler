@@ -54,9 +54,6 @@ class ScopeNode implements PrettyPrintable {
         return this.syms.get(key);
     }
 
-    public void addParam(Record rec) {
-    }
-
     public void AddArchive(ScopeNode node) {
         this.archive.add(node);
     }
