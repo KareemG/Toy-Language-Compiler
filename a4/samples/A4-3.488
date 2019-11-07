@@ -1,0 +1,30 @@
+% Assignment 4 Sample Program 3				% 3-1
+ { 							% 3-2
+   var a, b, c, d : integer				% 3-3
+   var p, q, r, s : boolean				% 3-4
+   procedure P 						% 3-5
+       { 						% 3-6
+         var e, f : integer				% 3-7
+         if p then  return    				% 3-8
+         e : = a 					% 3-9
+	 return						% 3-10
+       }   % P						% 3-11
+  function F( m : integer , n : boolean ) : integer	% 3-12
+       { 						% 3-13
+         if n then  return with m + b  			% 3-14
+         else  return with c - m      			% 3-15
+       }   % F						% 3-16
+  procedure Q( m : boolean , n : integer, p : boolean )	% 3-17
+     { 							% 3-18
+      var t, u, v : integer				% 3-19
+      function G : boolean				% 3-20
+           { 						% 3-21
+             var w, x : integer				% 3-22
+             return with 				% 3-23
+              (m and not p ? v < u : not r and s )	% 3-24
+           }   % G					% 3-25
+      write F( t - n + a  ,  not  G  or  r ) , newline 	% 3-26
+   }   %Q						% 3-27
+  Q(  not  p  or  q , F(F( b, p ),not q ) ,		% 3-28
+      ( not r or not s ? true : s not= q ) )		% 3-29
+ } 							% 3-30
