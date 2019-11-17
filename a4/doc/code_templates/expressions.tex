@@ -1,0 +1,93 @@
+% !TeX root = expressions.tex
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{listings}
+
+\lstset{
+  numbers=left,
+  numberfirstline=true
+}
+
+
+% Your document starts here!
+\begin{document}
+
+% Define document title and author
+	\title{Expressions Template}
+	\author{Jasmeet Brar}
+    \maketitle
+
+
+\section{Arithmetic and Comparison Operations}
+
+All the binary operations have this form: \textit{expression} \textbf{operator} \textit{expression}. In the AST, the \textbf{operator} node will be the parent node of both the operand expressions. So when we are generating code for a binary operations, we must generate the code for both operands first, and then we generate code for the operation itself.
+
+Assume that for each binary operation, code is generated for each operand expression, and the result of each operand is stored on the stack, where the left operand's result is stored first, followed by the right operand's.
+
+\subsection{Arithmetic Operators}
+
+For each of the arithmetic operators, $+,-,*,/$, there is a single machine instruction associated with each one of them, that is: ADD, SUB, MUL, and DIV respectively. So the code we generate is simply the instruction of the given operation.
+
+\subsection{Comparison Operators}
+
+For the $<$ operator, we have LT instruction that can directly compute if one operand is less than the other. So we just call LT.
+
+For the $<=$ operator, we can notice that this is the same as first comparing if the left operand is the less than the right, then compare that they are the same, and then return the result that is the \textbf{or} of the two operations. LT is the instruction to for $<$, EQ is the instruction for $=$, and OR is the operator for \textbf{or}. Thus we can generate the following code:
+
+\begin{lstlisting}
+    y := top; POP;
+    x := top; POP;
+    PUSH x;
+    PUSH y;
+    PUSH x;
+    PUSH y;
+    LT;
+    x := top; POP;
+    EQ;
+    PUSH x;
+    OR;
+\end{lstlisting}
+
+Additional instructions for PUSH and POP had to be added, since LT and EQ would be popping the arguments out of the stack, but we need the operands being passed to the operators to be the same, hence the instructions in lines 1-6 are needed to store the operands, duplicate, and push them into the stack so that we have two copies of each operands, and we maintain their order. Instruction on line 8 is needed to store the result that was pushed by LT, and line 10 is needed to push the result of LT back to the stack, so that it can be used by OR.
+
+For the $>$ operator, we can swap the arguments that are on the top of the stack, so that we just have to generate code for $<$, which is LT:
+
+\begin{lstlisting}
+    SWAP;
+    LT;
+\end{lstlisting}
+
+As for the $>=$ operator, we can swap the arguments on the top of the stack, so that this problem now becomes generating code for $<=$, which we had just did earlier:
+
+\begin{lstlisting}
+    SWAP;
+    y := top; POP;
+    x := top; POP;
+    PUSH x;
+    PUSH y;
+    PUSH x;
+    PUSH y;
+    LT;
+    x := top; POP;
+    EQ;
+    PUSH x;
+    OR;
+\end{lstlisting}
+
+The $=$ operator has a single machine instruction that can directly compute it, which is EQ.
+
+As for \textbf{'not'} $=$ operator, we can first check the equality, with the EQ, and then push the value of false in to the stack, so that we can check if the result of the equality is actually false. The code we would generate is:
+
+\begin{lstlisting}
+    EQ;
+    PUSH MACHINE_FALSE;
+    EQ;
+\end{lstlisting}
+
+\end{document}
