@@ -28,4 +28,8 @@
 
 \section{Display Management Strategy}
 
+When the function references a variable outside of the scope, we must create a reference to the said variable for the correctness of the program. This can be done by scanning through the function and gathering all of the references that were made in the said function. Then, we can add the addreses to the references variables in one of the {\tt display} registers. Then, every time the variable gets references, we can load the address from the corresponding display register.
+
+% Explain in detail how we can manage
+
 \end{document}
