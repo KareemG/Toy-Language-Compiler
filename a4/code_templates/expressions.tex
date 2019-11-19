@@ -137,4 +137,28 @@ As for the \textbf{'not'} operator, we can just compare the operand with the val
     EQ;
 \end{lstlisting}
 
+\section{Conditional Expressions}
+
+Conditional statements have the form of: (condition ? expression\_1 : expression\_2)
+
+Where expression\_1 is the expression that would result from this should the condition be true, and expression\_2 is the expression should the condition be false. Implementing this should be straight forward with branching:
+
+\begin{lstlisting}
+    (Instructions for condition)
+    PUSH pc;
+    PUSH num_1;
+    ADD;
+    BF;
+    (Instructions for expression_1)
+    PUSH pc;
+    PUSH num_2;
+    ADD;
+    BR;
+    (Instructions for expression_2)
+\end{lstlisting}
+
+First we must generate the code for the condition, which would in the end push a boolean value onto the stack. Then lines 2-4 is needed to push pc+num\_1 onto the stack, which is the address of line 11. The value of num\_1 would have to be calculated after we generate the rest of the code, since the number of instructions for expression\_1 can vary.
+
+Line 5 is the actual BF instruction, which would branch to line 11, if the condition is false. Line 6 contains all the instructions for expression\_1. Lines 7-9 pushes pc+num\_2 onto the stack, which is the address of the line after line 11, which would bypass all the instructions for expression\_2, when the condition was true. Just like before, num\_2 would have to be determined after we generate the rest of the code since the number of instructions for expression\_2 can vary. Line 10 is the unconditonal branch to bypass the next line, like what we said before. Line 11 contains all the instructions for expression\_2.
+
 \end{document}
