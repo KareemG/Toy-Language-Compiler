@@ -24,7 +24,7 @@
     \maketitle
 
 
-\section{Arithmetic and Comparison Operations}
+\section{Arithmetic and Comparison Operators}
 
 All the binary operations have this form: \textit{expression} \textbf{operator} \textit{expression}. In the AST, the \textbf{operator} node will be the parent node of both the operand expressions. So when we are generating code for a binary operations, we must generate the code for both operands first, and then we generate code for the operation itself.
 
@@ -86,6 +86,53 @@ As for \textbf{'not'} $=$ operator, we can first check the equality, with the EQ
 
 \begin{lstlisting}
     EQ;
+    PUSH MACHINE_FALSE;
+    EQ;
+\end{lstlisting}
+
+\section{Logical Operators}
+
+As for the \textbf{'and'} operator, we need to first execute the instructions for the left operand first, so that we can determine if we need to proceed with executing instructions for the second operand. In this case, as we're going through the AST tree, we'll generate the code for the first operand, followed by:
+
+\begin{lstlisting}
+    PUSH pc;
+    PUSH num;
+    ADD;
+    BF;
+    (Instructions for the second operand)
+    PUSH pc;
+    PUSH 5;
+    ADD;
+    BR;
+    PUSH MACHINE_FALSE;
+\end{lstlisting}
+
+Lines 1-3 is when we're trying to add pc+num to the stack, where pc is the program counter, and num is the value that we add to pc, so that we would end up jumping to line 10 in this example, should the first operand give us false. The value of num cannot be determined right away, since we would have to jump over all the instructions that would appear for the second opperand, as shown in line 5. So in this case, we would generate all the other instructions, and then determine the value we add to pc to jump to line 10. Line 4 is when we do the actual branching should the value we get for the first operand is false.
+
+Line 5 is of course all the instructions for the second operand, and this follows after line 4, meaning that the first operand is true. After executing all the instructions for the second expression, its result would appear in the stack, and that would be the result of the entire \textbf{'and'} operation. Lines 6-8 is when we push pc+5 to the stack, which is the address after the instruction on line 10. This is needed to jump over the statement that pushes false to the stack, since the instructions of our expression would've already placed its result on the stack. Line 9 is the unconditional branch that would make this work, and line 10 is the instruction to push false to the stack if the first operand was false.
+
+As for the \textbf{'or'} operator, the code that is to be generated is similar to the code generated for \textbf{'and'}, since one requires going through both operands to determine if the overall result is true, and the other does the same to determine if it is false. We start off by having the code generated for the first operand, followed by the following code:
+
+\begin{lstlisting}
+    PUSH MACHINE_FALSE;
+    EQ;
+    PUSH pc;
+    PUSH num;
+    ADD;
+    BF;
+    (Instructions for the second operand)
+    PUSH pc;
+    PUSH 5;
+    ADD;
+    BR;
+    PUSH MACHINE_TRUE;
+\end{lstlisting}
+
+Since we only have an instruction that branches if the condition is false, lines 1-2 is needed to invert the result, so that the BF instruction on line 6 would branch if the first operand is true. Like before, lines 3-5 is needed to push pc+num to the stack, which is the address of line 12, where we are pushing the value true to our stack. The value of num would be computed after we generate the rest of the code. Line 7 is all the instructions for the second operand, which will get executed if the first operand was false. Lines 5-8 pushes pc+5 to the stack, which is the address after line 10, so we can jump to that line, and bypass the instruction to push false to the stack, since the actual result of the whole \text{'or'} operation has already been pushed onto the stack by line 7. Line 11 does the unconditional branching that bypasses the next line.
+
+As for the \textbf{'not'} operator, we can just compare the operand with the value of false in order to flip the boolean value. The code that will be generated is:
+
+\begin{lstlisting}
     PUSH MACHINE_FALSE;
     EQ;
 \end{lstlisting}
