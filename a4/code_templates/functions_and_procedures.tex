@@ -14,11 +14,27 @@
 
 \begin{document}
 
-\section{Activation Record}
+\section{Activation Record} \label{rec}
+
+The activation record will consist of couple of informations in order for callee to gather all the necessary information to carry out the function/procedure, and for caller to successfully execute and return from the callee.
+
+If it is a function, we will first reserve a space in stack in order to hold to return value. Such memory in the stack allows for callee to store its return value, and it also allows caller to retrieve the return value when the callee is done.
+
+Then, for both function and procedure, we must push the return address to the stack. Such address will be used by the callee to return to the caller when it is done.
+
+Finally, if the function or the procedure contains parameters. It will be included in the activation record as well.
+
+All of the mentioned information must be stored in the activation record in this specific order at all times.
 
 \section{Procedure and Function Entrance Code}
 
+When the function or a procedure enters, the activation record needs to be properly set up. Please refer to {\it Section \ref{rec}} for more information in regards to the information contained within activation record.
+
+Once the activation record has been set up, we must also set the display register of an index equivalent to the caller's lexical level. Now, we can jump to the callee, which effectively allows the program to start the execution of called function.
+
 \section{Procedure and Function Exit Code}
+
+When the function finishes its execution, the first thing it must do is 
 
 \section{Parameter Passing}
 
