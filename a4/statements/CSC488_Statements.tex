@@ -1,0 +1,82 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[legalpaper, portrait, margin=1in]{geometry}
+\usepackage{listings}
+
+\lstset{
+  numbers=left,
+  numberfirstline=true
+}
+
+\author{Jasmeet Sidhu}
+\title{CSC488 Statements}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Assignment statement:}
+In an assignment statement, the address of the variable will first be pushed onto the stack,
+and then the expression will be fully evaluated. Once the expression is fully evaluated, it's final result will be on top of the stack, with the address behind it.
+\newline
+\newline
+Given the assignment statement
+\begin{lstlisting}
+a := expr
+\end{lstlisting}
+the compiler would generate this sequence of instructions:
+\newline
+\begin{lstlisting}
+    ADDR lexical_level offset_of_a;
+    ...
+    (instructions for expression)
+    ...
+    STORE
+\end{lstlisting}
+
+\section{If statement:}
+Given the if statement
+\begin{lstlisting}
+if expression then statement
+\end{lstlisting}
+the compiler would generate this sequence of instructions:
+\begin{lstlisting}
+    ...
+    (instructions to evaluate expression)
+    ...
+    PUSH offset_to_skip_if_body
+    BF
+    ...
+    (if_body)
+    ...
+\end{lstlisting}
+
+\noindent
+If there is an else statement, then the compiler will need to insert a branch at the end of the if body.
+\newline
+Given the if and else statements
+\begin{lstlisting}
+if expression then
+    statement
+else
+    statement
+\end{lstlisting}
+the compiler should generate this sequence of instructions
+\begin{lstlisting}
+    ...
+    (instructions to evaulate expression)
+    ...
+    PUSH offset_to_else_body
+    BF
+    ...
+    (if_body)
+    ...
+    PUSH offset_to_skip_else_body
+    BR
+    (else_body)
+    ...
+    
+\end{lstlisting}
+
+\end{document}
