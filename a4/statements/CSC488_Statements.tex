@@ -54,7 +54,7 @@ the compiler would generate this sequence of instructions:
 \end{lstlisting}
 
 \noindent
-If there is an else statement, then the compiler will need to insert a branch at the end of the if body.
+If there is an else statement, then the compiler will need to insert a branch in the if body to skip the else body. Also, if the condition is not satisfied, then the compiler must branch into the else body.
 \newline
 Given the if and else statements
 \begin{lstlisting}
@@ -70,8 +70,10 @@ the compiler should generate this sequence of instructions
     PUSH address_of_else_body
     BF
     (if_body)
-    PUSH address_to_end_of_else_body
+    PUSH address_to_end_of_else_body // skip the else body
     BR
+    
+    // else body start
     (else_body)
     
     // end of else body
@@ -114,9 +116,10 @@ the compiler should generate this sequence of instructions:
     // loop start
     (loop body)
     (instructions to evaluate condition)
-    PUSH address_to_end_of_loop
+    // condition result now on top of stack
+    PUSH address_to_end_of_loop // jump out of loop if condition not satisfied
     BF
-    PUSH address_to_loop_start
+    PUSH address_to_loop_start // jump back to start of loop
     BR
     
     // end of loop
@@ -143,15 +146,19 @@ Similarly, a conditional exit statement of the form
 should be converted to these instructions:
 \begin{lstlisting}
     (instructions to evaluate the condition)
+    // condition result now on top of stack
+    
+    // skip the exit instructions if the condition is false
     PUSH address_to_skip_exit_instructions
     BF
+    
     // exit instructions:
     PUSH address_to_end_of_current_loop
     BR
 \end{lstlisting}
 
 \noindent
-The multi-loop exit instructions loop very similar.
+The multi-loop exit instructions are very similar.
 Given the following multi-loop exit statement
 \begin{lstlisting}
     exit N
@@ -162,6 +169,7 @@ the compiler should generate these instructions
     BR
 \end{lstlisting}
 
+\noindent
 Similarly, given the following conditional multi-loop exit statement
 \begin{lstlisting}
     exit N when expression
@@ -170,7 +178,7 @@ the compiler would generate
 \begin{lstlisting}
     (instructions to evaluate the condition)
     // condition result now on top of stack
-    PUSH address_to_skip_exit_instructions
+    PUSH address_to_skip_exit_instructions // skip exit instructions if condition false
     BF
     // exit instructions:
     PUSH address_to_end_of_Nth_loop
@@ -192,7 +200,7 @@ the compiler produces
 \end{lstlisting}
 
 \noindent
-Function return statements are very similar to procedural return statements, except they need to push the return value onto the stack as well. To accomplish this, the compiler can simply push the return value and use the swap operation to ensure the return address comes onto the stack.
+Function return statements are very similar to procedural return statements, except they need to store the return value on the stack as well. To accomplish this, the compiler can simply copy the return value to the spot after the return address and then use the swap operation to ensure the return address comes onto the stack.
 \newline
 \newline
 Given the functional return statement:
@@ -202,7 +210,7 @@ Given the functional return statement:
 the compiler would produce
 \begin{lstlisting}
     // store the return value right after return address
-    ADDR lexical_level (offset_to_return_value_address + 1)
+    ADDR lexical_level (offset_to_return_address + 1)
     (instructions to evaluate the return value)
     // return value now on top of stack
     STORE
@@ -217,22 +225,22 @@ the compiler would produce
 Even though the virtual machine supports reading characters, the language only allows integers to be read. Hence read instructions only support integers.
 \newline
 \newline
-Given a read statement
+Given a read integer(s) statement
 \begin{lstlisting}
     read a, b, c, ...
 \end{lstlisting}
 the compiler would generate the following instructions
 \begin{lstlisting}
-    READI
     ADDR lexical_level offset_of_a
+    READI
     STORE
     
-    READI
     ADDR lexical_level offset_of_b
+    READI
     STORE
     
-    READI
     ADDR lexical_level offset_of_c
+    READI
     STORE
     
     ...
@@ -306,7 +314,7 @@ the compiler would output
 \end{lstlisting}
 
 \noindent
-If there are no local variables, meaning the local stack size is zero, there would be no stack space allocation/deallocation. Hence the code would like like:
+If there are no local variables, meaning the local stack size is zero, there would be no stack space allocation/deallocation. Hence the generated code would look like as if theres no minor scope:
 \begin{lstlisting}
     (instructions for statements)
 \end{lstlisting}
