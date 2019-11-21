@@ -103,8 +103,7 @@ the compiler should generate this sequence of instructions:
     // end of loop body
 \end{lstlisting}
 \newline
-A similar strategy is used for the repeat statement.
-\newline
+A similar strategy is used for the repeat statement. The only difference is that the condition is evalulated after the loop body.
 Given the repeat loop
 \begin{lstlisting}
 repeat
@@ -132,29 +131,25 @@ For a simple exit statement of the form
 \begin{lstlisting}
     exit
 \end{lstlisting}
-the compiler should generate these simple instructions
+the compiler should simply branch out of the current loop:
 \begin{lstlisting}
     PUSH address_to_end_of_current_loop
     BR
 \end{lstlisting}
 
 \noindent
-Similarly, a conditional exit statement of the form
+When given the following conditional multi-loop exit statement
 \begin{lstlisting}
     exit when expression
 \end{lstlisting}
-should be converted to these instructions:
+the compiler must negate the result of the condition and then branch if false:
 \begin{lstlisting}
     (instructions to evaluate the condition)
     // condition result now on top of stack
-    
-    // skip the exit instructions if the condition is false
-    PUSH address_to_skip_exit_instructions
-    BF
-    
-    // exit instructions:
+    PUSH MACHINE_FALSE
+    EQ
     PUSH address_to_end_of_current_loop
-    BR
+    BF
 \end{lstlisting}
 
 \noindent
@@ -170,19 +165,18 @@ the compiler should generate these instructions
 \end{lstlisting}
 
 \noindent
-Similarly, given the following conditional multi-loop exit statement
+Similarly, when given the following conditional multi-loop exit statement
 \begin{lstlisting}
     exit N when expression
 \end{lstlisting}
-the compiler would generate
+the compiler must generate:
 \begin{lstlisting}
     (instructions to evaluate the condition)
     // condition result now on top of stack
-    PUSH address_to_skip_exit_instructions // skip exit instructions if condition false
-    BF
-    // exit instructions:
+    PUSH MACHINE_FALSE
+    EQ
     PUSH address_to_end_of_Nth_loop
-    BR
+    BF
 \end{lstlisting}
 
 \section{Return statements}
