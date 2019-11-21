@@ -28,28 +28,29 @@ a := expr
 the compiler would generate this sequence of instructions:
 \newline
 \begin{lstlisting}
-    ADDR lexical_level offset_of_a;
-    ...
+    ADDR lexical_level offset_of_a
     (instructions for expression)
-    ...
+    // expression result now on top of stack
     STORE
 \end{lstlisting}
 
 \section{If statement:}
+In if statements, the condition will be evaluated first, and its result will be on top of the stack. Then the address to the end of the if body will be pushed onto the stack, and finally a BF instruction will be used to skip the if body if the condition is false.
+\newline
+\newline
 Given the if statement
 \begin{lstlisting}
 if expression then statement
 \end{lstlisting}
 the compiler would generate this sequence of instructions:
 \begin{lstlisting}
-    ...
-    (instructions to evaluate expression)
-    ...
-    PUSH offset_to_skip_if_body
+    (instructions to evaluate condition)
+    // condition result now on top of stack
+    PUSH address_to_end_of_if_body
     BF
-    ...
-    (if_body)
-    ...
+    (instructions for if statement body)
+    
+    // end of if body
 \end{lstlisting}
 
 \noindent
@@ -64,19 +65,250 @@ else
 \end{lstlisting}
 the compiler should generate this sequence of instructions
 \begin{lstlisting}
-    ...
-    (instructions to evaulate expression)
-    ...
-    PUSH offset_to_else_body
+    (instructions to evaluate condition)
+    // condition result now on top of stack
+    PUSH address_of_else_body
     BF
-    ...
     (if_body)
-    ...
-    PUSH offset_to_skip_else_body
+    PUSH address_to_end_of_else_body
     BR
     (else_body)
-    ...
     
+    // end of else body
+\end{lstlisting}
+
+\newpage
+\section{Loop statements}
+Similarly to the if statements, the while loop will evaluate its condition first, and so the expression result will be on top of the stack. Then the program can simply branch to skip the loop body if the condition is not met. Additionally, a branch instruction will be placed at the end of the loop body to jump to the beginning of the loop.
+\newline
+\newline
+Given the while loop
+\begin{lstlisting}
+while expression do
+    statement
+\end{lstlisting}
+the compiler should generate this sequence of instructions:
+\begin{lstlisting}
+    // loop start
+    (instructions to evaluate the condition)
+    // condition result now on top of stack
+    PUSH address_to_end_of_loop_body
+    BF
+    (loop body)
+    PUSH address_to_loop_start
+    BR
+    
+    // end of loop body
+\end{lstlisting}
+\newline
+A similar strategy is used for the repeat statement.
+\newline
+Given the repeat loop
+\begin{lstlisting}
+repeat
+    statement
+until expression
+\end{lstlisting}
+the compiler should generate this sequence of instructions:
+\begin{lstlisting}
+    // loop start
+    (loop body)
+    (instructions to evaluate condition)
+    PUSH address_to_end_of_loop
+    BF
+    PUSH address_to_loop_start
+    BR
+    
+    // end of loop
+\end{lstlisting}
+
+\newpage
+\section{Exit statements}
+
+For a simple exit statement of the form
+\begin{lstlisting}
+    exit
+\end{lstlisting}
+the compiler should generate these simple instructions
+\begin{lstlisting}
+    PUSH address_to_end_of_current_loop
+    BR
+\end{lstlisting}
+
+\noindent
+Similarly, a conditional exit statement of the form
+\begin{lstlisting}
+    exit when expression
+\end{lstlisting}
+should be converted to these instructions:
+\begin{lstlisting}
+    (instructions to evaluate the condition)
+    PUSH address_to_skip_exit_instructions
+    BF
+    // exit instructions:
+    PUSH address_to_end_of_current_loop
+    BR
+\end{lstlisting}
+
+\noindent
+The multi-loop exit instructions loop very similar.
+Given the following multi-loop exit statement
+\begin{lstlisting}
+    exit N
+\end{lstlisting}
+the compiler should generate these instructions
+\begin{lstlisting}
+    PUSH address_to_end_of_Nth_loop
+    BR
+\end{lstlisting}
+
+Similarly, given the following conditional multi-loop exit statement
+\begin{lstlisting}
+    exit N when expression
+\end{lstlisting}
+the compiler would generate
+\begin{lstlisting}
+    (instructions to evaluate the condition)
+    // condition result now on top of stack
+    PUSH address_to_skip_exit_instructions
+    BF
+    // exit instructions:
+    PUSH address_to_end_of_Nth_loop
+    BR
+\end{lstlisting}
+
+\section{Return statements}
+When encountering a procedure return statement, the stack variables need to be cleaned up and the return address needs to be read.
+\newline
+Given the procedural exit statement
+\begin{lstlisting}
+    return
+\end{lstlisting}
+the compiler produces
+\begin{lstlisting}
+    (instructions to cleanup local variables, etc.)
+    // now the return address is on top of the stack
+    BR
+\end{lstlisting}
+
+\noindent
+Function return statements are very similar to procedural return statements, except they need to push the return value onto the stack as well. To accomplish this, the compiler can simply push the return value and use the swap operation to ensure the return address comes onto the stack.
+\newline
+\newline
+Given the functional return statement:
+\begin{lstlisting}
+    return with expression
+\end{lstlisting}
+the compiler would produce
+\begin{lstlisting}
+    // store the return value right after return address
+    ADDR lexical_level (offset_to_return_value_address + 1)
+    (instructions to evaluate the return value)
+    // return value now on top of stack
+    STORE
+    (instructions to cleanup local variables, etc.)
+    SWAP // swap return address and value so that the address is on top
+    BR
+\end{lstlisting}
+
+\newpage
+\section{I/O statements}
+
+Even though the virtual machine supports reading characters, the language only allows integers to be read. Hence read instructions only support integers.
+\newline
+\newline
+Given a read statement
+\begin{lstlisting}
+    read a, b, c, ...
+\end{lstlisting}
+the compiler would generate the following instructions
+\begin{lstlisting}
+    READI
+    ADDR lexical_level offset_of_a
+    STORE
+    
+    READI
+    ADDR lexical_level offset_of_b
+    STORE
+    
+    READI
+    ADDR lexical_level offset_of_c
+    STORE
+    
+    ...
+\end{lstlisting}
+
+\noindent
+Write instructions support both integers and strings.
+\newline
+\newline
+Given a string printing statement
+\begin{lstlisting}
+    write str
+\end{lstlisting}
+the compiler generates the following instructions
+\begin{lstlisting}
+    PUSH chr1 // push first character of string
+    PRINTC
+    
+    PUSH chr2 // push second character of string
+    PRINT C
+    
+    ...
+\end{lstlisting}
+
+\noindent
+Similarly, when given a "write newline" statement, the compiler generates
+\begin{lstlisting}
+    PUSH '\n' // push newline character
+    PRINTC
+    ...
+\end{lstlisting}
+
+\noindent
+Integer/expression printing statements are also identical.
+\newline
+Given an expression printing statement
+\begin{lstlisting}
+    write expr
+\end{lstlisting}
+the compiler generates
+\begin{lstlisting}
+    (code to evaluate the expression)
+    // result is on top of stack
+    PRINTI
+\end{lstlisting}
+
+\noindent
+When there are multiple write statements, the compiler simply performs each write statement sequentially like read.
+
+\newpage
+\section{Minor scopes}
+
+At the beginning of the a minor scope, stack space is allocated for all the local variables. Similarly, the stack space is free'd at the end of the minor scope.
+\newline
+\newline
+Hence, given a minor scope
+\begin{lstlisting}
+    {
+        (declarations)
+        (statements)
+    }
+\end{lstlisting}
+the compiler would output
+\begin{lstlisting}
+    PUSH 0
+    DUPN (local_stack_size - 1)
+    
+    (instructions for statements)
+    
+    POPN local_stack_size
+\end{lstlisting}
+
+\noindent
+If there are no local variables, meaning the local stack size is zero, there would be no stack space allocation/deallocation. Hence the code would like like:
+\begin{lstlisting}
+    (instructions for statements)
 \end{lstlisting}
 
 \end{document}
