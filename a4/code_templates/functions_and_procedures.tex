@@ -24,17 +24,34 @@ Then, for both function and procedure, we must push the return address to the st
 
 Finally, if the function or the procedure contains parameters. It will be included in the activation record as well.
 
-All of the mentioned information must be stored in the activation record in this specific order at all times.
+All of the mentioned information must be stored in the activation record in this specific order at all times. For instance, an activation record for {\tt function F( m : integer , n : boolean) : integer} found in ``A4-3.488'' can be represented as such:
+
+\begin{lstlisting}[language=]
+param : n
+param : m
+return address
+return value
+\end{lstlisting}
+
+Note that in this example, the stack grows up. Hence {\tt param : n} is located on top of the stack. A simpler activation record can be observed with {\tt procedure P} from same sample file:
+
+\begin{lstlisting}[language=]
+return address
+\end{lstlisting}
+
+In this case, only the return address is necessary, since it is a procedure (no return value necessary) without any parameters.
 
 \section{Procedure and Function Entrance Code}
 
 When the function or a procedure enters, the activation record needs to be properly set up. Please refer to {\it Section \ref{rec}} for more information in regards to the information contained within activation record.
 
-Once the activation record has been set up, we must also set the display register of an index equivalent to the caller's lexical level. Now, we can jump to the callee, which effectively allows the program to start the execution of called function.
+Once the activation record has been set up, we must also set the display register of an index equivalent to the caller's lexical level. More information on this can be found in {\it Section \ref{display}}. Now, we can jump to the callee, which effectively allows the program to start the execution of called function.
+
+Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. We 
 
 \section{Procedure and Function Exit Code}
 
-When the function finishes its execution, the first thing it must do is 
+Do note that in terms of exit code, procedure and functions differs due to the fact that functions must return a value, while procedures do not. The cleanup which caller must do is similar however.
 
 \section{Parameter Passing}
 
@@ -42,7 +59,7 @@ When the function finishes its execution, the first thing it must do is
 
 \section{Procedure Call}
 
-\section{Display Management Strategy}
+\section{Display Management Strategy} \label{display}
 
 When the function references a variable outside of the scope, we must create a reference to the said variable for the correctness of the program. This can be done by scanning through the function and gathering all of the references that were made in the said function. Then, we can add the addreses to the references variables in one of the {\tt display} registers. Then, every time the variable gets references, we can load the address from the corresponding display register.
 

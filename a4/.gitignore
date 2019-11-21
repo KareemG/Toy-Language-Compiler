@@ -8,3 +8,9 @@ doc/compiler488.ps
 jdt.ls-java-project
 .project
 .vscode
+*.fls
+*.log
+*.xdv
+*.aux
+*.fdb_latexmk
+*.synctex.gz
