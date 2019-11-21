@@ -47,11 +47,35 @@ When the function or a procedure enters, the activation record needs to be prope
 
 Once the activation record has been set up, we must also set the display register of an index equivalent to the caller's lexical level. More information on this can be found in {\it Section \ref{display}}. Now, we can jump to the callee, which effectively allows the program to start the execution of called function.
 
-Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. We 
+Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. The following instructions must be executed:
+
+\begin{lstlisting}
+SETD (current display LL)
+PUSH -1
+PUSHMT
+ADDR (address of argument for m)
+ADDR (address of argument for n)
+ADDR (address of F)
+BR
+\end{lstlisting}
+
+Note that the initial {\tt PUSH -1} will be a placeholder used for return value. Furthermore, our implementation implies that the caller must set up the stack before calling the callee.
 
 \section{Procedure and Function Exit Code}
 
-Do note that in terms of exit code, procedure and functions differs due to the fact that functions must return a value, while procedures do not. The cleanup which caller must do is similar however.
+Do note that in terms of exit code, procedure and functions differs due to the fact that functions must return a value, while procedures do not. The cleanup which caller must do is similar.
+
+For all functions, we must first load the return value into the address which we have reserved for return value. Then for both functions and procedures, we can branch back to the return address in order to return to the caller function.
+
+Below is an example of exiting function {\tt function F(m : integer , n : boolean) : integer}. Do note that for procedure, instead of load the return value to $LL + 0x0$, we would instead simply use that value of that address to unconditionally branch back to caller, since we will not be storing the return value for procedures.
+
+\begin{lstlisting}
+PUSH (return value)
+ADDR (last display number) 0x0
+LOAD
+ADDR (last display number) 0x4
+BR
+\end{lstlisting}
 
 \section{Parameter Passing}
 
