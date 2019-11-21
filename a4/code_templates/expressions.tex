@@ -26,13 +26,15 @@
 
 \section{Accessing Constants}
 
-Constant values will be accessed by performing LOAD instructions on the addresses of where the constants are located. The address of a constant would be located in a reserved area in memory, where constants would be located. To get the address of a constant symbol, we can just do a lookup in the symbol table.
+If we ever encounter a constant numeric value in the AST, we can directly push the value onto the stack.
 
 \section{Accessing Scalars}
 
-Just like constants, scalars will be accessed the same way by performing LOAD instructions on the addresses of scalars, and these addresses can be obtained by doing a lookup in the symbol table.
+To access a scalar, we would use the ADDR instruction to index into the array of display that we have so that we get the correct context of where the variable would be located, and then we would use an offset to go to the correct address of where the scalar would be located. We then use LOAD to load the value of the scalar from that address.
 
 \section{Accessing Array Elements}
+
+To access an array element, we can use ADDR to index into the display array, and get the address of the beginning of the stack, where the array would be located, and then it would add an offset which would jump us straight to the address of the array element. This offset can be calculated by the compiler, by using strides.
 
 \section{Arithmetic and Comparison Operators}
 
@@ -48,46 +50,11 @@ For each of the arithmetic operators, $+,-,*,/$, there is a single machine instr
 
 For the $<$ operator, we have LT instruction that can directly compute if one operand is less than the other. So we just call LT.
 
-For the $<=$ operator, we can notice that this is the same as first comparing if the left operand is the less than the right, then compare that they are the same, and then return the result that is the \textbf{or} of the two operations. LT is the instruction to for $<$, EQ is the instruction for $=$, and OR is the operator for \textbf{or}. Thus we can generate the following code:
-
-\begin{lstlisting}
-    y := top; POP;
-    x := top; POP;
-    PUSH x;
-    PUSH y;
-    PUSH x;
-    PUSH y;
-    LT;
-    x := top; POP;
-    EQ;
-    PUSH x;
-    OR;
-\end{lstlisting}
-
-Additional instructions for PUSH and POP had to be added, since LT and EQ would be popping the arguments out of the stack, but we need the operands being passed to the operators to be the same, hence the instructions in lines 1-6 are needed to store the operands, duplicate, and push them into the stack so that we have two copies of each operands, and we maintain their order. Instruction on line 8 is needed to store the result that was pushed by LT, and line 10 is needed to push the result of LT back to the stack, so that it can be used by OR.
-
 For the $>$ operator, we can swap the arguments that are on the top of the stack, so that we just have to generate code for $<$, which is LT:
 
 \begin{lstlisting}
     SWAP;
     LT;
-\end{lstlisting}
-
-As for the $>=$ operator, we can swap the arguments on the top of the stack, so that this problem now becomes generating code for $<=$, which we had just did earlier:
-
-\begin{lstlisting}
-    SWAP;
-    y := top; POP;
-    x := top; POP;
-    PUSH x;
-    PUSH y;
-    PUSH x;
-    PUSH y;
-    LT;
-    x := top; POP;
-    EQ;
-    PUSH x;
-    OR;
 \end{lstlisting}
 
 The $=$ operator has a single machine instruction that can directly compute it, which is EQ.
@@ -100,47 +67,59 @@ As for \textbf{'not'} $=$ operator, we can first check the equality, with the EQ
     EQ;
 \end{lstlisting}
 
+As for the $<=$ operator, notice that $x \leq y \equiv \lnot(x > y)$. To generate code for the \textbf{'not'}, we are simply going to push 
+"MACHINE\_FALSE" into the stack, and then check if it equals the operand, to invert the result, as shown in the next section. From this, we can generate the following code:
+
+\begin{lstlisting}
+    SWAP;
+    LT;
+    PUSH MACHINE_FALSE;
+    EQ;
+\end{lstlisting}
+
+As for the $>=$ operator, notice that $x \geq y \equiv \lnot(x < y)$. The code we generate for this is the following:
+
+\begin{lstlisting}
+    LT;
+    PUSH MACHINE_FALSE;
+    EQ;
+\end{lstlisting}
+
 \section{Logical Operators}
 
 As for the \textbf{'and'} operator, we need to first execute the instructions for the left operand first, so that we can determine if we need to proceed with executing instructions for the second operand. In this case, as we're going through the AST tree, we'll generate the following code:
 
 \begin{lstlisting}
     (Instructions for the first operand)
-    PUSH pc;
-    PUSH num;
-    ADD;
+    PUSH address_1
     BF;
     (Instructions for the second operand)
-    PUSH pc;
-    PUSH 5;
-    ADD;
+    PUSH address_2
     BR;
     PUSH MACHINE_FALSE;
 \end{lstlisting}
 
-Line 1 is the instructions for the first operand, which will in the end, push its result onto the stack. Lines 2-4 is when we're trying to add pc+num to the stack, where pc is the program counter, and num is the value that we add to pc, so that we would end up jumping to line 11 in this example, should the first operand give us false. The value of num cannot be determined right away, since we would have to jump over all the instructions that would appear for the second operand, as shown in line 5. So in this case, we would generate all the other instructions, and then determine the value we add to pc to jump to line 11. Line 5 is when we do the actual branching should the value we get for the first operand is false.
+Line 1 is the instructions for the first operand, which will in the end, push its result onto the stack. Line 2 is when we're pushing address\_1, which is the address to line 7 onto the stack. This is done so that if the first operand is false, we can jump using the BF instruction on line 3 to line 7, which will push false onto the stack. The value of address\_1 cannot be determined right away, since we would have to jump over all the instructions that would appear for the second operand, as shown in line 4. So in this case, we would generate all the other instructions, and then determine the address of line 7.
 
-Line 6 is of course all the instructions for the second operand, and this follows after line 5, meaning that the first operand is true. After executing all the instructions for the second expression, its result would appear in the stack, and that would be the result of the entire \textbf{'and'} operation. Lines 7-9 is when we push pc+5 to the stack, which is the address after the instruction on line 11. This is needed to jump over the statement that pushes false to the stack, since the instructions of our expression would've already placed its result on the stack. Line 10 is the unconditional branch that would make this work, and line 11 is the instruction to push false to the stack if the first operand was false.
+Line 4 is of course all the instructions for the second operand, and this follows after line 3, meaning that the first operand is true. After executing all the instructions for the second expression, its result would appear in the stack, and that would be the result of the entire \textbf{'and'} operation. Line 5 us when we are pushing address\_2, which is the address of the line after line 7, to bypass the instruction that would push false onto the stack, since the final result of the whole \textbf{'and'} operation is already on the stack due to the execution of all the instructions on line 4. Line 6 is the unconditional branch that would make this work, and line 7 is the instruction to push false to the stack if the first operand was false.
 
-As for the \textbf{'or'} operator, the code that is to be generated is similar to the code generated for \textbf{'and'}, since one requires going through both operands to determine if the overall result is true, and the other does the same to determine if it is false. In this case, we generate the following code:
+As for the \textbf{'or'} operator, the code that is to be generated is similar to the code generated for the \textbf{'and'} operator, since one requires going through both operands to determine if the overall result is true, and the other does the same to determine if it is false. In this case, we generate the following code:
 
 \begin{lstlisting}
     (Instructions for the first operand)
     PUSH MACHINE_FALSE;
     EQ;
-    PUSH pc;
-    PUSH num;
-    ADD;
+    PUSH address_1
     BF;
     (Instructions for the second operand)
-    PUSH pc;
-    PUSH 5;
-    ADD;
+    PUSH address_2
     BR;
     PUSH MACHINE_TRUE;
 \end{lstlisting}
 
-Since we only have an instruction that branches if the condition is false, lines 2-3 is needed to invert the result, so that the BF instruction on line 7 would branch if the first operand is true. Like before, lines 4-6 is needed to push pc+num to the stack, which is the address of line 13, where we are pushing the value true to our stack. The value of num would be computed after we generate the rest of the code. Line 8 is all the instructions for the second operand, which will get executed if the first operand was false. Lines 9-11 pushes pc+5 to the stack, which is the address after line 10, so we can jump to that line, and bypass the instruction to push false to the stack, since the actual result of the whole \text{'or'} operation has already been pushed onto the stack by line 8. Line 12 does the unconditional branching that bypasses the next line.
+At the beginning of all this, we generate instructions for the first operand, since we need to determine the result of that before we consider about executing the instructions for the second operand. Since we only have an instruction that branches if the condition is false, lines 2-3 is needed to invert the result, so that the BF instruction on line 5 would branch if the first operand is true. Line 4 is when we're pushing address\_1, which is the address of line 9, onto the stack, so that the BF instruction would actually branch us to the line where we would add back the value of true onto the stack, for the entire \textbf{'or'} operation. The value of address\_1 would be computed after we generate the rest of the instructions.
+
+Line 6 is all the instructions for the second operand, which will get executed if the first operand was false. Line 7 is when we're pushing address\_2 onto the stack, which is the address of the line after line 9, to bypass the instruction to add true onto the stack, since the result we get from executing all the instructions for the second operand would've already pushed the result of the entire \textbf{'or'} operation onto the stack. Line 8 does the unconditional branching that would make this work, and line 9 is the instruction to push true onto the stack, if the first operand's result is true.
 
 As for the \textbf{'not'} operator, we can just compare the operand with the value of false in order to flip the boolean value. The code that will be generated is:
 
@@ -158,20 +137,16 @@ Where expression\_1 is the expression that would result from this should the con
 
 \begin{lstlisting}
     (Instructions for condition)
-    PUSH pc;
-    PUSH num_1;
-    ADD;
+    PUSH address_1
     BF;
     (Instructions for expression_1)
-    PUSH pc;
-    PUSH num_2;
-    ADD;
+    PUSH address_2
     BR;
     (Instructions for expression_2)
 \end{lstlisting}
 
-First we must generate the code for the condition, which would in the end push a boolean value onto the stack. Then lines 2-4 is needed to push pc+num\_1 onto the stack, which is the address of line 11. The value of num\_1 would have to be calculated after we generate the rest of the code, since the number of instructions for expression\_1 can vary.
+First we must generate the code for the condition, which would in the end push a boolean value onto the stack. At line 2 we're pushing address\_1 onto the stack, which is the address of line 7, at the beginning of the instructions for the second operand. This value is pushed so that we can branch off should the condition be false, and this value would be determined after we generate the rest of the instructions, since the number of instructions to jump over would vary.
 
-Line 5 is the actual BF instruction, which would branch to line 11, if the condition is false. Line 6 contains all the instructions for expression\_1. Lines 7-9 pushes pc+num\_2 onto the stack, which is the address of the line after line 11, which would bypass all the instructions for expression\_2, when the condition was true. Just like before, num\_2 would have to be determined after we generate the rest of the code since the number of instructions for expression\_2 can vary. Line 10 is the unconditonal branch to bypass the next line, like what we said before. Line 11 contains all the instructions for expression\_2.
+Line 3 is the actual BF instruction, which would branch to line 7, if the condition is false. Line 4 contains all the instructions for expression\_1, and this proceeds after the BF instruction, meaning that the condition would be true before we start executing instructions for expression\_1. Line 5 pushes address\_2 onto the stack, which is the address of the line after line 7, to bypass all the instructions for expression\_2. This is needed since, we only need to execute expression\_1 if the condition is true. Just like before, the value of address\_2 would be determined after we execute the rest of instructions, since the number of instructions to jump over would vary. Line 6 is the instruction for the unconditional branch to actually perform the jump needed after executing all the instructions for expression\_1. Line 7 contains all the instructions for expression\_2.
 
 \end{document}
