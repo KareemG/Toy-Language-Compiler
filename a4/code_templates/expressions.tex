@@ -26,7 +26,7 @@
 
 \section{Accessing Constants}
 
-If we ever encounter a constant numeric value in the AST, we can directly push the value onto the stack.
+If we ever encounter a constant numeric value in the AST, we can directly push the value onto the stack. As for accessing string constant, we'll push each individual characters onto the stack in order.
 
 \section{Accessing Scalars}
 
@@ -34,7 +34,56 @@ To access a scalar, we would use the ADDR instruction to index into the array of
 
 \section{Accessing Array Elements}
 
-To access an array element, we can use ADDR to index into the display array, and get the address of the beginning of the stack, where the array would be located, and then it would add an offset which would jump us straight to the address of the array element. This offset can be calculated by the compiler, by using strides.
+\subsection{Accessing 1D Arrays}
+
+For 1D arrays, where we have, \texttt{x[lower:upper]}, and we are trying to access \texttt{x[index]}. The first thing that we must note is that the actual index that we are trying to access in memory is \texttt{index - lower}, since the array in memory would start at the $0^\text{th}$ index, so the difference between index and lower would give us the index with respect to having its lower bound to be 0.
+
+Then for the identifier, x, we can do a call to ADDR, with two values: LL and ON. LL is the value that we would index into display array to get the address of the stack where the variable is located. The compiler would know which stack to access, since we would store that information in the symbol table. ON is the offset that is added to that address to give us the address of the variable, and in our case, the address of the beginning of the array. Once again, the compiler would know this because the symbol table has the offsets of all the variables in the stack.
+
+In the end, we would add the offset to the address, which will give us the address of the array element. At that point, we can call LOAD to access its value. Altogether, would generate the following code:
+
+\begin{lstlisting}
+    PUSH index;
+    PUSH lower;
+    SUB;
+    ADDR LL ON;
+    ADD;
+    LOAD;
+\end{lstlisting}
+
+\subsection{Accessing 2D Arrays}
+
+For 2D arrays, where we have, \texttt{x[a:b,c:d]}, and we are trying to access \texttt{x[i,j]}. The first thing we must note is that the actual index we are trying to access in memory is \texttt{(i-a,j-c)}, since the array in memory would start at 0 at each level, just like the case for 1D arrays.
+
+The next thing that we must note is the 'stride' and 'multi' at each level, where 'stride' is the number of elements at a level, and 'multi' is the size of an array element at a level. For the first level, $\text{multi}_1 = 1$, which is the size of a boolean or integer in our language. They would just take up one word. The number of elements in the first level is $\text{stride}_1 = d - c + 1$. For the second level, $\text{multi}_2 = \text{stride}_1 \cdot \text{multi}_1 = (d - c + 1) \cdot 1 = d - c + 1$. This means that every time we increment at the second level, we are advancing forward in our address by $d - c + 1$. The number of elements at the second level is $\text{stride}_2 = b - a + 1$.
+
+Altogether, if we want to access \texttt{x[i,j]}, the offset needed to add to the base address of the \texttt{x} in order to access the element is:
+
+$$(i - a) \cdot (b - a + 1) + (j - c) \cdot 1$$
+
+The value, $(b - a + 1)$, can actually be calculated statically by the compiler, since we would have access to the symbol table, containing the upper and lower bounds of all the dimensions of this array. So we can just let $y = (b - a + 1)$, where the term $y$ will be used in our code so we can subsitute the actual value. $(i - a)$ and $(j - c)$ cannot be reduced as both expressions have variables in them. Thus a simplified expression that we actually need to calculate at runtime is:
+
+$$(i - a) \cdot y + (j - c)$$
+
+Just like the case for 1D array, the compiler knows the value (LL) to index into the display array and it knows the offset (ON) for each variable, because they are all recorded in the symbol table. Once we get the address, we can add the offset to it, and then load the value from that addres.
+
+Altogether the code that we generate to access \texttt{x[i,j]} is the following:
+
+\begin{lstlisting}
+    PUSH i;
+    PUSH a;
+    SUB;
+    PUSH y;
+    MUL;
+    PUSH j;
+    PUSH c;
+    SUB;
+    ADD;
+    ADDR LL ON;
+    ADD;
+    LOAD;
+\end{lstlisting}
+
 
 \section{Arithmetic and Comparison Operators}
 
