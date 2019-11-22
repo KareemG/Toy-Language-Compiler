@@ -12,7 +12,12 @@
   numberfirstline=true
 }
 
+\title{Functions and Procedures Template}
+\author{KyoKeun Park}
+
 \begin{document}
+
+\maketitle
 
 \section{Activation Record} \label{rec}
 
@@ -76,7 +81,7 @@ PUSH (return value)
 ADDR 0 0
 LOAD
 POP(total memory used by function/procedure)
-ADDR 0 2
+ADDR 0 1
 BR
 \end{lstlisting}
 
@@ -87,7 +92,7 @@ Parameter passing is done via loading the values to the parameters onto the stac
 We have the following set of instructions for {\tt function F(m : integer, n : boolean) : intger} function when the user attempts to use {\tt m}.
 
 \begin{lstlisting}
-ADDR 0 4
+ADDR 0 2
 LOAD
 // DO SOMETHING WITH VALUE m
 \end{lstlisting}
