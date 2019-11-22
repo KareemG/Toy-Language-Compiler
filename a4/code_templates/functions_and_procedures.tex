@@ -55,12 +55,12 @@ Once the activation record has been set up, we must also set the display registe
 Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. The following instructions must be executed:
 
 \begin{lstlisting}
-SETD 0
 PUSH -1
-PUSHMT
+ADDR 1 0
+PUSH (next instruction that needs to be executed after returning)
 ADDR (address of argument for m)
 ADDR (address of argument for n)
-ADDR (address of F)
+PUSH (address of F)
 BR
 \end{lstlisting}
 
