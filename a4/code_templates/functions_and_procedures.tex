@@ -67,13 +67,16 @@ Do note that in terms of exit code, procedure and functions differs due to the f
 
 For all functions, we must first load the return value into the address which we have reserved for return value. Then for both functions and procedures, we can branch back to the return address in order to return to the caller function.
 
+Furthermore, we must then remove all of the variables that has been declared within this function and procedure before exiting. In order to figure out how much we need to pop by, we can keep track of amount of memory used by the current function/procedure using the symbol table.
+
 Below is an example of exiting function {\tt function F(m : integer , n : boolean) : integer}. Do note that for procedure, instead of load the return value to $LL + 0x0$, we would instead simply use that value of that address to unconditionally branch back to caller, since we will not be storing the return value for procedures.
 
 \begin{lstlisting}
 PUSH (return value)
 ADDR 0 0
 LOAD
-ADDR 0 1
+POP(total memory used by function/procedure)
+ADDR 0 2
 BR
 \end{lstlisting}
 
@@ -84,7 +87,7 @@ Parameter passing is done via loading the values to the parameters onto the stac
 We have the following set of instructions for {\tt function F(m : integer, n : boolean) : intger} function when the user attempts to use {\tt m}.
 
 \begin{lstlisting}
-ADDR 0 2
+ADDR 0 4
 LOAD
 // DO SOMETHING WITH VALUE m
 \end{lstlisting}
