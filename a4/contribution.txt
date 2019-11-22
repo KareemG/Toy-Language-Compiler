@@ -1,8 +1,11 @@
 Jasmeet Sidhu: Worked on code gen template for "Statements"
 
 Jasmeet Brar: Worked on code gen template for "Expressions"
+              Worked on translation of fcode sample "A4-2.488"
 
 Kareem Golaub: Worked on code gen template for "Storage" and "Everything Else"
+               Combined multiple templates into a singular template
+               Worked on translation of code sample "A4-1.488"
 
 KyoKeun Park: Worked on code gen template for "Functions and Procedures"
               Worked on translation of code sample "A4-3.488"
