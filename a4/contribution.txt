@@ -9,3 +9,5 @@ Kareem Golaub: Worked on code gen template for "Storage" and "Everything Else"
 
 KyoKeun Park: Worked on code gen template for "Functions and Procedures"
               Worked on translation of code sample "A4-3.488"
+
+Everyone has contributed on template correctness and consistency
