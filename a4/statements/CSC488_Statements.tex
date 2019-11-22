@@ -124,6 +124,14 @@ the compiler should generate this sequence of instructions:
     // end of loop
 \end{lstlisting}
 
+\section{Return statements}
+Since the activation record is cleaned by the caller, a procedure return statement simply needs to read the activation record's return address and then branch to it.
+\newline
+\newline
+\noindent
+Function return statements are very similar to procedural return statements, except they need to write their return value into the reserved return value section of the activation record. After the return value is written, the function can branch to the return address from the activation record.
+\newline
+
 \newpage
 \section{Exit statements}
 
@@ -179,38 +187,32 @@ the compiler must generate:
     BF
 \end{lstlisting}
 
-\section{Return statements}
-When encountering a procedure return statement, the stack variables need to be cleaned up and the return address needs to be read.
+\section{Minor scopes}
+
+At the beginning of the a minor scope, stack space is allocated for all the local variables. Similarly, the stack space is free'd at the end of the minor scope.
 \newline
-Given the procedural exit statement
+\newline
+Hence, given a minor scope
 \begin{lstlisting}
-    return
+    {
+        (declarations)
+        (statements)
+    }
 \end{lstlisting}
-the compiler produces
+the compiler would output
 \begin{lstlisting}
-    (instructions to cleanup local variables, etc.)
-    // now the return address is on top of the stack
-    BR
+    PUSH 0
+    DUPN (local_stack_size - 1)
+    
+    (instructions for statements)
+    
+    POPN local_stack_size
 \end{lstlisting}
 
 \noindent
-Function return statements are very similar to procedural return statements, except they need to store the return value on the stack as well. To accomplish this, the compiler can simply copy the return value to the spot after the return address and then use the swap operation to ensure the return address comes onto the stack.
-\newline
-\newline
-Given the functional return statement:
+If there are no local variables, meaning the local stack size is zero, there would be no stack space allocation/deallocation. Hence the generated code would look like as if theres no minor scope:
 \begin{lstlisting}
-    return with expression
-\end{lstlisting}
-the compiler would produce
-\begin{lstlisting}
-    // store the return value right after return address
-    ADDR lexical_level (offset_to_return_address + 1)
-    (instructions to evaluate the return value)
-    // return value now on top of stack
-    STORE
-    (instructions to cleanup local variables, etc.)
-    SWAP // swap return address and value so that the address is on top
-    BR
+    (instructions for statements)
 \end{lstlisting}
 
 \newpage
@@ -283,34 +285,5 @@ the compiler generates
 
 \noindent
 When there are multiple write statements, the compiler simply performs each write statement sequentially like read.
-
-\newpage
-\section{Minor scopes}
-
-At the beginning of the a minor scope, stack space is allocated for all the local variables. Similarly, the stack space is free'd at the end of the minor scope.
-\newline
-\newline
-Hence, given a minor scope
-\begin{lstlisting}
-    {
-        (declarations)
-        (statements)
-    }
-\end{lstlisting}
-the compiler would output
-\begin{lstlisting}
-    PUSH 0
-    DUPN (local_stack_size - 1)
-    
-    (instructions for statements)
-    
-    POPN local_stack_size
-\end{lstlisting}
-
-\noindent
-If there are no local variables, meaning the local stack size is zero, there would be no stack space allocation/deallocation. Hence the generated code would look like as if theres no minor scope:
-\begin{lstlisting}
-    (instructions for statements)
-\end{lstlisting}
 
 \end{document}
