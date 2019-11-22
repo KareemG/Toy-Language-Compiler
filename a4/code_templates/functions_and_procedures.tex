@@ -25,46 +25,40 @@ The activation record will consist of couple of informations in order for callee
 
 If it is a function, we will first reserve a space in stack in order to hold to return value. Such memory in the stack allows for callee to store its return value, and it also allows caller to retrieve the return value when the callee is done.
 
-Then, for both function and procedure, we must push the return address to the stack. Such address will be used by the callee to return to the caller when it is done.
+Then, for both function and procedure, we must push the return address to the stack. Such address will be used by the callee to return to the caller when it is done. As well as it needs to store the address which resides in display number of the caller. This allows us to restore the address to the display number in the case of conflict.
 
 Finally, if the function or the procedure contains parameters. It will be included in the activation record as well.
 
 All of the mentioned information must be stored in the activation record in this specific order at all times. For instance, an activation record for {\tt function F( m : integer , n : boolean) : integer} found in ``A4-3.488'' can be represented as such:
 
-\begin{lstlisting}[language=]
-param : n
-param : m
-return address
-return value
+\begin{lstlisting}[language=,numbers=none]
+4 param : n
+3 param : m
+2 prev address in display 1
+1 return address
+0 return value
 \end{lstlisting}
 
 Note that in this example, the stack grows up. Hence {\tt param : n} is located on top of the stack. A simpler activation record can be observed with {\tt procedure P} from same sample file:
 
-\begin{lstlisting}[language=]
-return address
+\begin{lstlisting}[language=,numbers=none]
+1 prev address in display 1
+0 return address
 \end{lstlisting}
 
 In this case, only the return address is necessary, since it is a procedure (no return value necessary) without any parameters.
 
 \section{Procedure and Function Entrance Code}
 
-When the function or a procedure enters, the activation record needs to be properly set up. Please refer to {\it Section \ref{rec}} for more information in regards to the information contained within activation record.
+Upon entering the procedure or function, it must first set its stack's base address in a respective display register. We will be using this display register and an offset value to refer to any local variables we wish to access. We also know that the display number can be statically determined during compile time, since we can refer to the lexical level of the current function/procedure. This can also be kept track within the symbol table.
 
-Once the activation record has been set up, we must also set the display register of an index equivalent to the caller's lexical level. More information on this can be found in {\it Section \ref{display}}. Now, we can jump to the callee, which effectively allows the program to start the execution of called function.
-
-Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. The following instructions must be executed:
+Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. Since {\tt F} has a lexical level of 1, we must execute the following instructions upon entrance:
 
 \begin{lstlisting}
-PUSH -1
-ADDR 1 0
-PUSH (next instruction that needs to be executed after returning)
-ADDR (address of argument for m)
-ADDR (address of argument for n)
-PUSH (address of F)
-BR
+PUSHMT
+SETD 1
 \end{lstlisting}
 
-Note that the initial {\tt PUSH -1} will be a placeholder used for return value. Furthermore, our implementation implies that the caller must set up the stack before calling the callee.
 
 \section{Procedure and Function Exit Code} \label{exit}
 
@@ -74,7 +68,7 @@ For all functions, we must first load the return value into the address which we
 
 Furthermore, we must then remove all of the variables that has been declared within this function and procedure before exiting. In order to figure out how much we need to pop by, we can keep track of amount of memory used by the current function/procedure using the symbol table.
 
-Below is an example of exiting function {\tt function F(m : integer , n : boolean) : integer}. Do note that for procedure, instead of load the return value to $LL + 0x0$, we would instead simply use that value of that address to unconditionally branch back to caller, since we will not be storing the return value for procedures.
+Below is an example of exiting function {\tt function F(m : integer , n : boolean) : integer}. Do note that for procedure, instead of load the return value to $LL + 0$, we would instead simply use that value of that address to unconditionally branch back to caller, since we will not be storing the return value for procedures.
 
 \begin{lstlisting}
 PUSH (return value)
@@ -101,21 +95,35 @@ After {\tt LOAD}, we will have value of {\tt m} stored on top of stack.
 
 \section{Function Call and Function Value Return}
 
-When a function is called, we must set up the stack for the following:
+When the function is called, the activation record needs to be properly set up. Please refer to {\it Section \ref{rec}} for more information in regards to the information contained within activation record.
 
-\begin{enumerate}
-	\item Reserved space for return value
-	\item Return address to the caller
-	\item Parameters, if any
-\end{enumerate}
+Let us take {\tt function F(m : integer , n : boolean) : integer} again as an example. The following instructions must be executed:
 
-Furthermore, we must also set the display register at the index equivalent to our lexical level in order to ensure access to variables outside of the given function.
+\begin{lstlisting}
+PUSH -1
+ADDR 1 0
+PUSH (next instruction that needs to be executed after returning)
+PUSHMT
+SETD 1
+ADDR (address of argument for m)
+ADDR (address of argument for n)
+PUSH (address of F)
+BR
+\end{lstlisting}
 
-As mentioned in {\it Section \ref{exit}}, when a function finishes its execution, it must return a value and then branch back to the caller. An example can be found in {\it Section \ref{exit}} as well.
+When we return from the function call, we must first restore the display number, and also remove the activation record from the stack, with an exception of return value. Again, here is an example with function {\tt F}:
+
+\begin{lstlisting}
+ADDR 1 2
+SETD 1
+POP4
+\end{lstlisting}
+
+Once the above instructions are executed, we will be left with the return value of {\tt F}, which we then can use.
 
 \section{Procedure Call}
 
-Procedure call is similar to function call with few exceptions. Firstly, since it does not need to return any value, we do not reserve any space in stack for stack value. Following is an example of what procedure call, {\tt procedure Q( m : boolean, n : integer, p : boolean)} from A4-3.488,may look like:
+Procedure call is similar to function call with few exceptions. Firstly, since it does not need to return any value, we do not reserve any space in stack for return value. Following is an example of what procedure call, {\tt procedure Q( m : boolean, n : integer, p : boolean)} from A4-3.488,may look like:
 
 \begin{lstlisting}
 SETD 0
@@ -130,16 +138,19 @@ BR
 Furthermore, since there are no return value, when the procedure finishes its execution, it does not need to set any values. Following is the cleanup code for same procedure, {\tt Q}:
 
 \begin{lstlisting}
-ADDR 0 0
-BR
+ADDR 1 1
+SETD 1
+POP5
 \end{lstlisting}
+
+Where {\tt POP5} will remove everything in the activation record.
 
 \section{Display Management Strategy} \label{display}
 
-Display managment is simply done with utilization of given procedure and/or function's lexical level, which can be determined statically during compile time. However, the program must keep track of all of the previous callers for a given procedure/function call. This is done in the case where functions from same lexical level calls each other. The most common example of this will be recursion.
+Display management is simply done with utilization of given procedure and/or function's lexical level, which can be determined statically during compile time. However, the program must keep track of all of the previous callers for a given procedure/function call. This is done in the case where functions from same lexical level calls each other. The most common example of this will be recursion.
 
 For example, given the caller $a$, callee $b$, and caller's caller $c$ with same lexical level, $x$, when the callee was called, it must have overwrote $x$th display register with address of $a$. This means that when callee $b$ finishes its execution, it must restore the $x$th display register with $c$'s address.
 
-This can be done by pushing additional work on caller's side. Before setting up activation record, the caller can first push the value of the display register of its lexical level. Then, when callee returns, the caller can first restore the display register to point to correct address.
+This can be done by pushing additional work on caller's side. Caller can simply keep an old address from display register of callee's display number. Once we return from callee, we can simply restore the value before continuing with our own instructions.
 
 \end{document}
