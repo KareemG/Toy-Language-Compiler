@@ -31,7 +31,8 @@ ADDR 0 4 		% load p
 LOAD
 PUSH 3-10		% address over if branch
 BF
-POP2 			% free local variables
+PUSH 2 			% free local variables
+POPN
 ADDR 1 0 		% load return address
 BR 			% branch to return address
 
@@ -42,7 +43,8 @@ LOAD
 STORE 			% store a to e
 
 % 3-10
-POP2 			% free local variables
+PUSH 2 			% free local variables
+POPN
 ADDR 1 0 		% load return address
 BR
 
@@ -145,7 +147,8 @@ PUSH 3-24.6 		% address which points to "STORE"
 BR
 PUSH MACHINE_FALSE 	% "not r and s" is false
 STORE 			% store "(m and not p ? v < u : not r and s)" to ret val
-POP0 			% free local variables
+PUSH 0 			% free local variables
+POPN
 ADDR 2 1 		% load return address
 BR
 
@@ -170,7 +173,8 @@ PUSH 3-21 		% address of function G
 BR 			% call function G
 ADDR 2 2 		% restore display register
 SETD 2
-POP2 			% clear activation record except return value
+PUSH 2 			% clear activation record except return value
+POPN
 PUSH MACHINE_FALSE 	% negate G
 EQ
 ADDR 0 6 		% load r
@@ -181,7 +185,8 @@ PUSH 3-14 		% address of function F
 BR 			% call function F (t - n + a, not G or r)
 ADDR 1 2 		% restore display register
 SETD 1
-POP4 			% clear activation record except return value
+PUSH 4 			% clear activation record except return value
+POPN
 % calling function F END
 PRINTI 			% print the return value of F
 PUSH '\n' 	 	% push newline onto stack
@@ -215,7 +220,8 @@ PUSH 3-14 		% load function F( b, p )
 BR 			% call function F
 ADDR 1 2 		% restore display register from INNER function F call
 SETD 1
-POP4 			% clear activation record except return value
+PUSH 4 			% clear activation record except return value
+POPN
 % inner function F call END
 % parameter p
 ADDR 0 5 		% load q
@@ -226,7 +232,8 @@ PUSH 3-14 		% address of function F
 BR 			% call function F( not p or q , ... , not q )
 ADDR 1 2 		% restore display register from OUTER function F call
 SETD 1
-POP4 			% clear activation record except return value
+PUSH 4 			% clear activation record except return value
+POPN
 % outer function F call END
 
 % 3-29
@@ -256,5 +263,6 @@ EQ 			% not s == q (which is equivalent to s not= q)
 PUSH 3-19 		% address of procedure Q
 BR 			% call procedure Q
 ADDR 1 1 		% restore the display register
-POP5 			% clear ALL activation record
+PUSH 5 			% clear ALL activation record
+POPN
 % procedure Q call END
