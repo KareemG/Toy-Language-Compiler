@@ -17,12 +17,15 @@ ADDR 0 2
 
   % i + 3
   ADDR 0 0
+  LOAD
   PUSH 3
   ADD
 
   % j * k
   ADDR 0 1
+  LOAD
   ADDR 0 2
+  LOAD
   MUL
 
   % (i + 3) - j * k
@@ -30,7 +33,9 @@ ADDR 0 2
 
   % k / l
   ADDR 0 2
+  LOAD
   ADDR 0 3
+  LOAD
   DIV
 
   % (i + 3) - j * k + k/l
@@ -53,21 +58,26 @@ ADDR 0 7
 
   % not q
   ADDR 0 6
+  LOAD
   PUSH MACHINE_FALSE
   EQ
 
   % p or q
   ADDR 0 5
+  LOAD
   ADDR 0 6
+  LOAD
   OR
 
     % (s and not p)
     ADDR 0 8
+    LOAD
     PUSH 1-8.0
     BF
 
       % not p
       ADDR 0 5
+      LOAD
       PUSH MACHINE_FALSE
       EQ
     
@@ -85,12 +95,16 @@ ADDR 0 5
 
   % i < j
   ADDR 0 0
+  LOAD
   ADDR 0 1
+  LOAD
   LT
 
   % k <= l
   ADDR 0 3
+  LOAD
   ADDR 0 2
+  LOAD
   LT
   PUSH MACHINE_FALSE
   EQ
@@ -100,6 +114,7 @@ ADDR 0 5
 
   % j = 1
   ADDR 0 1
+  LOAD
   PUSH 1
   EQ
 
@@ -115,7 +130,9 @@ ADDR 0 8
     % (k not = m) and (j >= k)
       % k not = m
       ADDR 0 2
+      LOAD
       ADDR 0 4
+      LOAD
       EQ
       PUSH MACHINE_FALSE
       EQ
@@ -125,7 +142,9 @@ ADDR 0 8
 
       % j >= k
       ADDR 0 1
+      LOAD
       ADDR 0 2
+      LOAD
       LT
       PUSH MACHINE_FALSE
       EQ
@@ -140,7 +159,9 @@ ADDR 0 8
 
     % r = s
     ADDR 0 7 % 1-10.1
+    LOAD
     ADDR 0 8
+    LOAD
     EQ
 
     % not (r = s)
@@ -159,12 +180,16 @@ ADDR 0 6
 
   % r = s
   ADDR 0 7
+  LOAD
   ADDR 0 8
+  LOAD
   EQ
 
   % s not = r
   ADDR 0 8
+  LOAD
   ADDR 0 7
+  LOAD
   EQ
   PUSH MACHINE_FALSE
   EQ
@@ -199,6 +224,7 @@ DUPN
 % 1-15
   % Address of B[i + 1, j - 100]
     ADDR 0 0
+    LOAD
     PUSH 1
     ADD
 
@@ -209,6 +235,7 @@ DUPN
     MUL
 
     ADDR 0 1
+    LOAD
     PUSH 100
     SUB
 
@@ -223,9 +250,13 @@ DUPN
     ADD
   % Address of A[j - 2]
     ADDR 0 1
+    LOAD
     PUSH 2
     SUB
+    
+    % Address of A
     ADDR 0 10
+
     ADD
 LOAD
 STORE
@@ -242,6 +273,7 @@ STORE
     ADD
   % Address of D[i + 20, k - 7]
     ADDR 0 0
+    LOAD
     PUSH 20
     ADD
 
@@ -249,6 +281,7 @@ STORE
     MUL
 
     ADDR 0 2
+    LOAD
     PUSH 7
     SUB
 
