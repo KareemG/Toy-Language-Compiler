@@ -117,7 +117,8 @@ PUSH 3-24.1 		% address which points to "PUSH MACHINE_FALSE"
 BF
 ADDR 1 5 		% load p
 LOAD
-NEG 			% negate p
+PUSH MACHINE_FALSE 	% negate p
+EQ
 PUSH 3-24.2 		% address which points to "PUSH 3-24.3"
 BR
 PUSH MACHINE_FALSE 	% "m and not p" is false
@@ -134,7 +135,8 @@ BR
 % false expression
 ADDR 0 6 		% load r
 LOAD
-NEG 			% negate r
+PUSH MACHINE_FALSE 	% negate r
+EQ
 PUSH 3-24.5 		% address which points to "PUSH MACHINE_FALSE"
 BF
 ADDR 0 7 		% load s
@@ -169,7 +171,8 @@ BR 			% call function G
 ADDR 2 2 		% restore display register
 SETD 2
 POP2 			% clear activation record except return value
-NEG 			% negate G
+PUSH MACHINE_FALSE 	% negate G
+EQ
 ADDR 0 6 		% load r
 LOAD
 OR 			% not G or r
@@ -191,7 +194,8 @@ ADDR 1 0 		% push existing display 1 address
 % parameter m
 ADDR 0 4 		% load p
 LOAD
-NEG 			% negate p
+PUSH MACHINE_FALSE 	% negate p
+EQ
 ADDR 0 5 		% load q
 LOAD
 % parameter n
@@ -216,7 +220,8 @@ POP4 			% clear activation record except return value
 % parameter p
 ADDR 0 5 		% load q
 LOAD
-NEG 			% negate q
+PUSH MACHINE_FALSE 	% negate q
+EQ
 PUSH 3-14 		% address of function F
 BR 			% call function F( not p or q , ... , not q )
 ADDR 1 2 		% restore display register from OUTER function F call
@@ -228,10 +233,12 @@ POP4 			% clear activation record except return value
 % parameter p
 ADDR 0 6 		% load r
 LOAD
-NEG 			% negate r
+PUSH MACHINE_FALSE 	% negate r
+EQ
 ADDR 0 7 		% load s
 LOAD
-NEG 			% negate s
+PUSH MACHINE_FALSE 	% negate s
+EQ
 OR 			% not r or not s
 PUSH 3-29.1 		% address which points to false expression
 BF
@@ -242,7 +249,8 @@ BR
 % false expression
 ADDR 0 7 		% load s
 LOAD
-NEG 			% negate s
+PUSH MACHINE_FALSE 	% negate s
+EQ
 ADDR 0 5 		% load q
 EQ 			% not s == q (which is equivalent to s not= q)
 PUSH 3-19 		% address of procedure Q
