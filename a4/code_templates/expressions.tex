@@ -59,9 +59,9 @@ The next thing that we must note is the 'stride' and 'multi' at each level, wher
 
 Altogether, if we want to access \texttt{x[i,j]}, the offset needed to add to the base address of the \texttt{x} in order to access the element is:
 
-$$(i - a) \cdot (b - a + 1) + (j - c) \cdot 1$$
+$$(i - a) \cdot (d - c + 1) + (j - c) \cdot 1$$
 
-The value, $(b - a + 1)$, can actually be calculated statically by the compiler, since we would have access to the symbol table, containing the upper and lower bounds of all the dimensions of this array. So we can just let $y = (b - a + 1)$, where the term $y$ will be used in our code so we can subsitute the actual value. $(i - a)$ and $(j - c)$ cannot be reduced as both expressions have variables in them. Thus a simplified expression that we actually need to calculate at runtime is:
+The value, $(d - c + 1)$, can actually be calculated statically by the compiler, since we would have access to the symbol table, containing the upper and lower bounds of all the dimensions of this array. So we can just let $y = (d - c + 1)$, where the term $y$ will be used in our code so we can subsitute the actual value. $(i - a)$ and $(j - c)$ cannot be reduced as both expressions have variables in them. Thus a simplified expression that we actually need to calculate at runtime is:
 
 $$(i - a) \cdot y + (j - c)$$
 
