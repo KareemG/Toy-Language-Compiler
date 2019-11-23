@@ -3,16 +3,16 @@ PUSHMT 			% set initial display
 SETD 0
 
 % 3-3
-PUSH -1 		% a
-PUSH -1 		% b
-PUSH -1 		% c
-PUSH -1 		% d
+PUSH UNDEFINED 		% a
+PUSH UNDEFINED 		% b
+PUSH UNDEFINED 		% c
+PUSH UNDEFINED 		% d
 
 % 3-4
-PUSH -1 		% p
-PUSH -1 		% q
-PUSH -1 		% r
-PUSH -1 		% s
+PUSH UNDEFINED 		% p
+PUSH UNDEFINED 		% q
+PUSH UNDEFINED 		% r
+PUSH UNDEFINED 		% s
 
 % 3-5
 PUSH 3-12 		% Branch over procedure P
@@ -23,8 +23,8 @@ PUSHMT 			% set display for P
 SETD 1
 
 % 3-7
-PUSH -1 		% e
-PUSH -1 		% f
+PUSH UNDEFINED 		% e
+PUSH UNDEFINED 		% f
 
 % 3-8
 ADDR 0 4 		% load p
@@ -91,9 +91,9 @@ PUSHMT 			% set display for F
 SETD 1
 
 % 3-19
-PUSH -1 		% t
-PUSH -1 		% u
-PUSH -1 		% v
+PUSH UNDEFINED 		% t
+PUSH UNDEFINED 		% u
+PUSH UNDEFINED 		% v
 
 % 3-20
 PUSH 3-26 		% branch over function G
@@ -104,8 +104,8 @@ PUSHMT 			% set display for G
 SETD 2
 
 % 3-22
-PUSH -1 		% w
-PUSH -1 		% x
+PUSH UNDEFINED 		% w
+PUSH UNDEFINED 		% x
 
 % 3-23
 ADDR 2 0 		% get the address for return val
@@ -150,7 +150,7 @@ ADDR 2 1 		% load return address
 BR
 
 % 3-26
-PUSH -1 		% allocate space for return value
+PUSH UNDEFINED 		% allocate space for return value
 PUSH 3-26.1 		% set return address (points to "ADDR 1 2")
 ADDR 1 0 		% push existing display 1 address
 % parameter "m"
@@ -163,7 +163,7 @@ ADDR 0 0 		% load a
 LOAD
 ADD 			% (t - n) + a
 % paramaeter "n"
-PUSH -1 		% allocate space for return value
+PUSH UNDEFINED 		% allocate space for return value
 PUSHMT 			% set return address
 ADDR 1 0 		% push existing display 2 address
 PUSH 3-21 		% address of function G
@@ -200,11 +200,11 @@ ADDR 0 5 		% load q
 LOAD
 % parameter n
 % outer function F call
-PUSH -1 		% allocate space for return value
+PUSH UNDEFINED 		% allocate space for return value
 PUSH 3-28.2 		% load return address (points to OUTER "ADDR 1 2")
 ADDR 1 0 		% push existing display 1 address
 % inner function F call
-PUSH -1 		% allocate space for return value
+PUSH UNDEFINED 		% allocate space for return value
 PUSH 3-28.3 		% load return address (points to INNER "ADDR 1 2")
 ADDR 1 0 		% push existing display 1 address
 ADDR 0 1 		% load b
