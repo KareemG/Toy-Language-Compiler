@@ -431,19 +431,8 @@ public class Main {
 		machine.reset();
 
 		try {
-			// INSERT CODE HERE TO DO CODE GENERATION
-			// e.g.
-			//
-			// ASTVisitor visitor = new CodeGen(machine);
-			// programAST.accept(visitor);
-			//
-			// or
-			//
-			// programAST.doCodeGen() ;
-			//
-			// or
-			//
-			// codeGen.doIt(programAST);
+			CodeGen generator = new CodeGen(machine);
+			programAST.accept(generator);
 		} catch (Exception e) {
 			System.err.println("Exception during Code Generation");
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());

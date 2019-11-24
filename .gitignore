@@ -5,3 +5,4 @@ a3/.vscode/settings.json
 sym.java
 Lexer.java
 BaseParser.java
+.vs/*
