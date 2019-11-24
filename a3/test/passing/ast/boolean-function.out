@@ -1,6 +1,6 @@
  { 
- function test : boolean { 
- return with true
+ function test : integer { 
+ return with 1
  } 
  write test
  }

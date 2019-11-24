@@ -1,0 +1,20 @@
+% A3-08a.488   ===========================================
+% test correct expressions
+  {  
+   var i , j , k : integer
+   var p , q , r : boolean
+   i : = i + j
+   j : = j - i
+   i : = j * k
+   i : = j / k 
+   i : = ( not p or not ( q and r ) ? i +1 : i - 1 )
+   p : = i < j
+   p : = i <= j
+   p : = i = j
+   p : = i not  = j
+   p : = j > k
+   p : = j >= k
+   p : = q = r
+   p : = r not = q
+   p : = (( i < j ? p : q ) ? not p : ( j = k ? false : not p or not q ))
+  }  

@@ -204,7 +204,8 @@ public class Semantics extends ASTVisitor.Default {
 			assert(s.get(1) instanceof Type);
 			Type type = (Type) s.get(1);
 			DeclarationPart declPart = (DeclarationPart) s.get(0);
-			symTable.get(declPart.getName()).setResult(type);
+			Record rec = symTable.get(declPart.getName());
+			rec.setResult(type);
 		});
 
 		// ===== EXPRESSION TYPES ===== //
@@ -252,7 +253,7 @@ public class Semantics extends ASTVisitor.Default {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
 			if(!(expn.getType() instanceof BooleanType))
-				printError("Expected expression type is boolean but it is not"
+				printError("Expected expression type for " + expn.toString() + " is boolean but it is not"
 					+ "Instead, it is: " + expn.getType());
 		});
 
@@ -260,7 +261,7 @@ public class Semantics extends ASTVisitor.Default {
 			assert(s.get(0) instanceof Expn);
 			Expn expn = (Expn) s.get(0);
 			if(!(expn.getType() instanceof IntegerType))
-				printError("Expected expression type is integer but it is not. "
+				printError("Expected expression type for " + expn.toString() + " is integer but it is not. "
 					+ "Instead, it is: " + expn.getType());
 		});
 
@@ -569,6 +570,13 @@ public class Semantics extends ASTVisitor.Default {
 		semanticAction(99);
 	}
 	@Override
+	public void visitLeave(ReadStmt readStmt) {
+		ListIterator<ReadableExpn> lst = readStmt.getInputs().listIterator();
+		while (lst.hasNext()) {
+			semanticAction(31, lst.next());
+		}
+	}
+	@Override
 	public void visitEnter(ScopeStmt scopeStmt) {
 		semanticAction(6);
 	}
@@ -579,6 +587,16 @@ public class Semantics extends ASTVisitor.Default {
 	@Override
 	public void visitEnter(IfStmt ifStmt) {
 		semanticAction(30, ifStmt.getCondition());
+	}
+	@Override
+	public void visitLeave(WriteStmt writeStmt) {
+		ListIterator<Printable> lst = writeStmt.getOutputs().listIterator();
+		while(lst.hasNext()) {
+			Printable tmp = lst.next();
+			if(tmp instanceof Expn && ((Expn)tmp).getType() != null) {
+				semanticAction(31, (Expn) tmp);
+			}
+		}
 	}
 
 	// ===== EXPRESSIONS ===== //
@@ -619,12 +637,8 @@ public class Semantics extends ASTVisitor.Default {
 		semanticAction(24, condExpn);
 	}
 	@Override
-	public void visitEnter(EqualsExpn equalExpn) {
-		semanticAction(31, equalExpn.getLeft());
-	}
-	@Override
 	public void visitLeave(EqualsExpn equalExpn) {
-		semanticAction(31, equalExpn.getLeft());
+		semanticAction(32, equalExpn.getLeft(), equalExpn.getRight());
 		semanticAction(20, equalExpn);
 	}
 	@Override

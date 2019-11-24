@@ -1,8 +1,11 @@
 package compiler488.ast.stmt;
 
+import java.util.ListIterator;
+
 import compiler488.ast.ASTList;
 import compiler488.ast.PrettyPrinter;
 import compiler488.ast.Printable;
+import compiler488.semantics.ASTVisitor;
 
 /**
  * The command to write data on the output device.
@@ -24,5 +27,14 @@ public class WriteStmt extends Stmt {
 
 	public ASTList<Printable> getOutputs() {
 		return outputs;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		ListIterator<Printable> lst = outputs.listIterator();
+		while(lst.hasNext()) {
+			lst.next().accept(visitor);
+		}
+		visitor.visitLeave(this);
 	}
 }

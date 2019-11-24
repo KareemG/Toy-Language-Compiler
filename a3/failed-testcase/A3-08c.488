@@ -1,0 +1,10 @@
+% A3-08c.488   
+% test correct expressions
+  {  
+   var p , q , r : boolean 
+   p : = p  and  ( not q and r ? true : ( q and not r ? true : false ))
+   p : = ( p not= q ? true : not r ) or
+		( r and not q ? false : p ) and ( not not q ? not not r : not ( not p ))
+   r : =  not p  and  q  or  p  and   not q
+   r : =  not  not  not p  and    not  not  not  ( p  or  q )
+  }  

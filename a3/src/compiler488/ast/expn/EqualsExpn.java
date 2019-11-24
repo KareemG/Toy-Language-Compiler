@@ -20,7 +20,6 @@ public class EqualsExpn extends BinaryExpn {
     @Override
     public void accept(ASTVisitor visitor) {
         this.left.accept(visitor);
-        visitor.visitEnter(this);
         this.right.accept(visitor);
         visitor.visitLeave(this);
     }

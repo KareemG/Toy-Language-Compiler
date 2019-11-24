@@ -1,0 +1,10 @@
+% A3-08d.488   
+% test subscript expressions
+  {  
+   var A[100] , B[ -100 .. 0 ] , i , j : integer
+   var P[100] , Q[ -10 .. 10 ] , R , S : boolean 
+   function F( A : integer) : integer { return with A + 1   }  
+   A[ i ] : = B[ j - 1 ] * A[ ( A[i+1] < j ? j + B[ j ] : A[ i + j - 1 ] ) ]
+   P[ i - 1 ] : = Q[ j + 7 ]  and  P[ i ]  or  ( R ? not Q[i] : P[j] = Q[i] )
+   B[F(-6)+F(-10)] : = A[ ( F(i+1) >= F( j-2) ? A[ F( i ) ] : B[ F(i+j) ] ) ]
+  }  

@@ -38,6 +38,8 @@ public interface ASTVisitor
     public void visitLeave(ScopeStmt scopeStmt);
     public void visitEnter(IfStmt ifStmt);
     public void visitLeave(IfStmt ifStmt);
+    public void visitEnter(WriteStmt writeStmt);
+    public void visitLeave(WriteStmt writeStmt);
 
     public void visitEnter(ArithExpn arith);
     public void visitLeave(ArithExpn arith);
@@ -159,6 +161,12 @@ public interface ASTVisitor
         public void visitLeave(IfStmt ifStmt) {
             defaultVisitLeave(ifStmt);
         }
+	public void visitEnter(WriteStmt writeStmt) {
+		defaultVisit(writeStmt);
+	}
+	public void visitLeave(WriteStmt writeStmt) {
+		defaultVisit(writeStmt);
+	}
 
         public void visitEnter(ArithExpn arith) {
             defaultVisitEnter(arith);

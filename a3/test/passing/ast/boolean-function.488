@@ -1,9 +1,9 @@
 % Declaring and calling a function that returns a boolean
 
 {
-    function test : boolean
+    function test : integer
     {
-        return with true
+        return with 1
     }
 
     write test

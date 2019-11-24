@@ -1,0 +1,10 @@
+% A3-09.488   
+% test read, write restrictions
+  {  
+	var i, j[10] : integer
+        var p, q[10] : boolean
+        read  i, j , p, q
+        write "Goodbye Cruel World", i , j , q[3], p, q , false,  newline
+        write newline , "integer " , ( p not= q[i]  ? i : j[i] ) , newline ,
+            " boolean " , ( p = q[i] ? p : q[i+1] ) , newline
+  }  
