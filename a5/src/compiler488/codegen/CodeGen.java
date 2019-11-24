@@ -68,6 +68,8 @@ public class CodeGen extends ASTVisitor.Default
 	public CodeGen(Machine machine) {
 		this.machine = machine;
 
+		this.actions = new HashMap<>();
+
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
 		});
