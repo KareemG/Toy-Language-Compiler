@@ -67,6 +67,23 @@ public class CodeGen extends ASTVisitor.Default
 	 */
 	public CodeGen(Machine machine) {
 		this.machine = machine;
+		Initialize();
+	}
+
+	// Utility procedures used for code generation GO HERE.
+
+	/**
+	 * Additional intialization for gode generation. Called once at the start of
+	 * code generation. May be unnecesary if constructor does everything.
+	 */
+
+	/** Additional initialization for Code Generation (if required) */
+	void Initialize() {
+		/********************************************************/
+		/* Initialization code for the code generator GOES HERE */
+		/* This procedure is called once before codeGeneration */
+		/*                                                      */
+		/********************************************************/
 
 		this.actions = new HashMap<>();
 
@@ -369,22 +386,6 @@ public class CodeGen extends ASTVisitor.Default
 		// C86 - Emit instruction(s) to create address of a 2 dimensional array element.
 		actions.put(86, (s, self) -> {
 		});
-	}
-
-	// Utility procedures used for code generation GO HERE.
-
-	/**
-	 * Additional intialization for gode generation. Called once at the start of
-	 * code generation. May be unnecesary if constructor does everything.
-	 */
-
-	/** Additional initialization for Code Generation (if required) */
-	void Initialize() {
-		/********************************************************/
-		/* Initialization code for the code generator GOES HERE */
-		/* This procedure is called once before codeGeneration */
-		/*                                                      */
-		/********************************************************/
 	}
 
 	/**
