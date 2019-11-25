@@ -13,6 +13,7 @@ public class Record {
     private RecordType type;
     private Type result;
     private ArrayList<Record> params = null;
+    private short addr;
 
     public Record(String ident) {
         this.ident = ident;
@@ -64,5 +65,13 @@ public class Record {
 
     public Type getResult() {
         return this.result;
+    }
+
+    public void setAddr(short addr) {
+	    this.addr = addr;
+    }
+
+    public short getAddr() {
+	    return this.addr;
     }
 }
