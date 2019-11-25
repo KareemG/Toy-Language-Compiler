@@ -220,6 +220,10 @@ public class CodeGen extends ASTVisitor.Default
 
 		// C32 - Allocate storage for a parameter. Save address in symbol table.
 		actions.put(32, (s, self) -> {
+			assert(s.get(0) instanceof ScalarDecl);
+			writeMemory(startMSP++, Machine.PUSH);
+			writeMemory(startMSP++, Machine.UNDEFINED);
+			// TODO: Need to insert this param into symbol table
 		});
 
 		// C33 - Allocate storage for the return value of a function. Save address in symbol table.
@@ -487,6 +491,57 @@ public class CodeGen extends ASTVisitor.Default
 	public void visitLeave(Program prog) {
 		generateCode(1, prog);
 		generateCode(2, prog);
+	}
+
+	// ===== FUNCTION & PROCEDURE DECLARATIONS ===== //
+	@Override
+	public void visitEnter(RoutineDecl routine) {
+		generateCode(35, routine);
+		if(routine.getType() != null) { // Routine is a fucntion
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		} else { // Routine is a procedure
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		}
+	}
+	@Override
+	public void visit(RoutineDecl routine) {
+		generateCode(34, routine);
+		if(routine.getType() != null) {
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		} else {
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		}
+	}
+	@Override
+	public void visitLeave(RoutineDecl routine) {
+		if(routine.getType() != null) { // Routine is a fucntion
+			if(routine.getParameters() != null) {
+				generateCode(13, routine);
+			} else {
+				generateCode(12, routine);
+			}
+		} else { // Routine is a procedure
+			if(routine.getParameters() != null) {
+				generateCode(17, routine);
+			} else {
+				generateCode(15, routine);
+			}
+		}
+		generateCode(36, routine);
+	}
+
+	@Override
+	public void visitLeave(ScalarDecl decl) {
+		generateCode(32, decl);
+		generateCode(24, decl);
 	}
 
 	@Override
