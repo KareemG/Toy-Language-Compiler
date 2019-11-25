@@ -6,6 +6,10 @@ import compiler488.compiler.Main;
 import compiler488.runtime.Machine;
 import compiler488.runtime.MemoryAddressException;
 import compiler488.ast.*;
+import compiler488.ast.decl.*;
+import compiler488.ast.expn.*;
+import compiler488.ast.stmt.*;
+import compiler488.ast.type.*;
 import compiler488.semantics.ASTVisitor;
 import java.util.function.BiConsumer;
 
@@ -72,6 +76,15 @@ public class CodeGen extends ASTVisitor.Default
 
 	// Utility procedures used for code generation GO HERE.
 
+	void writeMemory(short addr, short value)
+	{
+		try {
+			machine.writeMemory(addr, value);
+		} catch(Exception e) {
+			System.out.println("Error writing instruction");
+		}
+	}
+
 	/**
 	 * Additional intialization for gode generation. Called once at the start of
 	 * code generation. May be unnecesary if constructor does everything.
@@ -89,14 +102,24 @@ public class CodeGen extends ASTVisitor.Default
 
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+			writeMemory(startMSP++, Machine.PUSHMT);
+			writeMemory(startMSP++, Machine.SETD);
+			writeMemory(startMSP++, (short) 0);
 		});
 
 		// C01 - Emit code to end program execution.
 		actions.put(1, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+			writeMemory(startMSP++, Machine.HALT);
 		});
 
 		// C02 - Set pc, msp and mlp to values for starting program execution.
 		actions.put(2, (s, self) -> {
+			assert(s.get(0) instanceof Program);
+			machine.setPC((short) 0);
+			machine.setMSP(startMSP);
+			machine.setMLP(Machine.MEMORY_SIZE);
 		});
 
 		// C03 - Emit code (if any) to enter an ordinary scope.
@@ -386,6 +409,21 @@ public class CodeGen extends ASTVisitor.Default
 		// C86 - Emit instruction(s) to create address of a 2 dimensional array element.
 		actions.put(86, (s, self) -> {
 		});
+
+		// C90 - Custom action for write statements
+		actions.put(90, (s, self) -> {
+			assert(s.get(0) instanceof Printable);
+			Printable p = (Printable) s.get(0);
+
+			if(p instanceof TextConstExpn)
+			{
+				for (char ch : ((TextConstExpn) p).getValue().toCharArray()) {
+					writeMemory(startMSP++, Machine.PUSH);
+					writeMemory(startMSP++, (short) ch);
+					writeMemory(startMSP++, Machine.PRINTC);
+				}
+			}
+		});
 	}
 
 	/**
@@ -420,7 +458,8 @@ public class CodeGen extends ASTVisitor.Default
 	 * @param actionNumber
 	 *            code generation action to perform
 	 */
-	void generateCode(int actionNumber) {
+	void generateCode(int actionNumber, BaseAST... nodes)
+	{
 		if (traceCodeGen) {
 			// output the standard trace stream
 			Main.traceStream.println("CodeGen: C" + actionNumber);
@@ -435,7 +474,27 @@ public class CodeGen extends ASTVisitor.Default
 		/****************************************************************/
 
 		System.out.println("Codegen: C" + actionNumber);
+
+		this.actions.get(actionNumber).accept(Arrays.asList(nodes), this);
 	}
 
-	// ADDITIONAL FUNCTIONS TO IMPLEMENT CODE GENERATION GO HERE
+	@Override
+	public void visitEnter(Program prog) {
+		generateCode(0, prog);
+	}
+
+	@Override
+	public void visitLeave(Program prog) {
+		generateCode(1, prog);
+		generateCode(2, prog);
+	}
+
+	@Override
+	public void visitLeave(WriteStmt writeStmt)
+	{
+		ListIterator<Printable> lst = writeStmt.getOutputs().listIterator();
+		while(lst.hasNext()) {
+			generateCode(90, (Expn) lst.next());
+		}
+	}
 }
