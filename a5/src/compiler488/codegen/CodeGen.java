@@ -59,6 +59,8 @@ public class CodeGen extends ASTVisitor.Default
 	/** initial value for memory limit pointer */
 	private short startMLP;
 
+	private ArrayList<IR> intermediate_code;
+	
 	private Map<Integer, BiConsumer<List<BaseAST>, CodeGen>> actions;
 
 	/** flag for tracing code generation */
@@ -99,27 +101,28 @@ public class CodeGen extends ASTVisitor.Default
 		/********************************************************/
 
 		this.actions = new HashMap<>();
+		this.intermediate_code = new ArrayList<>();
 
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
 			assert(s.get(0) instanceof Program);
-			writeMemory(startMSP++, Machine.PUSHMT);
-			writeMemory(startMSP++, Machine.SETD);
-			writeMemory(startMSP++, (short) 0);
+			this.intermediate_code.add(new IR(IR.SET_DISPLAY, new IR.Operand(false, (short) 0)));
 		});
 
 		// C01 - Emit code to end program execution.
 		actions.put(1, (s, self) -> {
 			assert(s.get(0) instanceof Program);
-			writeMemory(startMSP++, Machine.HALT);
+			this.intermediate_code.add(new IR(IR.HALT));
 		});
 
 		// C02 - Set pc, msp and mlp to values for starting program execution.
 		actions.put(2, (s, self) -> {
 			assert(s.get(0) instanceof Program);
-			machine.setPC((short) 0);
-			machine.setMSP(startMSP);
-			machine.setMLP(Machine.MEMORY_SIZE);
+
+			try
+			{
+				this.Finalize();
+			} catch (Exception e) { }
 		});
 
 		// C03 - Emit code (if any) to enter an ordinary scope.
@@ -292,14 +295,22 @@ public class CodeGen extends ASTVisitor.Default
 
 		// C51 - Emit code to print an integer expression.
 		actions.put(51, (s, self) -> {
+			assert(s.get(0) instanceof PrintExpn);
+			writeMemory(startMSP++, Machine.PRINTI);
 		});
 
 		// C52 - Emit code to print a text string.
 		actions.put(52, (s, self) -> {
+			assert(s.get(0) instanceof TextConstExpn);
+			for (char ch : ((TextConstExpn) s.get(0)).getValue().toCharArray()) {
+				this.intermediate_code.add(new IR(IR.PRINTC, new IR.Operand(false, (short) ch)));
+			}
 		});
 
 		// C53 - Emit code to implement newline.
 		actions.put(53, (s, self) -> {
+			assert(s.get(0) instanceof SkipConstExpn);
+			this.intermediate_code.add(new IR(IR.PRINTC, new IR.Operand(false, (short) '\n')));
 		});
 
 		// C54 - Emit code to read one integer value and save it in a variable.
@@ -413,21 +424,6 @@ public class CodeGen extends ASTVisitor.Default
 		// C86 - Emit instruction(s) to create address of a 2 dimensional array element.
 		actions.put(86, (s, self) -> {
 		});
-
-		// C90 - Custom action for write statements
-		actions.put(90, (s, self) -> {
-			assert(s.get(0) instanceof Printable);
-			Printable p = (Printable) s.get(0);
-
-			if(p instanceof TextConstExpn)
-			{
-				for (char ch : ((TextConstExpn) p).getValue().toCharArray()) {
-					writeMemory(startMSP++, Machine.PUSH);
-					writeMemory(startMSP++, (short) ch);
-					writeMemory(startMSP++, Machine.PRINTC);
-				}
-			}
-		});
 	}
 
 	/**
@@ -448,11 +444,57 @@ public class CodeGen extends ASTVisitor.Default
 		// REPLACE THIS CODE WITH YOUR OWN CODE
 		// THIS CODE generates a single HALT instruction
 		// as an example.
-		machine.setPC((short) 0); /* where code to be executed begins */
-		machine.setMSP((short) 1); /* where memory stack begins */
-		machine.setMLP((short) (Machine.MEMORY_SIZE - 1));
+		//machine.setPC((short) 0); /* where code to be executed begins */
+		//machine.setMSP((short) 1); /* where memory stack begins */
+		//machine.setMLP((short) (Machine.MEMORY_SIZE - 1));
 		/* limit of stack */
-		machine.writeMemory((short) 0, Machine.HALT);
+		//machine.writeMemory((short) 0, Machine.HALT);
+
+		// convert the IR code into machine code
+		try
+		{
+			for(IR ir : this.intermediate_code)
+			{
+				switch(ir.opcode)
+				{
+					case IR.SET_DISPLAY:
+					{
+						writeMemory(this.startMSP++, Machine.PUSHMT);
+						writeMemory(this.startMSP++, Machine.SETD);
+						writeMemory(this.startMSP++, ir.op1.get_value());
+						break;
+					}
+
+					case IR.PRINTC:
+					{
+						writeMemory(this.startMSP++, Machine.PUSH);
+						writeMemory(this.startMSP++, ir.op1.get_value());
+						writeMemory(this.startMSP++, Machine.PRINTC);
+						break;
+					}
+
+					case IR.HALT:
+					{
+						writeMemory(this.startMSP++, Machine.HALT);
+						break;
+					}
+
+					default:
+					{
+						System.out.println("error: unknown intermediate instruction\n");
+						throw new Exception();
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("error generating machine code from intermedia code");
+		}
+
+		machine.setPC((short) 0);      /* where code to be executed begins */
+		machine.setMSP(this.startMSP); /* where memory stack begins */
+		machine.setMLP((short) (Machine.MEMORY_SIZE - 1));
 	}
 
 	/**
@@ -545,11 +587,20 @@ public class CodeGen extends ASTVisitor.Default
 	}
 
 	@Override
-	public void visitLeave(WriteStmt writeStmt)
+	public void visit(PrintExpn expn)
 	{
-		ListIterator<Printable> lst = writeStmt.getOutputs().listIterator();
-		while(lst.hasNext()) {
-			generateCode(90, (Expn) lst.next());
-		}
+		generateCode(51, expn);
+	}
+
+	@Override
+	public void visit(SkipConstExpn expn)
+	{
+		generateCode(53, expn);
+	}
+
+	@Override
+	public void visit(TextConstExpn expn)
+	{
+		generateCode(52, expn);
 	}
 }

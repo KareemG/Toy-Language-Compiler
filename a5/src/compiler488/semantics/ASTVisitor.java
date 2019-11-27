@@ -71,6 +71,7 @@ public interface ASTVisitor
     public void visit(IdentExpn ident);
     public void visit(BoolConstExpn boolExpn);
     public void visit(IntConstExpn intExpn);
+    public void visit(PrintExpn printExpn);
     public void visit(SkipConstExpn skipExpn);
     public void visit(TextConstExpn textExpn);
 
@@ -257,6 +258,9 @@ public interface ASTVisitor
         }
         public void visit(IntConstExpn intExpn) {
             defaultVisitForLeaf(intExpn);
+        }
+        public void visit(PrintExpn printExpn) {
+            defaultVisitForLeaf(printExpn);
         }
         public void visit(SkipConstExpn skipExpn) {
             defaultVisitForLeaf(skipExpn);
