@@ -224,8 +224,8 @@ public class CodeGen extends ASTVisitor.Default
 		// C32 - Allocate storage for a parameter. Save address in symbol table.
 		actions.put(32, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDecl);
-			writeMemory(startMSP++, Machine.PUSH);
-			writeMemory(startMSP++, Machine.UNDEFINED);
+			// Store as UNDEFINED for now
+			this.intermediate_code.add(new IR(IR.PUSH, new IR.Operand(false, Machine.UNDEFINED)));
 			// TODO: Need to insert this param into symbol table
 		});
 
