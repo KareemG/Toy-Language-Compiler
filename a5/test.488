@@ -1,3 +1,5 @@
 {
+    var a : integer
+    a := 1
     write "hello", " ", "world"
 }

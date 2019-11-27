@@ -12,6 +12,7 @@ import compiler488.ast.stmt.*;
 import compiler488.ast.type.*;
 import compiler488.semantics.ASTVisitor;
 import java.util.function.BiConsumer;
+import compiler488.symbol.*;
 
 /**
  * CodeGenerator.java
@@ -59,14 +60,19 @@ public class CodeGen extends ASTVisitor.Default
 	/** initial value for memory limit pointer */
 	private short startMLP;
 
-	private ArrayList<IR> intermediate_code;
-	
-	private Map<Integer, BiConsumer<List<BaseAST>, CodeGen>> actions;
-
 	/** flag for tracing code generation */
 	private boolean traceCodeGen = Main.traceCodeGen;
 
 	private Machine machine;
+
+	// global scope information:
+	// these things should be in symbol table but I am doing this for initial testing
+	private int reg_offset;
+	private HashMap<String, Integer> var_to_reg_map;
+	private Stack<Integer> result_stack;
+
+	private ArrayList<IR> intermediate_code;
+	private Map<Integer, BiConsumer<List<BaseAST>, CodeGen>> actions;
 
 	/**
 	 * Constructor to initialize code generation
@@ -102,6 +108,10 @@ public class CodeGen extends ASTVisitor.Default
 
 		this.actions = new HashMap<>();
 		this.intermediate_code = new ArrayList<>();
+
+		this.reg_offset = 0;
+		this.var_to_reg_map = new HashMap<>();
+		this.result_stack = new Stack<>();
 
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
@@ -215,6 +225,9 @@ public class CodeGen extends ASTVisitor.Default
 		
 		// C30 - Allocate storage for a scalar variable. Save address in symbol table.
 		actions.put(30, (s, self) -> {
+			assert(s.get(0) instanceof ScalarDeclPart);
+			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
+			this.var_to_reg_map.put(decl.getName(), this.reg_offset++);
 		});
 		
 		// C31 - Allocate storage for a 1 dimensional array variable. Save address in symbol table.
@@ -391,10 +404,18 @@ public class CodeGen extends ASTVisitor.Default
 
 		// C76 - Emit instruction(s) to obtain value of variable or parameter.
 		actions.put(76, (s, self) -> {
+			assert(s.get(0) instanceof IdentExpn);
+			IdentExpn e = (IdentExpn) s.get(0);
+			this.result_stack.add(this.var_to_reg_map.get(e.getName()));
 		});
 
 		// C77 - Emit instruction(s) to store a value in a variable.
 		actions.put(77, (s, self) -> {
+			assert(result_stack.size() == 2);
+			System.out.println("stack size = " + result_stack.size());
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.ASSIGN, new IR.Operand(true, (short) lhs), new IR.Operand(true, (short) rhs)));
 		});
 
 		// C78 - Emit instruction(s) to load the value MACHINEFALSE.
@@ -407,6 +428,10 @@ public class CodeGen extends ASTVisitor.Default
 
 		// C80 - Emit instruction(s) to load the value of the integer constant.
 		actions.put(80, (s, self) -> {
+			assert(s.get(0) instanceof IntConstExpn);
+			int target_register = this.reg_offset ++;
+			this.intermediate_code.add(new IR(IR.ASSIGN, new IR.Operand(true, (short) target_register), new IR.Operand(false, ((IntConstExpn) s.get(0)).getValue().shortValue())));
+			this.result_stack.add(target_register);
 		});
 
 		// C81 - Emit instructions(s)to obtain address of an array variable.
@@ -455,6 +480,7 @@ public class CodeGen extends ASTVisitor.Default
 				{
 					case IR.SET_DISPLAY:
 					{
+						System.out.println(String.format("(SET_DISPLAY, %d)", ir.op1.get_value()));
 						writeMemory(this.startMSP++, Machine.PUSHMT);
 						writeMemory(this.startMSP++, Machine.SETD);
 						writeMemory(this.startMSP++, ir.op1.get_value());
@@ -463,6 +489,7 @@ public class CodeGen extends ASTVisitor.Default
 
 					case IR.PRINTC:
 					{
+						System.out.println(String.format("(PRINTC, %d)", ir.op1.get_value()));
 						writeMemory(this.startMSP++, Machine.PUSH);
 						writeMemory(this.startMSP++, ir.op1.get_value());
 						writeMemory(this.startMSP++, Machine.PRINTC);
@@ -471,7 +498,44 @@ public class CodeGen extends ASTVisitor.Default
 
 					case IR.HALT:
 					{
+						System.out.println("(HALT)");
 						writeMemory(this.startMSP++, Machine.HALT);
+						break;
+					}
+
+					case IR.ASSIGN:
+					{
+						System.out.println(String.format("(ASSIGN, %s, %s)", (ir.op1.is_register() ? "R" : "") + ir.op1.get_value(), (ir.op2.is_register() ? "R" : "") + ir.op2.get_value()));
+						if(ir.op1.is_register() && ir.op2.is_register())
+						{
+							// load address of lhs
+							writeMemory(this.startMSP++, Machine.ADDR);
+							writeMemory(this.startMSP++, (short) 0);
+							writeMemory(this.startMSP++, ir.op1.get_value());
+
+							// load value of rhs
+							writeMemory(this.startMSP++, Machine.ADDR);
+							writeMemory(this.startMSP++, (short) 0);
+							writeMemory(this.startMSP++, ir.op2.get_value());
+							writeMemory(this.startMSP++, Machine.LOAD);
+
+							// lhs = rhs
+							writeMemory(this.startMSP++, Machine.STORE);
+						}
+						else // assuming lhs is the register, and rhs is a constant
+						{
+							// load address of lhs
+							writeMemory(this.startMSP++, Machine.ADDR);
+							writeMemory(this.startMSP++, (short) 0);
+							writeMemory(this.startMSP++, ir.op1.get_value());
+
+							// push constant value to stack
+							writeMemory(this.startMSP++, Machine.PUSH);
+							writeMemory(this.startMSP++, ir.op2.get_value());
+
+							// lhs = constant
+							writeMemory(this.startMSP++, Machine.STORE);
+						}
 						break;
 					}
 
@@ -485,7 +549,7 @@ public class CodeGen extends ASTVisitor.Default
 		}
 		catch(Exception e)
 		{
-			System.out.println("error generating machine code from intermedia code");
+			System.out.println("error generating machine code from intermediate code");
 		}
 
 		machine.setPC((short) 0);      /* where code to be executed begins */
@@ -547,5 +611,29 @@ public class CodeGen extends ASTVisitor.Default
 	public void visit(TextConstExpn expn)
 	{
 		generateCode(52, expn);
+	}
+
+	@Override
+	public void visit(ScalarDeclPart decl)
+	{
+		generateCode(30, decl);
+	}
+
+	@Override
+	public void visitLeave(AssignStmt assign)
+	{
+		generateCode(77, assign);
+	}
+
+	@Override
+	public void visit(IdentExpn expn)
+	{
+		generateCode(76, expn);
+	}
+
+	@Override
+	public void visit(IntConstExpn expn)
+	{
+		generateCode(80, expn);
 	}
 }

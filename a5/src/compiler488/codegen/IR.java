@@ -20,9 +20,8 @@ public class IR
 	public static final short PRINTC = 16;
 	public static final short BRANCH = 17;
 	public static final short SET_DISPLAY = 18;
-	public static final short PUSH = 19;
-	public static final short POP = 20;
 	public static final short HALT = 21;
+	public static final short ASSIGN = 22;
 	
 	public static class Operand
 	{
