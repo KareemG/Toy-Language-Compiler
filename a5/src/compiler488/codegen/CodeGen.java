@@ -420,11 +420,6 @@ public class CodeGen extends ASTVisitor.Default
 		// C86 - Emit instruction(s) to create address of a 2 dimensional array element.
 		actions.put(86, (s, self) -> {
 		});
-
-		// C90 - Custom action to write integer
-		actions.put(90, (s, self) -> {
-			
-		});
 	}
 
 	/**
