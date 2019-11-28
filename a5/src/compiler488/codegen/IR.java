@@ -18,8 +18,10 @@ public class IR
 	public static final short READI = 14;
 	public static final short PRINTI = 15;
 	public static final short PRINTC = 16;
-	public static final short BRANCH = 17;
-	public static final short SET_DISPLAY = 18;
+	public static final short BR = 17;
+	public static final short BT = 18;
+	public static final short BF = 19;
+	public static final short SET_DISPLAY = 20;
 	public static final short HALT = 21;
 	public static final short ASSIGN = 22;
 	public static final short PATCH_TRUE = 23;
