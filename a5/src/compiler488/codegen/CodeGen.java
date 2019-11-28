@@ -609,14 +609,12 @@ public class CodeGen extends ASTVisitor.Default
 
 					case IR.PATCH_FALSE:
 					{
-						System.out.println("false size = " + false_stack.size());
 						writeMemory(false_stack.pop(), this.startMSP);
 						break;
 					}
 
 					case IR.PATCH_TRUE:
 					{
-						System.out.println("true = " + true_stack.size());
 						writeMemory(true_stack.pop(), this.startMSP);
 						break;
 					}
