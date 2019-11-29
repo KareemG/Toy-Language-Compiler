@@ -61,6 +61,8 @@ public interface ASTVisitor
     public void visitEnter(UnaryMinusExpn minusExpn);
     public void visitLeave(UnaryMinusExpn minusExpn);
 
+    public void visit(IfStmt stmt);
+
     // ===== LEAF NODES ===== //
     public void visit(ArrayDeclPart arrPart);
     public void visit(ScalarDeclPart scaPart);
@@ -226,6 +228,10 @@ public interface ASTVisitor
         }
         public void visitLeave(UnaryMinusExpn minusExpn) {
             defaultVisitLeave(minusExpn);
+        }
+
+        public void visit(IfStmt stmt) {
+            defaultVisit(stmt);
         }
 
         // ===== LEAF NODES ===== //

@@ -18,24 +18,47 @@ public class IR
 	public static final short READI = 14;
 	public static final short PRINTI = 15;
 	public static final short PRINTC = 16;
-	public static final short BRANCH = 17;
-	public static final short SET_DISPLAY = 18;
-	public static final short PUSH = 19;
-	public static final short POP = 20;
+	public static final short BR = 17;
+	public static final short BT = 18;
+	public static final short BF = 19;
+	public static final short SET_DISPLAY = 20;
 	public static final short HALT = 21;
+	public static final short ASSIGN = 22;
+	public static final short PATCH_TRUE = 23;
+	public static final short PATCH_FALSE = 24;
 	
 	public static class Operand
 	{
+		public static final int NONE = 0x00000000;
+		public static final int REGISTER = 0x00010000;
+		public static final int PATCH_TRUE = 0x00020000;
+		public static final int PATCH_FALSE = 0x00040000;
+
 		private int value;
 
-		public Operand(boolean register, short value)
+		public Operand(int flags, short value)
 		{
-			this.value = (register ? 0x00010000 : 0x00000000) | value;
+			this.value = flags | ((int) value);
 		}
 
 		public boolean is_register()
 		{
-			return (this.value & 0x00010000) != 0;
+			return (this.value & REGISTER) != 0;
+		}
+
+		public boolean needs_true_patch()
+		{
+			return (this.value & PATCH_TRUE) != 0;
+		}
+
+		public boolean needs_false_patch()
+		{
+			return (this.value & PATCH_FALSE) != 0;
+		}
+
+		public boolean needs_patch()
+		{
+			return needs_true_patch() || needs_false_patch();
 		}
 
 		public short get_value()
