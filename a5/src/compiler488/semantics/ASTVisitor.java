@@ -60,6 +60,9 @@ public interface ASTVisitor
     public void visitEnter(UnaryMinusExpn minusExpn);
     public void visitLeave(UnaryMinusExpn minusExpn);
 
+    public void visit(IfStmt stmt);
+    public void visit(WhileDoStmt stmt);
+
     // ===== LEAF NODES ===== //
     public void visit(ArrayDeclPart arrPart);
     public void visit(ScalarDeclPart scaPart);
@@ -70,6 +73,7 @@ public interface ASTVisitor
     public void visit(IdentExpn ident);
     public void visit(BoolConstExpn boolExpn);
     public void visit(IntConstExpn intExpn);
+    public void visit(PrintExpn printExpn);
     public void visit(SkipConstExpn skipExpn);
     public void visit(TextConstExpn textExpn);
 
@@ -223,6 +227,14 @@ public interface ASTVisitor
             defaultVisitLeave(minusExpn);
         }
 
+        public void visit(IfStmt stmt) {
+            defaultVisit(stmt);
+        }
+
+        public void visit(WhileDoStmt stmt) {
+            defaultVisit(stmt);
+        }
+
         // ===== LEAF NODES ===== //
         public void visit(ArrayDeclPart arrPart) {
             defaultVisitForLeaf(arrPart);
@@ -253,6 +265,9 @@ public interface ASTVisitor
         }
         public void visit(IntConstExpn intExpn) {
             defaultVisitForLeaf(intExpn);
+        }
+        public void visit(PrintExpn printExpn) {
+            defaultVisitForLeaf(printExpn);
         }
         public void visit(SkipConstExpn skipExpn) {
             defaultVisitForLeaf(skipExpn);
