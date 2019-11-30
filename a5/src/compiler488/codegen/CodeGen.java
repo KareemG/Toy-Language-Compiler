@@ -122,7 +122,7 @@ public class CodeGen extends ASTVisitor.Default
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
 			assert(s.get(0) instanceof Program);
-			this.intermediate_code.add(new IR(IR.SET_DISPLAY, new IR.Operand(IR.Operand.NONE, (short) 0)));
+			// this.intermediate_code.add(new IR(IR.SET_DISPLAY, new IR.Operand(IR.Operand.NONE, (short) 0)));
 		});
 
 		// C01 - Emit code to end program execution.
@@ -516,6 +516,18 @@ public class CodeGen extends ASTVisitor.Default
 			
 			this.startMSP++;
 		};
+
+		// insert initialization code here:
+		appendCode(Machine.PUSHMT);
+		appendCode(Machine.SETD);
+		appendCode((short) 0);
+
+		// allocating space for all registers:
+		appendCode(Machine.PUSH); // we will be filling the register space with zeroes
+		appendCode((short) 0);
+		appendCode(Machine.PUSH); // we have 'reg_offset' registers
+		appendCode((short) this.reg_offset);
+		appendCode(Machine.DUPN); // perform the fill
 
 		// convert the IR code into machine code
 		try
