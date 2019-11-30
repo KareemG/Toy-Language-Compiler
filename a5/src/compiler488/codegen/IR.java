@@ -26,6 +26,8 @@ public class IR
 	public static final short ASSIGN = 22;
 	public static final short PATCH_TRUE = 23;
 	public static final short PATCH_FALSE = 24;
+	public static final short LOOP_START = 25;
+	public static final short REPEAT = 26;
 	
 	public static class Operand
 	{
