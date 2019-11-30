@@ -2,6 +2,7 @@
     var a : integer
     a := 1
 
-    while true do
+    repeat
         write "hello world"
+    until true
 }
