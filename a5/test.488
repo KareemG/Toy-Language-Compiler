@@ -3,6 +3,13 @@
     a := 1
 
     repeat
-        write "hello world"
+    {
+        repeat
+        {
+            write "hello world"
+            exit 2 when true
+        }
+        until false
+    }
     until false
 }
