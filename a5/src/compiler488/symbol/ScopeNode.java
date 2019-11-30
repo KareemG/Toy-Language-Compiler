@@ -21,6 +21,8 @@ class ScopeNode implements PrettyPrintable {
     protected String label = null; // scope node label (functions and procedures)
     protected Type type = null; // return type of the scope (for functions)
     protected ArrayList<Record> param = null;
+    private int lexicalLevel;
+    private int size;
 
     public ScopeNode() {
         Initialize();
@@ -29,24 +31,32 @@ class ScopeNode implements PrettyPrintable {
     public ScopeNode(ScopeNode parent) {
         Initialize();
         this.parent = parent;
+        this.lexicalLevel = parent.lexicalLevel + 1;
     }
 
     public ScopeNode(ScopeNode parent, String label) {
         Initialize();
         this.parent = parent;
         this.label = label;
+        this.lexicalLevel = parent.lexicalLevel + 1;
     }
 
     private void Initialize() {
         this.archive = new ArrayList<ScopeNode>();
         this.syms = new Hashtable<>();
+        this.lexicalLevel = 0;
+        this.size = 0;
     }
 
     public int put(String key, Record value) {
         if (this.syms.containsKey(key)) {
             return 1;
         }
+
+        value.setOrderNumber(this.size);
         this.syms.put(key, value);
+        this.size += value.getSize();
+
         return 0;
     }
 
@@ -60,6 +70,14 @@ class ScopeNode implements PrettyPrintable {
 
     public ScopeNode GetParent() {
         return this.parent;
+    }
+
+    public int GetLexicalLevel() {
+        return this.lexicalLevel;
+    }
+
+    public int GetSize() {
+        return this.size;
     }
 
     @Override

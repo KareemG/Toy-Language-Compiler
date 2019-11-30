@@ -13,14 +13,13 @@ public class Record {
     private RecordType type;
     private Type result;
     private ArrayList<Record> params = null;
+    private int size;
+    private int orderNumber;
 
-    public Record(String ident) {
-        this.ident = ident;
-    }
-
-    public Record(String ident, RecordType type) {
+    public Record(String ident, RecordType type, int size) {
         this.ident = ident;
         this.type = type;
+        this.size = size;
     }
 
     public void setType(RecordType type) {
@@ -43,12 +42,20 @@ public class Record {
         this.params = params;
     }
 
+    public void setOrderNumber(int number) {
+        this.orderNumber = number;
+    }
+
     public String getIdent() {
         return this.ident;
     }
 
     public RecordType getType() {
         return this.type;
+    }
+
+    public int getOrderNumber() {
+        return this.orderNumber;
     }
 
     public int getParamCount() {
@@ -64,5 +71,9 @@ public class Record {
 
     public Type getResult() {
         return this.result;
+    }
+
+    public int getSize() {
+        return this.size;
     }
 }

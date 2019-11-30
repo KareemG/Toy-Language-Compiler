@@ -111,13 +111,13 @@ public class Semantics extends ASTVisitor.Default {
 		// End procedure scope.
 		analyzers.put(9, (s, self) -> {
 			symTable.exitScope();
-		 });
+		});
 
 		// Declare scalar variable.
 		analyzers.put(10, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDeclPart);
 			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.SCALAR);
+			Record newRec = new Record(decl.getName(), RecordType.SCALAR, 1);
 			if(this.symTable.put(newRec.getIdent(), newRec) == 1)
 				printError("Attempt to declare a variable more than once");
 		});
@@ -126,7 +126,7 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(11, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
+			Record newRec = new Record(decl.getName(), RecordType.FUNCTION, 1);
 			newRec.setResult(decl.getType());
 			if(this.symTable.put(newRec.getIdent(), newRec) == 1) // S11
 				printError("Attempt to declare a variable more than once");
@@ -136,7 +136,7 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(12, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.FUNCTION);
+			Record newRec = new Record(decl.getName(), RecordType.FUNCTION, 1);
 			newRec.setResult(decl.getType());
 			newRec.setParam(symTable.getParams());
 			if(this.symTable.pPut(newRec.getIdent(), newRec) == 1) // S12
@@ -151,7 +151,7 @@ public class Semantics extends ASTVisitor.Default {
 
 			symTable.initParams();
 			for (ScalarDecl p : decl.getParameters()) {
-				Record pRec = new Record(p.getName(), RecordType.PARAMETER);
+				Record pRec = new Record(p.getName(), RecordType.PARAMETER, 1);
 				pRec.setResult(p.getType());
 				symTable.addParams(pRec);
 			}
@@ -161,7 +161,7 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(17, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
+			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE, 1);
 			if(this.symTable.put(newRec.getIdent(), newRec) == 1)
 				printError("Attempt to declare a variable more than once");
 		});
@@ -170,7 +170,7 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(18, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 			RoutineDecl decl = (RoutineDecl) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE);
+			Record newRec = new Record(decl.getName(), RecordType.PROCEDURE, 1);
 			newRec.setParam(symTable.getParams());
 			if(this.symTable.pPut(newRec.getIdent(), newRec) == 1)
 				printError("Attempt to declare a variable more than once");
@@ -180,7 +180,7 @@ public class Semantics extends ASTVisitor.Default {
 		analyzers.put(19, (s, self) -> {
 			assert(s.get(0) instanceof ArrayDeclPart);
 			ArrayDeclPart decl = (ArrayDeclPart) s.get(0);
-			Record newRec = new Record(decl.getName(), RecordType.ARRAY);
+			Record newRec = new Record(decl.getName(), RecordType.ARRAY, decl.getSize());
 			if(this.symTable.put(decl.getName(), newRec) == 1)
 				printError("Attempt to declare a variable more than once");
 		});

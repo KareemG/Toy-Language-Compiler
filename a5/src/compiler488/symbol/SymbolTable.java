@@ -32,7 +32,7 @@ public class SymbolTable implements PrettyPrintable {
  	 *                does all required initialization
 	 */
 	public void Initialize() {
-		this.root = new ScopeNode(null);
+		this.root = new ScopeNode();
 	}
 
 	/**  Finalize - called once by Semantics at the end of compilation
