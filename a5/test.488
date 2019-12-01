@@ -1,16 +1,12 @@
 {
-    var a : integer
+    var a, b, c, d : integer
     a := 1
+    b := 2
+    c := 3
+    d := a + b * c
 
-    repeat
-        while true do
-        {
-            write "repeat"
-            exit 2 when true
-        }
-    until false
-
-    write newline
-
-    write "end"
+    if not (d = -7) and true then
+        write "pass"
+    else
+        write "fail"
 }

@@ -193,6 +193,65 @@ public class Translator
                     break;
                 }
 
+                case IR.NEG: // negate a integer
+                {
+                    addr((short) 0, ir.op2.get_value());
+                    load((short) 0, ir.op1.get_value());
+                    append(Machine.NEG);
+                    append(Machine.STORE);
+                    break;
+                }
+
+                case IR.NOT: // negate a boolean
+                {
+                    addr((short) 0, ir.op2.get_value());
+                    load((short) 0, ir.op1.get_value());
+                    negate();
+                    append(Machine.STORE);
+                    break;
+                }
+
+                case IR.OR:
+                {
+                    boolean_or(ir.op1.get_value(), ir.op2.get_value(), ir.op3.get_value());
+                    break;
+                }
+
+                case IR.AND:
+                {
+                    boolean_and(ir.op1.get_value(), ir.op2.get_value(), ir.op3.get_value());
+                    break;
+                }
+
+                case IR.LT:
+                case IR.GT:
+                case IR.EQ:
+                case IR.LEQ:
+                case IR.GEQ:
+                case IR.NEQ:
+                case IR.ADD:
+                case IR.SUB:
+                case IR.MUL:
+                case IR.DIV:
+                {
+                    addr((short) 0, ir.op3.get_value());
+                    switch(ir.opcode)
+                    {
+                        case IR.LT:  { lt(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.GT:  { gt(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.EQ:  { eq(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.LEQ: { leq(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.GEQ: { geq(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.NEQ: { neq(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.ADD: { add(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.SUB: { sub(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.MUL: { mul(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.DIV: { div(ir.op1.get_value(), ir.op2.get_value()); break; }
+                    }
+                    append(Machine.STORE);
+                    break;
+                }
+
                 default:
                 {
                     System.out.println("error: unknown intermediate instruction\n");
@@ -231,9 +290,7 @@ public class Translator
 
     private void load(short lex_level, short addr)
     {
-        append(Machine.ADDR);
-        append(lex_level);
-        append(addr);
+        addr(lex_level, addr);
         append(Machine.LOAD);
     }
 
@@ -255,7 +312,7 @@ public class Translator
         append(c);
     }
 
-    private void invert()
+    private void negate()
     {
         append(Machine.PUSH);
         append(Machine.MACHINE_FALSE);
@@ -275,7 +332,7 @@ public class Translator
     {
         load((short) 0, cond); // load the condition result
         if(type) {
-            invert();
+            negate();
         }
 
         append(Machine.PUSH);
@@ -325,7 +382,7 @@ public class Translator
     {
         // condition
         load((short) 0, cond);
-        invert();
+        negate();
 
         // branch address
         append(Machine.PUSH);
@@ -333,5 +390,100 @@ public class Translator
         exit_stack.get(exit_stack.size() - level).add(addr);
 
         append(Machine.BF);
+    }
+
+    private void lt(short op1, short op2)
+    {
+        load((short) 0, op1);
+        load((short) 0, op2);
+        append(Machine.LT);
+    }
+
+    private void gt(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.LT);
+    }
+
+    private void eq(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.EQ);
+    }
+
+    private void geq(short op1, short op2)
+    {
+        lt(op1, op2);
+        negate();
+    }
+
+    private void leq(short op1, short op2)
+    {
+        gt(op1, op2);
+        negate();
+    }
+
+    private void neq(short op1, short op2)
+    {
+        eq(op1, op2);
+        negate();
+    }
+
+    private void add(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.ADD);
+    }
+
+    private void sub(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.SUB);
+    }
+
+    private void mul(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.MUL);
+    }
+
+    private void div(short op1, short op2)
+    {
+        load((short) 0, op2);
+        load((short) 0, op1);
+        append(Machine.DIV);
+    }
+
+    private void boolean_or(short op1, short op2, short target)
+    {
+        addr((short) 0, target);
+        load((short) 0, op1);
+        load((short) 0, op2);
+        append(Machine.OR);
+        append(Machine.STORE);
+    }
+
+    private void boolean_and(short op1, short op2, short target)
+    {
+        // using De Morgan's law
+        addr((short) 0, target);
+
+        // not A
+        load((short) 0, op1);
+        negate();
+
+        // not B
+        load((short) 0, op2);
+        negate();
+
+        append(Machine.OR);
+        negate(); // not (not A or not B)
+
+        append(Machine.STORE);
     }
 }
