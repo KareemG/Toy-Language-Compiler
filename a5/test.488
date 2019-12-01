@@ -1,16 +1,10 @@
 {
-    var a : integer
-    a := 1
+    var i : integer
+    i := 0
 
-    repeat
-        while true do
-        {
-            write "repeat"
-            exit 2 when true
-        }
-    until false
-
-    write newline
-
-    write "end"
+    while i < 10 do
+    {
+        write i, newline
+        i := i + 1
+    }
 }

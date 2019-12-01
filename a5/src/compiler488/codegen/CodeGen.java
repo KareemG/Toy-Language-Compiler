@@ -273,8 +273,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C42 - Emit branch on FALSE. Save address of branch instruction.
 		actions.put(42, (s, self) -> {
-			this.intermediate_code
-					.add(new IR(IR.BF, new IR.Operand(IR.Operand.REGISTER, this.result_stack.pop().shortValue()),
+			this.intermediate_code.add(new IR(IR.BF, new IR.Operand(IR.Operand.REGISTER, this.result_stack.pop().shortValue()),
 							new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
@@ -328,8 +327,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C51 - Emit code to print an integer expression.
 		actions.put(51, (s, self) -> {
 			assert (s.get(0) instanceof PrintExpn);
-			this.intermediate_code
-					.add(new IR(Machine.PRINTI, new IR.Operand(IR.Operand.REGISTER, result_stack.pop().shortValue())));
+			this.intermediate_code.add(new IR(IR.PRINTI, new IR.Operand(IR.Operand.REGISTER, result_stack.pop().shortValue())));
 
 		});
 
@@ -374,7 +372,9 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(60, (s, self) -> {
 			assert (s.get(0) instanceof UnaryMinusExpn);
 			int operand = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.NEG, new IR.Operand(IR.Operand.REGISTER, (short) operand)));
+			int target_register = this.reg_offset++;
+			this.intermediate_code.add(new IR(IR.NEG, new IR.Operand(IR.Operand.REGISTER, (short) operand), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C61 - Emit instruction(s) to perform addition.
@@ -382,8 +382,10 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_PLUS));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.ADD, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C62 - Emit instruction(s) to perform subtraction.
@@ -391,8 +393,10 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_MINUS));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.SUB, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C63 - Emit instruction(s) to perform multiplication.
@@ -400,8 +404,10 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_TIMES));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.MUL, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C64 - Emit instruction(s) to perform division.
@@ -409,15 +415,19 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_DIVIDE));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.DIV, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C65 - Emit instruction(s) to perform logical not operation.
 		actions.put(65, (s, self) -> {
 			assert (s.get(0) instanceof NotExpn);
 			int operand = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.NOT, new IR.Operand(IR.Operand.REGISTER, (short) operand)));
+			int target_register = this.reg_offset++;
+			this.intermediate_code.add(new IR(IR.NOT, new IR.Operand(IR.Operand.REGISTER, (short) operand), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C66 - Emit instruction(s) to perform logical and operation.
@@ -425,8 +435,10 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_AND));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.AND, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C67 - Emit instruction(s) to perform logical or operation.
@@ -434,8 +446,10 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_OR));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.OR, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C68 - Emit instruction(s) to obtain address of parameter.
@@ -448,8 +462,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((EqualsExpn) s.get(0)).getOpSymbol().equals(EqualsExpn.OP_EQUAL));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C70 - Emit instruction(s) to perform inequality comparison.
@@ -458,14 +474,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((EqualsExpn) s.get(0)).getOpSymbol().equals(EqualsExpn.OP_NOT_EQUAL));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 			int target_register = this.reg_offset++;
-			this.intermediate_code.add(new IR(IR.ASSIGN, new IR.Operand(IR.Operand.REGISTER, (short) target_register),
-					new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
-			int operand = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) operand),
-					new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.intermediate_code.add(new IR(IR.NEQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C71 - Emit instruction(s) to perform less than comparison.
@@ -474,8 +486,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_LESS));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.LT, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C72 - Emit instruction(s) to perform less than or equal comparison.
@@ -484,8 +498,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_LESS_EQUAL));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.LEQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C73 - Emit instruction(s) to perform greater than comparison.
@@ -494,8 +510,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.GT, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C74 - Emit instruction(s) to perform greater than or equal comparison.
@@ -504,8 +522,10 @@ public class CodeGen extends ASTVisitor.Default {
 					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER_EQUAL));
 			int rhs = result_stack.pop();
 			int lhs = result_stack.pop();
+			int target_register = this.reg_offset++;
 			this.intermediate_code.add(new IR(IR.GEQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs),
-					new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+					new IR.Operand(IR.Operand.REGISTER, (short) rhs), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
+			this.result_stack.add(target_register);
 		});
 
 		// C75 - Emit instruction(s) to obtain address of variable.
@@ -597,7 +617,7 @@ public class CodeGen extends ASTVisitor.Default {
 		try {
 			Translator translator = new Translator(this.machine, this.intermediate_code);
 			translator.initialize((short) this.reg_offset);
-			translator.translate();
+			this.startMSP = translator.translate();
 		} catch (Exception e) {
 			System.out.println("error generating machine code from intermediate code:");
 			e.printStackTrace();
