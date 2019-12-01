@@ -1,0 +1,9 @@
+
+{
+    function abc : integer
+    {
+        write "executing abc"
+    }
+
+    abc
+}

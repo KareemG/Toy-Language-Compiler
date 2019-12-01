@@ -1,0 +1,77 @@
+
+{
+    % A1c.488: Forms of loop and loop constructs
+    % Author: Jasmeet Sidhu
+
+    % test the repeat loop by counting to ten
+    procedure count_to_ten
+    {
+        var i : integer
+        i := 1
+
+        repeat
+        {
+            write i
+        }
+        until (i > 10)
+    }
+
+
+    % test breaking out of loops using 'exit', 'exit' integer, 'return', and the condition itself
+    procedure wait_for_numbers(a : integer, b : integer, c : integer, d : integer)
+    {
+        var temp : integer
+        var running : boolean
+
+        running := true
+        while running do
+        {
+            read temp
+
+            if temp = a then
+            {
+                exit
+            }
+            else if temp = b then
+            {
+                exit 1
+            }
+            else if temp = c then
+            {
+                running := false
+            }
+            else if temp = d then
+            {
+                return
+            }
+        }
+    }
+
+    % test the 'return with' and conditional exit statements: 'exit when expression' and 'exit integer when expression'
+    function break_out_of_loop : boolean
+    {
+        var temp : integer
+        temp := 0
+
+        while true do
+        {
+            write "enter 1 or 2"
+
+            read temp
+
+            exit when (temp = 1)
+            exit 1 when (temp = 2)
+
+            if temp = 0 then
+                return with false
+        }
+
+        return with true
+    }
+
+    var i : boolean
+
+    count_to_ten
+    wait_for_numbers(1, 2, 3, 4)
+    i := break_out_of_loop
+}
