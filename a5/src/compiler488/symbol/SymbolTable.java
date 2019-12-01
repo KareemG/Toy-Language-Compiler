@@ -130,7 +130,7 @@ public class SymbolTable implements PrettyPrintable {
 		if (this.root != null) {
 			ScopeNode tmp = this.root;
 			this.root = root.GetParent();
-			this.root.AddArchive(tmp);
+			this.root.AddArchive(tmp.label, tmp);
 		}
 	}
 

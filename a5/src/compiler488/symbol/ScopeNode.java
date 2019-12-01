@@ -16,7 +16,7 @@ import compiler488.ast.type.*;
  */
 class ScopeNode implements PrettyPrintable {
     private Hashtable<String, Record> syms;
-    private ArrayList<ScopeNode> archive; // essentially children of given scope
+    private Hashtable<String, ScopeNode> archive; // essentially children of given scope
     private ScopeNode parent = null; // reference to parent
     protected String label = null; // scope node label (functions and procedures)
     protected Type type = null; // return type of the scope (for functions)
@@ -42,7 +42,7 @@ class ScopeNode implements PrettyPrintable {
     }
 
     private void Initialize() {
-        this.archive = new ArrayList<ScopeNode>();
+        this.archive = new Hashtable<String, ScopeNode>();
         this.syms = new Hashtable<>();
         this.lexicalLevel = 0;
         this.size = 0;
@@ -64,8 +64,8 @@ class ScopeNode implements PrettyPrintable {
         return this.syms.get(key);
     }
 
-    public void AddArchive(ScopeNode node) {
-        this.archive.add(node);
+    public void AddArchive(String label, ScopeNode node) {
+        this.archive.put(label, node);
     }
 
     public ScopeNode GetParent() {
@@ -114,7 +114,7 @@ class ScopeNode implements PrettyPrintable {
         p.exitBlock();
 
         // Print children ScopeNodes
-        for(ScopeNode child : archive) {
+        for(ScopeNode child : archive.values()) {
             child.prettyPrint(p);
         }
 
