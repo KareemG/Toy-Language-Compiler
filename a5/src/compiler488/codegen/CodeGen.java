@@ -232,14 +232,12 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(32, (s, self) -> {
 			assert(s.get(0) instanceof ScalarDecl);
 			// Store as UNDEFINED for now
-			this.intermediate_code.add(new IR(IR.PUSH, new IR.Operand(false, Machine.UNDEFINED)));
 			// TODO: Need to insert this param into symbol table
 		});
 
 		// C33 - Allocate storage for the return value of a function. Save address in
 		// symbol table.
 		actions.put(33, (s, self) -> {
-			this.intermediate_code.add(new IR(IR.PUSH, new IR.Operand(false, Machine.UNDEFINED)));
 		});
 
 		// C34 - Save entry point address of procedure or function in symbol table.
