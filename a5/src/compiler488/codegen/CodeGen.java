@@ -378,54 +378,63 @@ public class CodeGen extends ASTVisitor.Default {
 		// C60 - Emit instruction(s) to perform negation.
 		actions.put(60, (s, self) -> {
 			assert (s.get(0) instanceof UnaryMinusExpn);
-			writeMemory(startMSP++, Machine.NEG);
+			int operand = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.NEG, new IR.Operand(IR.Operand.REGISTER, (short) operand)));
 		});
 
 		// C61 - Emit instruction(s) to perform addition.
 		actions.put(61, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn);
-			writeMemory(startMSP++, Machine.ADD);
+			assert (s.get(0) instanceof  ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_PLUS));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.ADD, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C62 - Emit instruction(s) to perform subtraction.
 		actions.put(62, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn);
-			writeMemory(startMSP++, Machine.SUB);
+			assert (s.get(0) instanceof  ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_MINUS));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.SUB, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C63 - Emit instruction(s) to perform multiplication.
 		actions.put(63, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn);
-			writeMemory(startMSP++, Machine.MUL);
+			assert (s.get(0) instanceof  ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_TIMES));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.MUL, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C64 - Emit instruction(s) to perform division.
 		actions.put(64, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn);
-			writeMemory(startMSP++, Machine.DIV);
+			assert (s.get(0) instanceof  ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_DIVIDE));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.DIV, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C65 - Emit instruction(s) to perform logical not operation.
 		actions.put(65, (s, self) -> {
-			assert (s.get(0) instanceof BoolExpn || s.get(0) instanceof BoolConstExpn);
-			if (s.get(0) instanceof BoolExpn) {
-				writeMemory(startMSP++, Machine.MACHINE_FALSE);
-				writeMemory(startMSP++, Machine.EQ);
-			} else {
-				if (s.get(0).value) {
-					writeMemory(startMSP++, Machine.MACHINE_TRUE);
-				} else {
-					writeMemory(startMSP++, Machine.MACHINE_FALSE);
-				}
-			}
+			assert (s.get(0) instanceof NotExpn);
+			int operand = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.NOT, new IR.Operand(IR.Operand.REGISTER, (short) operand)));
 		});
 
 		// C66 - Emit instruction(s) to perform logical and operation.
 		actions.put(66, (s, self) -> {
+			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_AND));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.AND, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C67 - Emit instruction(s) to perform logical or operation.
 		actions.put(67, (s, self) -> {
+			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_OR));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.OR, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C68 - Emit instruction(s) to obtain address of parameter.
@@ -434,26 +443,55 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C69 - Emit instruction(s) to perform equality comparison.
 		actions.put(69, (s, self) -> {
+			assert (s.get(0) instanceof EqualsExpn && ((EqualsExpn) s.get(0)).getOpSymbol().equals(EqualsExpn.OP_EQUAL));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C70 - Emit instruction(s) to perform inequality comparison.
 		actions.put(70, (s, self) -> {
+			assert (s.get(0) instanceof EqualsExpn && ((EqualsExpn) s.get(0)).getOpSymbol().equals(EqualsExpn.OP_NOT_EQUAL));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
+			int target_register = this.reg_offset++;
+			this.intermediate_code.add(new IR(IR.ASSIGN, new IR.Operand(IR.Operand.REGISTER, (short) target_register),
+					new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
+			int operand = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.EQ, new IR.Operand(IR.Operand.REGISTER, (short) operand), new IR.Operand(IR.Operand.REGISTER, (short) target_register)));
 		});
 
 		// C71 - Emit instruction(s) to perform less than comparison.
 		actions.put(71, (s, self) -> {
+			assert (s.get(0) instanceof CompareExpn && ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_LESS));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.LT, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C72 - Emit instruction(s) to perform less than or equal comparison.
 		actions.put(72, (s, self) -> {
+			assert (s.get(0) instanceof CompareExpn && ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_LESS_EQUAL));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.LEQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C73 - Emit instruction(s) to perform greater than comparison.
 		actions.put(73, (s, self) -> {
+			assert (s.get(0) instanceof CompareExpn && ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.GT, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C74 - Emit instruction(s) to perform greater than or equal comparison.
 		actions.put(74, (s, self) -> {
+			assert (s.get(0) instanceof CompareExpn && ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER_EQUAL));
+			int rhs = result_stack.pop();
+			int lhs = result_stack.pop();
+			this.intermediate_code.add(new IR(IR.GEQ, new IR.Operand(IR.Operand.REGISTER, (short) lhs), new IR.Operand(IR.Operand.REGISTER, (short) rhs)));
 		});
 
 		// C75 - Emit instruction(s) to obtain address of variable.
@@ -872,5 +910,71 @@ public class CodeGen extends ASTVisitor.Default {
 	@Override
 	public void visit(ExitStmt stmt) {
 		generateCode(stmt.getExpn() == null ? 48 : 57, stmt);
+	}
+
+	@Override
+	public void visitLeave(UnaryMinusExpn expn) {
+		generateCode(60, expn);
+	}
+
+	@Override
+	public void visitLeave(ArithExpn expn) {
+		switch(expn.getOpSymbol()) {
+			case ArithExpn.OP_PLUS:
+				generateCode(61, expn);
+				break;
+			case ArithExpn.OP_MINUS:
+				generateCode(62, expn);
+				break;
+			case ArithExpn.OP_TIMES:
+				generateCode(63, expn);
+				break;
+			case ArithExpn.OP_DIVIDE:
+				generateCode(64, expn);
+				break;
+		}
+	}
+
+	@Override
+	public void visitLeave(NotExpn expn) {
+		generateCode(65, expn);
+	}
+
+	@Override
+	public void visitLeave(BoolExpn expn) {
+		if (expn.getOpSymbol().equals(BoolExpn.OP_AND)) {
+			generateCode(66, expn);
+		}
+		else {
+			generateCode(67, expn);
+		}
+	}
+
+	@Override
+	public void visitLeave(EqualsExpn expn) {
+		if (expn.getOpSymbol().equals(EqualsExpn.OP_EQUAL)) {
+			generateCode(69, expn);
+		}
+		else {
+			generateCode(70, expn);
+		}
+	}
+
+	@Override
+	public void visitLeave(CompareExpn expn) {
+		switch(expn.getOpSymbol()) {
+			case CompareExpn.OP_LESS:
+				generateCode(71, expn);
+				break;
+			case CompareExpn.OP_LESS_EQUAL:
+				generateCode(72, expn);
+				break;
+			case CompareExpn.OP_GREATER:
+				generateCode(73, expn);
+				break;
+			case CompareExpn.OP_GREATER_EQUAL:
+				generateCode(74, expn);
+				break;
+		}
 	}
 }
