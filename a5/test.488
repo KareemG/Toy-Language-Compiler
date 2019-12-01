@@ -1,10 +1,6 @@
 {
-    var i : integer
-    i := 0
-
-    while i < 10 do
-    {
-        write i, newline
-        i := i + 1
-    }
+    write "10 - 12 = ", 10 - 12, newline
+    write "12 - 10 = ", 12 - 10, newline
+    write "2 / 4 = ", 2 / 4, newline
+    write "4 / 2 = ", 4 / 2, newline
 }
