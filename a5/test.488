@@ -3,13 +3,14 @@
     a := 1
 
     repeat
-    {
-        repeat
+        while true do
         {
-            write "hello world"
+            write "repeat"
             exit 2 when true
         }
-        until false
-    }
     until false
+
+    write newline
+
+    write "end"
 }
