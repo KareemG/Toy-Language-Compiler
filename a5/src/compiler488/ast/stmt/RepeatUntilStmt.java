@@ -26,11 +26,11 @@ public class RepeatUntilStmt extends LoopingStmt {
 	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visitEnter(this);
-		this.expn.accept(visitor);
 		ListIterator<Stmt> bod_lst = body.listIterator();
 		while (bod_lst.hasNext()) {
 			bod_lst.next().accept(visitor);
 		}
+		this.expn.accept(visitor);
 		visitor.visitLeave(this);
 	}
 }

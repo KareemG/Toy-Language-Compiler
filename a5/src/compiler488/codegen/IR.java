@@ -24,15 +24,21 @@ public class IR
 	public static final short SET_DISPLAY = 20;
 	public static final short HALT = 21;
 	public static final short ASSIGN = 22;
-	public static final short PATCH_TRUE = 23;
-	public static final short PATCH_FALSE = 24;
+	public static final short PATCH_BT = 23;
+	public static final short PATCH_BF = 24;
+	public static final short PATCH_BR = 25;
+	public static final short LOOP_START = 26;
+	public static final short REPEAT = 27;
+	public static final short COND_REPEAT = 28;
+	public static final short EXIT = 29;
+	public static final short COND_EXIT = 30;
+	public static final short PATCH_EXIT_LIST = 31;
 	
 	public static class Operand
 	{
 		public static final int NONE = 0x00000000;
 		public static final int REGISTER = 0x00010000;
-		public static final int PATCH_TRUE = 0x00020000;
-		public static final int PATCH_FALSE = 0x00040000;
+		public static final int PATCH = 0x00020000;
 
 		private int value;
 
@@ -41,28 +47,15 @@ public class IR
 			this.value = flags | ((int) value);
 		}
 
-		public boolean is_register()
-		{
+		public boolean is_register() {
 			return (this.value & REGISTER) != 0;
 		}
 
-		public boolean needs_true_patch()
-		{
-			return (this.value & PATCH_TRUE) != 0;
+		public boolean needs_patch() {
+			return (this.value & PATCH) != 0;
 		}
 
-		public boolean needs_false_patch()
-		{
-			return (this.value & PATCH_FALSE) != 0;
-		}
-
-		public boolean needs_patch()
-		{
-			return needs_true_patch() || needs_false_patch();
-		}
-
-		public short get_value()
-		{
+		public short get_value() {
 			return (short) (this.value & 0x0000FFFF);
 		}
 	}

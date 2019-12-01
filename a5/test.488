@@ -1,10 +1,16 @@
 {
     var a : integer
     a := 1
-    write "hello", " ", "world"
 
-    if true then
-        write "true"
-    else
-        write "false"
+    repeat
+        while true do
+        {
+            write "repeat"
+            exit 2 when true
+        }
+    until false
+
+    write newline
+
+    write "end"
 }
