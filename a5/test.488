@@ -1,12 +1,10 @@
 {
-    var a, b, c, d : integer
-    a := 1
-    b := 2
-    c := 3
-    d := a + b * c
+    var i : integer
+    i := 0
 
-    if not (d = -7) and true then
-        write "pass"
-    else
-        write "fail"
+    while i < 10 do
+    {
+        write i, newline
+        i := i + 1
+    }
 }

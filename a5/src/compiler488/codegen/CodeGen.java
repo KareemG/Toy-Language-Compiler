@@ -322,8 +322,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C51 - Emit code to print an integer expression.
 		actions.put(51, (s, self) -> {
 			assert (s.get(0) instanceof PrintExpn);
-			this.intermediate_code
-					.add(new IR(Machine.PRINTI, new IR.Operand(IR.Operand.REGISTER, result_stack.pop().shortValue())));
+			this.intermediate_code.add(new IR(IR.PRINTI, new IR.Operand(IR.Operand.REGISTER, result_stack.pop().shortValue())));
 
 		});
 
