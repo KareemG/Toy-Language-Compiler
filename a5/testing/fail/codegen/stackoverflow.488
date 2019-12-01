@@ -1,0 +1,15 @@
+{
+	% stackoverflow.488: checks if error occurs when recursively calling too many times
+	% Author: KyoKeun Park
+
+	function foo : integer
+	{
+		var x : integer
+		x := foo
+		return with x
+	}
+
+	var y : integer
+
+	y := foo
+}

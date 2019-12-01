@@ -16,6 +16,12 @@ repeat-until.488: similar to "single-loop.488" test, but uses repeat-until forma
 FAILING TEST CASES
 ==================
 
+CODEGEN
+-------
+no-assign.488 		: we should not be allowed to use a variable without assigning a value. This test checks for that
+stackoverflow.488 	: an infinite recursive call should lead to stackoverflow
+zero-division.488 	: dividing a value by zero should lead to an error
+
 SEMANTICS (from A3)
 -------------------
 add_bools.488                 : test that adding two booleans fail
