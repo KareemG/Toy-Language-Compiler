@@ -29,6 +29,9 @@ public class IR
 	public static final short LOOP_START = 25;
 	public static final short REPEAT = 26;
 	public static final short COND_REPEAT = 27;
+	public static final short EXIT = 28;
+	public static final short COND_EXIT = 29;
+	public static final short PATCH_EXIT_LIST = 30;
 	
 	public static class Operand
 	{
