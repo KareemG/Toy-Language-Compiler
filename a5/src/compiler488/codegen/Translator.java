@@ -408,8 +408,8 @@ public class Translator
 
     private void eq(short op1, short op2)
     {
-        load((short) 0, op2);
         load((short) 0, op1);
+        load((short) 0, op2);
         append(Machine.EQ);
     }
 
@@ -433,29 +433,29 @@ public class Translator
 
     private void add(short op1, short op2)
     {
-        load((short) 0, op2);
         load((short) 0, op1);
+        load((short) 0, op2);
         append(Machine.ADD);
     }
 
     private void sub(short op1, short op2)
     {
-        load((short) 0, op2);
         load((short) 0, op1);
+        load((short) 0, op2);
         append(Machine.SUB);
     }
 
     private void mul(short op1, short op2)
     {
-        load((short) 0, op2);
         load((short) 0, op1);
+        load((short) 0, op2);
         append(Machine.MUL);
     }
 
     private void div(short op1, short op2)
     {
-        load((short) 0, op2);
         load((short) 0, op1);
+        load((short) 0, op2);
         append(Machine.DIV);
     }
 
