@@ -5,13 +5,13 @@ A1a.488 	: test case from assignment 1, modified to work in assignment 3.
 		  operation.
 A1b.488 	: test case from assignment 1, modified to work in assignment 3.
 		  declaration of arrays and then assigning values to the array.
-A1c.488 	: test case from assignment 1, modified to work in assignment 3.
-		  procedures and functions with loop constructs
 A1d.488 	: test case from assignment 1, modified to work in assignment 3.
 		  series of functions and procedures which calls different
 		  functions and procedures.
 A1e.488 	: test case from assignment 1, modified to work in assignment 3.
 		  series of recursive functions and procedures call
+single-loop.488 : test to see that simple loop and while loop condition is working as intended
+repeat-until.488: similar to "single-loop.488" test, but uses repeat-until format
 
 FAILING TEST CASES
 ==================

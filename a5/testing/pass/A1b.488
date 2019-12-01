@@ -30,4 +30,6 @@
 
     g[1] := true
     g[2] := false
+
+    write "Result: ", a[1], " ", a[2], " ", a[3], " ", e[1,1], " ", e[1,2], newline
 }
