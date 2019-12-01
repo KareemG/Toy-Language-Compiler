@@ -1,0 +1,8 @@
+{
+	% int-underflow.488: test to see if integer underflow leads to error
+	% Author: KyoKeun Park
+
+	int i : integer
+	i := -32767 % min integer we can represent
+	i := i - 1 % should cause error here
+}

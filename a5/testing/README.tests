@@ -10,6 +10,9 @@ A1d.488 	: test case from assignment 1, modified to work in assignment 3.
 		  functions and procedures.
 A1e.488 	: test case from assignment 1, modified to work in assignment 3.
 		  series of recursive functions and procedures call
+loop-exit.488 	: similar to "single-loop.488" test, but exits out of loop with "exit when"
+		  condition rather than the loop condition
+simple-if.488 	: test the correctness of if condition check and proper branching
 single-loop.488 : test to see that simple loop and while loop condition is working as intended
 repeat-until.488: similar to "single-loop.488" test, but uses repeat-until format
 
@@ -18,6 +21,8 @@ FAILING TEST CASES
 
 CODEGEN
 -------
+int-overflow.488 	: test to see if program errors when integer overflow occurs
+int-underflow.488 	: test to see if program errors when integer underflow occurs
 no-assign.488 		: we should not be allowed to use a variable without assigning a value. This test checks for that
 stackoverflow.488 	: an infinite recursive call should lead to stackoverflow
 zero-division.488 	: dividing a value by zero should lead to an error
