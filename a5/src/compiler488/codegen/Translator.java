@@ -68,7 +68,7 @@ public class Translator
 
 		// allocating space for all registers:
 		append(Machine.PUSH); // we will be filling the register space with zeroes
-		append((short) 0);
+		append(Machine.UNDEFINED);
 		append(Machine.PUSH); // we have 'reg_offset' registers
 		append((short) num_registers);
 		append(Machine.DUPN); // perform the fill
@@ -106,11 +106,11 @@ public class Translator
 
                 case IR.ASSIGN:
                 {
-                    addr((short) 0, ir.op1.get_value());
+                    addr(ir.op1.get_lexical_level(), ir.op1.get_value());
                     if(!ir.op2.is_register()) {
                         push(ir.op2.get_value());
                     } else {
-                        load((short) 0, ir.op2.get_value());
+                        load(ir.op2.get_lexical_level(), ir.op2.get_value());
                     }
                     store();
                     break;
@@ -213,13 +213,13 @@ public class Translator
 
                 case IR.OR:
                 {
-                    boolean_or(ir.op1.get_value(), ir.op2.get_value(), ir.op3.get_value());
+                    boolean_or(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value(), ir.op3.get_lexical_level(), ir.op3.get_value());
                     break;
                 }
 
                 case IR.AND:
                 {
-                    boolean_and(ir.op1.get_value(), ir.op2.get_value(), ir.op3.get_value());
+                    boolean_and(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value(), ir.op3.get_lexical_level(), ir.op3.get_value());
                     break;
                 }
 
@@ -237,16 +237,16 @@ public class Translator
                     addr((short) 0, ir.op3.get_value());
                     switch(ir.opcode)
                     {
-                        case IR.LT:  { lt(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.GT:  { gt(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.EQ:  { eq(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.LEQ: { leq(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.GEQ: { geq(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.NEQ: { neq(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.ADD: { add(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.SUB: { sub(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.MUL: { mul(ir.op1.get_value(), ir.op2.get_value()); break; }
-                        case IR.DIV: { div(ir.op1.get_value(), ir.op2.get_value()); break; }
+                        case IR.LT:  { lt(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.GT:  { gt(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.EQ:  { eq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.LEQ: { leq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.GEQ: { geq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.NEQ: { neq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.ADD: { add(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.SUB: { sub(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.MUL: { mul(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.DIV: { div(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
                     }
                     append(Machine.STORE);
                     break;
@@ -392,93 +392,93 @@ public class Translator
         append(Machine.BF);
     }
 
-    private void lt(short op1, short op2)
+    private void lt(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.LT);
     }
 
-    private void gt(short op1, short op2)
+    private void gt(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op2);
-        load((short) 0, op1);
+        load(ll2, op2);
+        load(ll1, op1);
         append(Machine.LT);
     }
 
-    private void eq(short op1, short op2)
+    private void eq(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.EQ);
     }
 
-    private void geq(short op1, short op2)
+    private void geq(short ll1, short op1, short ll2, short op2)
     {
-        lt(op1, op2);
+        lt(ll1, op1, ll2, op2);
         negate();
     }
 
-    private void leq(short op1, short op2)
+    private void leq(short ll1, short op1, short ll2, short op2)
     {
-        gt(op1, op2);
+        gt(ll1, op1, ll2, op2);
         negate();
     }
 
-    private void neq(short op1, short op2)
+    private void neq(short ll1, short op1, short ll2, short op2)
     {
-        eq(op1, op2);
+        eq(ll1, op1,  ll2, op2);
         negate();
     }
 
-    private void add(short op1, short op2)
+    private void add(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.ADD);
     }
 
-    private void sub(short op1, short op2)
+    private void sub(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.SUB);
     }
 
-    private void mul(short op1, short op2)
+    private void mul(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.MUL);
     }
 
-    private void div(short op1, short op2)
+    private void div(short ll1, short op1, short ll2, short op2)
     {
-        load((short) 0, op1);
-        load((short) 0, op2);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.DIV);
     }
 
-    private void boolean_or(short op1, short op2, short target)
+    private void boolean_or(short ll1, short op1, short ll2, short op2, short target_ll, short target)
     {
-        addr((short) 0, target);
-        load((short) 0, op1);
-        load((short) 0, op2);
+        addr(target_ll, target);
+        load(ll1, op1);
+        load(ll2, op2);
         append(Machine.OR);
         append(Machine.STORE);
     }
 
-    private void boolean_and(short op1, short op2, short target)
+    private void boolean_and(short ll1, short op1, short ll2, short op2, short target_ll, short target)
     {
         // using De Morgan's law
-        addr((short) 0, target);
+        addr(target_ll, target);
 
         // not A
-        load((short) 0, op1);
+        load(ll1, op1);
         negate();
 
         // not B
-        load((short) 0, op2);
+        load(ll2, op2);
         negate();
 
         append(Machine.OR);

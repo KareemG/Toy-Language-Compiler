@@ -38,14 +38,15 @@ public class IR
 	public static class Operand
 	{
 		public static final int NONE = 0x00000000;
-		public static final int REGISTER = 0x00010000;
-		public static final int PATCH = 0x00020000;
+		public static final int REGISTER = 0x00100000;
+		public static final int PATCH = 0x00200000;
+		public static final int LEXICAL_LEVEL = 0x000F0000;
 
 		private int value;
 
-		public Operand(int flags, short value)
+		public Operand(int flags, int ll, int value)
 		{
-			this.value = flags | ((int) value);
+			this.value = flags | ((ll & 0xF) << 16) | value;
 		}
 
 		public boolean is_register() {
@@ -54,6 +55,10 @@ public class IR
 
 		public boolean needs_patch() {
 			return (this.value & PATCH) != 0;
+		}
+
+		public short get_lexical_level() {
+			return (short) ((this.value & LEXICAL_LEVEL) >> 16);
 		}
 
 		public short get_value() {
