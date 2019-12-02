@@ -1,6 +1,6 @@
 {
 	% simple-func.488: call to a simple function to check that
-			   function call is working as intended
+	% 		   function call is working as intended
 	% Author: KyoKeun Park
 
 	function foo : integer

@@ -14,7 +14,7 @@
 	c := ( i = 0 or j = 1 or k = 3 ) % should be true
 
 	if (a and not b and c) then
-		write "Result: pass"
+		write "Result: pass", newline
 	else
-		write "Result: fail"
+		write "Result: fail", newline
 }

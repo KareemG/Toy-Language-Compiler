@@ -2,9 +2,9 @@
 	% simple-proc.488: check for correctness of procedure call
 	% Author: KyoKeun Park
 
-	procedure foo()
+	procedure foo
 	{
-		write "Result: pass"
+		write "Result: pass", newline
 	}
 
 	foo
