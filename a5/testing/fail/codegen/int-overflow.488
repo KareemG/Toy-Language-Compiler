@@ -2,7 +2,7 @@
 	% int-overflow.488: test to see if integer overflow leads to error
 	% Author: KyoKeun Park
 
-	int i : integer
+	var i : integer
 	i := 32767 % max integer we can represent
 	i := i + 1 % should cause error here
 }

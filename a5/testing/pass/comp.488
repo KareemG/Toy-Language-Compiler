@@ -1,0 +1,21 @@
+{
+	% comp.488: comparison operations
+	% Author: KyoKeun Park
+
+	var i, j, k, l : integer
+	var a, b, c : boolean
+
+	i := 1
+	j := 2
+	k := 3
+	l := 1
+
+	a := i < j % should be true
+	b := k < j % should be false
+	c := i <= l % should be true
+
+	if ( a and not b and c ) then
+		write "Result: pass"
+	else
+		write "Result: fail"
+}

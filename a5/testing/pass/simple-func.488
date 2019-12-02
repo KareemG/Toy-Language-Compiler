@@ -1,0 +1,12 @@
+{
+	% simple-func.488: call to a simple function to check that
+			   function call is working as intended
+	% Author: KyoKeun Park
+
+	function foo : integer
+	{
+		return with 1
+	}
+
+	write "Result: ", foo, newline
+}

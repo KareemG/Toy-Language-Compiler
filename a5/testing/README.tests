@@ -10,11 +10,17 @@ A1d.488 	: test case from assignment 1, modified to work in assignment 3.
 		  functions and procedures.
 A1e.488 	: test case from assignment 1, modified to work in assignment 3.
 		  series of recursive functions and procedures call
+comp.488 	: series of comparison operations tested for correctness
+cond-expr.488 	: check to see if conditional expression is working as intended
 loop-exit.488 	: similar to "single-loop.488" test, but exits out of loop with "exit when"
 		  condition rather than the loop condition
-simple-if.488 	: test the correctness of if condition check and proper branching
-single-loop.488 : test to see that simple loop and while loop condition is working as intended
+nested-loop.488 : check correctness of nested loops
+or.488 		: checks correctness of "or" operation
 repeat-until.488: similar to "single-loop.488" test, but uses repeat-until format
+simple-func.488 : check correctness of function call procedure with simple function
+simple-if.488 	: test the correctness of if condition check and proper branching
+simple-proc.488 : check correctness of procedure call procedure with simple procedure
+single-loop.488 : test to see that simple loop and while loop condition is working as intended
 
 FAILING TEST CASES
 ==================
