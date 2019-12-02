@@ -36,10 +36,10 @@
 
     function f3 : integer
     {
-        return with f1(1000)
+        return with f1(10)
     }
 
     proc3
     proc(1, 2)
-    write f3
+    write "Result: ", f3, newline
 }
