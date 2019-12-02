@@ -31,4 +31,5 @@
 
 	PrintHelloWorld
 	PrintCourseGreeting
+	write "Result: ", GetCourseCode(true), newline
 }

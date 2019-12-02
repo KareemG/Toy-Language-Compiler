@@ -12,12 +12,15 @@ A1e.488 	: test case from assignment 1, modified to work in assignment 3.
 		  series of recursive functions and procedures call
 comp.488 	: series of comparison operations tested for correctness
 cond-expr.488 	: check to see if conditional expression is working as intended
+fmulti-param.488: check correctness for function with multiple parameters
 func-param.488 	: similar to "simple-func" but with function with parameter
 loop-exit.488 	: similar to "single-loop.488" test, but exits out of loop with "exit when"
 		  condition rather than the loop condition
 nested-func.488 : check correctness of calling function within another function
 nested-loop.488 : check correctness of nested loops
 or.488 		: checks correctness of "or" operation
+pmulti-param.488: check correctness for procedure with multiple parameters
+proc-param.488 	: similar to "simple-proc" but with procedure with parameter
 recurse-func.488: check correctness of recursive function call
 recurse-proc.488: check correctness of recursive procedure call
 repeat-until.488: similar to "single-loop.488" test, but uses repeat-until format
