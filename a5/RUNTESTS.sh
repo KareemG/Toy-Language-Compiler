@@ -2,14 +2,6 @@
 
 STATUS=1
 
-declare -i PASSED=0
-declare -i FAILED=0
-
-declare -a pARRAY
-declare -a fARRAY
-declare -i pARRCOUNT=0
-declare -i fARRCOUNT=0
-
 function runpassing()
 {
 	path="./testing/pass"
@@ -20,20 +12,20 @@ function runpassing()
 		test_name="${test_name%.488}"
 		output="$(./RUNCOMPILER.sh "${path}/${test_name}.488" 2> /dev/null | grep "Result")"
 
-		echo -n "${test_name}.488: "
 		if [ "$output" ]
 		then
 			if [ "$(grep "$output" "${path}/${test_name}.out")" ]
 			then
-				echo "PASS"
+				echo -n "PASS: "
 			else
 				STATUS=0
-				echo "FAIL"
+				echo -n "FAIL: "
 			fi
 		else
 			STATUS=0
-			echo "FAIL"
+			echo -n "FAIL: "
 		fi
+		echo "${test_name}.488"
 	done
 }
 
@@ -48,14 +40,14 @@ function runcodegen()
 		test_name="${test_name%.488}"
 		output="$(./RUNCOMPILER.sh "${path}/${test_name}.488" 2>&1 | grep "Execution Error")"
 
-		echo -n "${test_name}.488: "
 		if [ "$output" ]
 		then
-			echo "PASS"
+			echo -n "PASS: "
 		else
 			STATUS=0
-			echo "FAIL"
+			echo -n "FAIL: "
 		fi
+		echo "${test_name}.488"
 	done
 
 }
@@ -71,14 +63,14 @@ function runsemantics()
 		test_name="${test_name%.488}"
 		output="$(./RUNCOMPILER.sh "${path}/${test_name}.488" 2>&1 | grep "Exception during Semantic Analysis")"
 
-		echo -n "${test_name}.488: "
 		if [ "$output" ]
 		then
-			echo "PASS"
+			echo -n "PASS: "
 		else
 			STATUS=0
-			echo "FAIL"
+			echo -n "FAIL: "
 		fi
+		echo "${test_name}.488"
 	done
 }
 
@@ -93,14 +85,14 @@ function runsyntax()
 		test_name="${test_name%.488}"
 		output="$(./RUNCOMPILER.sh "${path}/${test_name}.488" 2>&1 | grep 'Syntax error\|Exception')"
 
-		echo -n "${test_name}.488: "
 		if [ "$output" ]
 		then
-			echo "PASS"
+			echo -n "PASS: "
 		else
 			STATUS=0
-			echo "FAIL"
+			echo -n "FAIL: "
 		fi
+		echo "${test_name}.488"
 	done
 }
 
