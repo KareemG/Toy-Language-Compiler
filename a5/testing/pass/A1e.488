@@ -28,7 +28,7 @@
 
     procedure proc3
     {
-        write "hello world"
+        write "hello world", newline
         proc(3, 4)
 
         return

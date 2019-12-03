@@ -2,7 +2,7 @@
 	% recurse-func.488: check correctness of recursive function call
 	% Author: KyoKeun Park
 
-	foo ( i : integer ) : integer
+	function foo ( i : integer ) : integer
 	{
 		if ( i = 5 ) then
 			return with 5
