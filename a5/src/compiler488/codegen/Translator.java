@@ -519,6 +519,22 @@ public class Translator
                     break;
                 }
 
+                case IR.READI:
+                {
+                    append(Machine.ADDR);
+                    append(ir.op1.get_lexical_level());
+                    append(ir.op1.get_value());
+
+                    if(ir.op1.is_pointer())
+                    {
+                        append(Machine.LOAD);
+                    }
+
+                    append(Machine.READI);
+                    append(Machine.STORE);
+                    break;
+                }
+
                 default:
                 {
                     System.out.println("error: unknown intermediate instruction\n");

@@ -1,27 +1,8 @@
 {
-    var result : integer
+    var array [2 .. 4, 2 .. 4] : integer
 
-    function const (v : integer) : integer
-    {
-        return with v
-    }
-
-    function bar : integer
-    {
-        return with const(2)
-    }
-
-    procedure add(a : integer, b : integer)
-    {
-        result := a + b
-    }
-
-    procedure foo
-    {
-        add(2, 3)
-        result := result * bar
-    }
-
-    foo
-    write result
+    read array[2,2]
+    read array[3,3]
+    read array[4,4]
+    write array[2,2] + array[3,3] + array[4,4]
 }

@@ -512,6 +512,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C54 - Emit code to read one integer value and save it in a variable.
 		actions.put(54, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.READI, this.result_stack.pop()));
 		});
 
 		// C55 - Emit code to call a procedure with no arguments.
@@ -1193,6 +1194,21 @@ public class CodeGen extends ASTVisitor.Default {
 			generateCode(19, stmt);
 		} else {
 			generateCode(18, stmt);
+		}
+	}
+
+	@Override
+	public void visitLeave(ReadStmt stmt)
+	{
+		ASTList<ReadableExpn> inputs = stmt.getInputs();
+		ListIterator<ReadableExpn> it = inputs.listIterator();
+
+		while (it.hasNext())
+		{
+			ReadableExpn expn = it.next();
+			expn.accept(this);
+
+			generateCode(54, expn);
 		}
 	}
 }

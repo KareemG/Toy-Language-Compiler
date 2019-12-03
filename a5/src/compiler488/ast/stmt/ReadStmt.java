@@ -36,6 +36,6 @@ public class ReadStmt extends Stmt {
 		while (inps_lst.hasNext()) {
 			inps_lst.next().accept(visitor);
 		}
-		visitor.visitEnter(this);
+		visitor.visitLeave(this);
 	}
 }
