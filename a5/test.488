@@ -1,19 +1,9 @@
 {
-    var a, b, c, i : integer
-    a := 1
-    b := 2
-    c := 3
-    i := 0
+    var array[5, 5] : integer
 
-    while (i < 10) do
-    {
-        a := a + 1
-        i := i + 1
-    }
-
-    write "a = ", a, newline
-    write "b = ", b, newline
-    write "c = ", c, newline
-    write "i = ", i, newline
-    write "a + b * c = ", a + b * c, newline
+    array[1,1] := 1
+    array[2,2] := 2
+    array[3,3] := array[1,1] + array[2,2]
+    
+    write array[3,3]
 }

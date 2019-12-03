@@ -65,7 +65,11 @@ public class ArrayDeclPart extends DeclarationPart {
 	 * @return size of the array
 	 */
 	public int getSize() {
-		return (ub2 - lb2) * (ub1 - lb1);
+		int size = ub1 - lb1 + 1;
+		if (this.isTwoDimensional) {
+			size *= ub2 - lb2 + 1; 
+		}
+		return size;
 	}
 
 	public Integer getLowerBoundary1() {

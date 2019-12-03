@@ -34,23 +34,36 @@ public class IR
 	public static final short EXIT = 30;
 	public static final short COND_EXIT = 31;
 	public static final short PATCH_EXIT_LIST = 32;
-	
+	public static final short ADDRESS = 33;
+	public static final short INDEX = 34;
+	public static final short COND_ASSIGN = 35;
+
 	public static class Operand
 	{
 		public static final int NONE = 0x00000000;
 		public static final int REGISTER = 0x00100000;
 		public static final int PATCH = 0x00200000;
+		public static final int PTR = 0x00400000;
 		public static final int LEXICAL_LEVEL = 0x000F0000;
 
 		private int value;
 
-		public Operand(int flags, int ll, int value)
+		public Operand(int flags, int value) // used for constant
+		{
+			this(flags, 0, value);
+		}
+
+		public Operand(int flags, int ll, int value) // used for register
 		{
 			this.value = flags | ((ll & 0xF) << 16) | value;
 		}
 
 		public boolean is_register() {
 			return (this.value & REGISTER) != 0;
+		}
+
+		public boolean is_pointer() {
+			return (this.value & PTR) != 0;
 		}
 
 		public boolean needs_patch() {
@@ -70,6 +83,7 @@ public class IR
     public Operand op1;
     public Operand op2;
 	public Operand op3;
+	public Operand op4;
 
     public IR(short opcode)
     {
@@ -95,5 +109,14 @@ public class IR
         this.op1 = op1;
         this.op2 = op2;
         this.op3 = op3;
+	}
+
+	public IR(short opcode, Operand op1, Operand op2, Operand op3, Operand op4)
+    {
+        this.opcode = opcode;
+        this.op1 = op1;
+        this.op2 = op2;
+		this.op3 = op3;
+		this.op4 = op4;
 	}
 }

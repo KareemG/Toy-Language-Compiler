@@ -61,6 +61,7 @@ public interface ASTVisitor
     public void visitLeave(UnaryMinusExpn minusExpn);
 
     public void visit(IfStmt stmt);
+    public void visit(ConditionalExpn expn);
     public void visit(WhileDoStmt stmt);
 
     // ===== LEAF NODES ===== //
@@ -233,6 +234,10 @@ public interface ASTVisitor
 
         public void visit(WhileDoStmt stmt) {
             defaultVisit(stmt);
+        }
+
+        public void visit(ConditionalExpn expn) {
+            defaultVisit(expn);
         }
 
         // ===== LEAF NODES ===== //
