@@ -288,7 +288,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 			short offset1 = decl.getLowerBoundary1().shortValue();
 			short offset2 = decl.getLowerBoundary2().shortValue();
-			short stride  = (short) (decl.getUpperBoundary2() - decl.getLowerBoundary2() + 1);
+			short stride  = (short) (decl.getUpperBoundary1() - decl.getLowerBoundary1() + 1);
 
 			this.map.insert(decl.getName(), new SymbolMap.Array2D(offset, offset1, offset2, stride));
 		});
@@ -610,8 +610,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index));
 			if(array.offset != 0) {
-				IR instr = new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index);
-				this.intermediate_code.add(instr);
+				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index));
 			}
 
 			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));
