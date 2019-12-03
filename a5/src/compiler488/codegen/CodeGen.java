@@ -407,7 +407,9 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(60, (s, self) -> {
 			assert (s.get(0) instanceof UnaryMinusExpn);
 			IR.Operand operand = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.NEG, operand));
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(new IR(IR.NEG, operand, result));
+			this.result_stack.push(result);
 		});
 
 		// C61 - Emit instruction(s) to perform addition.
@@ -446,7 +448,9 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(65, (s, self) -> {
 			assert (s.get(0) instanceof NotExpn);
 			IR.Operand operand = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.NOT, operand, new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register())));
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(new IR(IR.NOT, operand, result));
+			this.result_stack.add(result);
 		});
 
 		// C66 - Emit instruction(s) to perform logical and operation.
@@ -606,7 +610,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index));
 			if(array.offset != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index));
+				IR instr = new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index);
+				this.intermediate_code.add(instr);
 			}
 
 			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));

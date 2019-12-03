@@ -74,7 +74,7 @@ public class Translator
 		append(Machine.DUPN); // perform the fill
     }
 
-    public String print(IR.Operand op)
+    public static String print(IR.Operand op)
     {
         String str = "null";
         if(op != null)
@@ -97,7 +97,7 @@ public class Translator
         return str;
     }
 
-    public void print(IR ir)
+    public static void print(IR ir)
     {
         String op = "unknown";
         switch(ir.opcode)

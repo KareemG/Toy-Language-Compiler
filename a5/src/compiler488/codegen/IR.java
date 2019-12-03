@@ -40,42 +40,44 @@ public class IR
 
 	public static class Operand
 	{
-		public static final int NONE = 0x00000000;
-		public static final int REGISTER = 0x00100000;
-		public static final int PATCH = 0x00200000;
-		public static final int PTR = 0x00400000;
-		public static final int LEXICAL_LEVEL = 0x000F0000;
+		public static final short NONE = 0x0000;
+		public static final short REGISTER = 0x0010;
+		public static final short PATCH = 0x0020;
+		public static final short PTR = 0x0040;
+		public static final short LEXICAL_LEVEL = 0x000F;
 
-		private int value;
+		private short flags;
+		private short value;
 
-		public Operand(int flags, int value) // used for constant
+		public Operand(short flags, short value) // used for constant
 		{
-			this(flags, 0, value);
+			this(flags, (short) 0, value);
 		}
 
-		public Operand(int flags, int ll, int value) // used for register
+		public Operand(short flags, short ll, short value) // used for register
 		{
-			this.value = flags | ((ll & 0xF) << 16) | value;
+			this.flags = (short) (flags | (ll & 0xF));
+			this.value = value;
 		}
 
 		public boolean is_register() {
-			return (this.value & REGISTER) != 0;
+			return (this.flags & REGISTER) != 0;
 		}
 
 		public boolean is_pointer() {
-			return (this.value & PTR) != 0;
+			return (this.flags & PTR) != 0;
 		}
 
 		public boolean needs_patch() {
-			return (this.value & PATCH) != 0;
+			return (this.flags & PATCH) != 0;
 		}
 
 		public short get_lexical_level() {
-			return (short) ((this.value & LEXICAL_LEVEL) >> 16);
+			return (short) (this.flags & LEXICAL_LEVEL);
 		}
 
 		public short get_value() {
-			return (short) (this.value & 0x0000FFFF);
+			return this.value;
 		}
 	}
 
