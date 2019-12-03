@@ -73,11 +73,82 @@ public class Translator
 		append((short) num_registers);
 		append(Machine.DUPN); // perform the fill
     }
+
+    public String print(IR.Operand op)
+    {
+        String str = "null";
+        if(op != null)
+        {
+            str = "(";
+
+            if(op.is_pointer()) {
+                str += "PTR";
+            } else if(op.is_register()) {
+                str += "REGISTER";
+            } else if(op.needs_patch()) {
+                str += "PATCH";
+            } else {
+                str += "NONE";
+            }
+
+            str += ", " + op.get_lexical_level() + ", " + op.get_value() + ")";
+        }
+        
+        return str;
+    }
+
+    public void print(IR ir)
+    {
+        String op = "unknown";
+        switch(ir.opcode)
+        {
+            case IR.NEG: op = "NEG"; break;
+            case IR.ADD: op = "ADD"; break;
+            case IR.SUB: op = "SUB"; break;
+            case IR.MUL: op = "MUL"; break;
+            case IR.DIV: op = "DIV"; break;
+            case IR.EQ: op = "EQ"; break;
+            case IR.NEQ: op = "NEQ"; break;
+            case IR.LT: op = "LT"; break;
+            case IR.GT: op = "GT"; break;
+            case IR.LEQ: op = "LEQ"; break;
+            case IR.GEQ: op = "GEQ"; break;
+            case IR.AND: op = "AND"; break;
+            case IR.OR: op = "OR"; break;
+            case IR.NOT: op = "NOT"; break;
+            case IR.READI: op = "READI"; break;
+            case IR.PRINTI: op = "PRINTI"; break;
+            case IR.PRINTC: op = "PRINTC"; break;
+            case IR.BR: op = "BR"; break;
+            case IR.BT: op = "BT"; break;
+            case IR.BF: op = "BF"; break;
+            case IR.SET_DISPLAY: op = "SET_DISPLAY"; break;
+            case IR.HALT: op = "HALT"; break;
+            case IR.ASSIGN: op = "ASSIGN"; break;
+            case IR.PATCH_BT: op = "PATCH_BT"; break;
+            case IR.PATCH_BF: op = "PATCH_BF"; break;
+            case IR.PATCH_BR: op = "PATCH_BR"; break;
+            case IR.LOOP_START: op = "LOOP_START"; break;
+            case IR.REPEAT: op = "REPEAT"; break;
+            case IR.COND_REPEAT: op = "COND_REPEAT"; break;
+            case IR.EXIT: op = "EXIT"; break;
+            case IR.COND_EXIT: op = "COND_EXIT"; break;
+            case IR.PATCH_EXIT_LIST: op = "PATCH_EXIT_LIST"; break;
+            case IR.ADDRESS: op = "ADDRESS"; break;
+            case IR.INDEX: op = "INDEX"; break;
+            case IR.COND_ASSIGN: op = "COND_ASSIGN"; break;
+            default: break;
+        }
+
+        System.out.println(String.format("(%s, %s, %s, %s, %s)", op, print(ir.op1), print(ir.op2), print(ir.op3), print(ir.op4)));
+    }
     
     public short translate() throws Exception
     {
         for(IR ir : this.intermediate_code)
         {
+            print(ir);
+
             switch(ir.opcode)
             {
                 case IR.SET_DISPLAY:
@@ -94,7 +165,7 @@ public class Translator
 
                 case IR.PRINTI:
                 {
-                    printi((short) 0, ir.op1.get_value());
+                    printi(ir.op1);
                     break;
                 }
 
@@ -106,13 +177,7 @@ public class Translator
 
                 case IR.ASSIGN:
                 {
-                    addr(ir.op1.get_lexical_level(), ir.op1.get_value());
-                    if(!ir.op2.is_register()) {
-                        push(ir.op2.get_value());
-                    } else {
-                        load(ir.op2.get_lexical_level(), ir.op2.get_value());
-                    }
-                    store();
+                    assign(ir.op1, ir.op2);
                     break;
                 }
 
@@ -213,13 +278,13 @@ public class Translator
 
                 case IR.OR:
                 {
-                    boolean_or(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value(), ir.op3.get_lexical_level(), ir.op3.get_value());
+                    boolean_or(ir.op1, ir.op2, ir.op3);
                     break;
                 }
 
                 case IR.AND:
                 {
-                    boolean_and(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value(), ir.op3.get_lexical_level(), ir.op3.get_value());
+                    boolean_and(ir.op1, ir.op2, ir.op3);
                     break;
                 }
 
@@ -234,21 +299,43 @@ public class Translator
                 case IR.MUL:
                 case IR.DIV:
                 {
-                    addr((short) 0, ir.op3.get_value());
+                    addr(ir.op3.get_lexical_level(), ir.op3.get_value()); // the target *must* be a register
                     switch(ir.opcode)
                     {
-                        case IR.LT:  { lt(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.GT:  { gt(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.EQ:  { eq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.LEQ: { leq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.GEQ: { geq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.NEQ: { neq(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.ADD: { add(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.SUB: { sub(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.MUL: { mul(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
-                        case IR.DIV: { div(ir.op1.get_lexical_level(), ir.op1.get_value(), ir.op2.get_lexical_level(), ir.op2.get_value()); break; }
+                        case IR.LT:  { lt(ir.op1, ir.op2); break; }
+                        case IR.GT:  { gt(ir.op1, ir.op2); break; }
+                        case IR.EQ:  { eq(ir.op1, ir.op2); break; }
+                        case IR.LEQ: { leq(ir.op1, ir.op2); break; }
+                        case IR.GEQ: { geq(ir.op1, ir.op2); break; }
+                        case IR.NEQ: { neq(ir.op1, ir.op2); break; }
+                        case IR.ADD: { add(ir.op1, ir.op2); break; }
+                        case IR.SUB: { sub(ir.op1, ir.op2); break; }
+                        case IR.MUL: { mul(ir.op1, ir.op2); break; }
+                        case IR.DIV: { div(ir.op1, ir.op2); break; }
                     }
                     append(Machine.STORE);
+                    break;
+                }
+
+                case IR.ADDRESS:
+                {
+                    addr(ir.op3.get_lexical_level(), ir.op3.get_value());
+                    addr(ir.op1.get_value(), ir.op2.get_value());
+                    append(Machine.STORE);
+                    break;
+                }
+
+                case IR.INDEX:
+                {
+                    addr(ir.op3.get_lexical_level(), ir.op3.get_value());
+                    add(ir.op1, ir.op2);
+                    append(Machine.STORE);
+                    break;
+                }
+
+                case IR.COND_ASSIGN:
+                {
+                    cond_assign(ir.op1, ir.op2, ir.op3, ir.op4);
                     break;
                 }
 
@@ -261,6 +348,39 @@ public class Translator
         }
 
         return this.wptr;
+    }
+
+    private void assign(IR.Operand lhs, IR.Operand rhs)
+    {
+        addr(lhs.get_lexical_level(), lhs.get_value());
+        if(lhs.is_pointer()) {
+            append(Machine.LOAD);
+        }
+
+        if(!rhs.is_register()) {
+            push(rhs.get_value());
+        } else {
+            load(rhs.get_lexical_level(), rhs.get_value());
+        }
+        
+        store();
+    }
+
+    private void cond_assign(IR.Operand cond, IR.Operand result, IR.Operand t_val, IR.Operand f_val)
+    {
+        load_operand(cond);
+        append(Machine.PUSH);
+        short false_branch = append((short) 0);
+        append(Machine.BF);
+
+        assign(result, t_val);
+        append(Machine.PUSH);
+        short true_branch = append((short) 0);
+        append(Machine.BR);
+
+        write(false_branch, this.wptr); // patch the false branch
+        assign(result, f_val);
+        write(true_branch, this.wptr);
     }
 
     private void set_display(short ptr)
@@ -277,9 +397,9 @@ public class Translator
         append(Machine.PRINTC);
     }
 
-    private void printi(short level, short reg)
+    private void printi(IR.Operand op)
     {
-        load(level, reg);
+        load_operand(op);
         append(Machine.PRINTI);
     }
 
@@ -392,93 +512,109 @@ public class Translator
         append(Machine.BF);
     }
 
-    private void lt(short ll1, short op1, short ll2, short op2)
+    private void load_operand(IR.Operand op)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        if(!op.is_register() && !op.is_pointer())
+        {
+            push(op.get_value());
+        }
+        else
+        {
+            load(op.get_lexical_level(), op.get_value());
+
+            if(op.is_pointer()) {
+                append(Machine.LOAD);
+            }
+        }
+    }
+
+    private void lt(IR.Operand op1, IR.Operand op2)
+    {
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.LT);
     }
 
-    private void gt(short ll1, short op1, short ll2, short op2)
+    private void gt(IR.Operand op1, IR.Operand op2)
     {
-        load(ll2, op2);
-        load(ll1, op1);
+        load_operand(op2);
+        load_operand(op1);
         append(Machine.LT);
     }
 
-    private void eq(short ll1, short op1, short ll2, short op2)
+    private void eq(IR.Operand op1, IR.Operand op2)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.EQ);
     }
 
-    private void geq(short ll1, short op1, short ll2, short op2)
+    private void geq(IR.Operand op1, IR.Operand op2)
     {
-        lt(ll1, op1, ll2, op2);
+        lt(op1, op2);
         negate();
     }
 
-    private void leq(short ll1, short op1, short ll2, short op2)
+    private void leq(IR.Operand op1, IR.Operand op2)
     {
-        gt(ll1, op1, ll2, op2);
+        gt(op1, op2);
         negate();
     }
 
-    private void neq(short ll1, short op1, short ll2, short op2)
+    private void neq(IR.Operand op1, IR.Operand op2)
     {
-        eq(ll1, op1,  ll2, op2);
+        eq(op1,  op2);
         negate();
     }
 
-    private void add(short ll1, short op1, short ll2, short op2)
+    private void add(IR.Operand op1, IR.Operand op2)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.ADD);
     }
 
-    private void sub(short ll1, short op1, short ll2, short op2)
+    private void sub(IR.Operand op1, IR.Operand op2)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.SUB);
     }
 
-    private void mul(short ll1, short op1, short ll2, short op2)
+    private void mul(IR.Operand op1, IR.Operand op2)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.MUL);
     }
 
-    private void div(short ll1, short op1, short ll2, short op2)
+    private void div(IR.Operand op1, IR.Operand op2)
     {
-        load(ll1, op1);
-        load(ll2, op2);
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.DIV);
     }
 
-    private void boolean_or(short ll1, short op1, short ll2, short op2, short target_ll, short target)
+    private void boolean_or(IR.Operand op1, IR.Operand op2, IR.Operand result)
     {
-        addr(target_ll, target);
-        load(ll1, op1);
-        load(ll2, op2);
+        addr(result.get_lexical_level(), result.get_value());
+        load_operand(op1);
+        load_operand(op2);
         append(Machine.OR);
         append(Machine.STORE);
     }
 
-    private void boolean_and(short ll1, short op1, short ll2, short op2, short target_ll, short target)
+    private void boolean_and(IR.Operand op1, IR.Operand op2, IR.Operand result)
     {
         // using De Morgan's law
-        addr(target_ll, target);
+        addr(result.get_lexical_level(), result.get_value());
 
         // not A
-        load(ll1, op1);
+        load_operand(op1);
         negate();
 
         // not B
-        load(ll2, op2);
+        load_operand(op2);
         negate();
 
         append(Machine.OR);
