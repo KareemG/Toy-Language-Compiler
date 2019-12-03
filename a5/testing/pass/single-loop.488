@@ -1,0 +1,12 @@
+{
+	% single-loop.488: test to see if simple loop works
+	% Author: KyoKeun Park
+
+	var i : integer
+	i := 0
+
+	while (i < 5) do
+		i := i + 1
+
+	write "Result: ", i, newline
+}

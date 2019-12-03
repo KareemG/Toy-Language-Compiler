@@ -18,6 +18,7 @@ public interface ASTVisitor
     public void visitLeave(Scope routine);
 
     public void visitEnter(RoutineDecl routine);
+    public void visit(RoutineDecl routine);
     public void visitLeave(RoutineDecl routine);
     public void visitEnter(MultiDeclarations decl);
     public void visitLeave(MultiDeclarations decl);
@@ -108,6 +109,9 @@ public interface ASTVisitor
         public void visitEnter(RoutineDecl routine) {
             defaultVisitEnter(routine);
         }
+	public void visit(RoutineDecl routine) {
+		defaultVisit(routine);
+	}
         public void visitLeave(RoutineDecl routine) {
             defaultVisitLeave(routine);
         }

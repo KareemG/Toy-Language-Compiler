@@ -130,6 +130,7 @@ public class RoutineDecl extends Declaration {
 		if (this.type != null) {
 			this.type.accept(visitor);
 		}
+		visitor.visit(this);
 		while(param_lst.hasNext()) {
 			param_lst.next().accept(visitor);
 		}

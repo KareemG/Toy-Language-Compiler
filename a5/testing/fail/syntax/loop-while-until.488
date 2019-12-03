@@ -1,0 +1,6 @@
+% mixing up 'while' keyword with 'until' keyword, which is not allowed
+{
+	while 1
+		write "hello world"
+	until 1		% syntax error
+}

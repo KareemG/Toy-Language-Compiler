@@ -150,6 +150,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C01 - Emit code to end program execution.
 		actions.put(1, (s, self) -> {
 			assert (s.get(0) instanceof Program);
+
 			this.intermediate_code.add(
 				new IR(IR.PATCH_ALLOCATE,
 					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
@@ -171,6 +172,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C03 - Emit code (if any) to enter an ordinary scope.
 		actions.put(3, (s, self) -> {
 			this.intermediate_code.add(new IR(IR.ALLOCATE));
+
 			this.map.push_minor();
 		});
 
@@ -182,11 +184,13 @@ public class CodeGen extends ASTVisitor.Default {
 			this.intermediate_code.add(
 				new IR(IR.MINOR_CLEANUP,
 					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
+
 			this.map.pop();
 		});
 
 		// C10 - Emit code for the start of a function with no parameters.
 		actions.put(10, (s, self) -> {
+			 this.intermediate_code.add(new IR(IR.FUNCTION_SETUP));
 		});
 
 		// C11 - Emit code for the end of a function with no parameters.
@@ -292,6 +296,9 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C32 - Allocate storage for a parameter. Save address in symbol table.
 		actions.put(32, (s, self) -> {
+			assert (s.get(0) instanceof ScalarDeclPart);
+			ScalarDeclPart decl = (ScalarDeclPart) s.get(0);
+			this.map.insert(decl.getName(), new SymbolMap.Scalar(new_register()));
 		});
 
 		// C33 - Allocate storage for the return value of a function. Save address in
@@ -832,6 +839,57 @@ public class CodeGen extends ASTVisitor.Default {
 	public void visitLeave(Program prog) {
 		generateCode(1, prog);
 		generateCode(2, prog);
+	}
+
+	// ===== FUNCTION & PROCEDURE DECLARATIONS ===== //
+	@Override
+	public void visitEnter(RoutineDecl routine) {
+		generateCode(35, routine);
+		if(routine.getType() != null) { // Routine is a fucntion
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		} else { // Routine is a procedure
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		}
+	}
+	@Override
+	public void visit(RoutineDecl routine) {
+		generateCode(34, routine);
+		if(routine.getType() != null) {
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		} else {
+			if(routine.getParameters() != null) {
+			} else {
+			}
+		}
+	}
+	@Override
+	public void visitLeave(RoutineDecl routine) {
+		if(routine.getType() != null) { // Routine is a fucntion
+			if(routine.getParameters() != null) {
+				generateCode(13, routine);
+			} else {
+				generateCode(12, routine);
+			}
+		} else { // Routine is a procedure
+			if(routine.getParameters() != null) {
+				generateCode(17, routine);
+			} else {
+				generateCode(15, routine);
+			}
+		}
+		generateCode(36, routine);
+	}
+
+	@Override
+	public void visitLeave(ScalarDecl decl) {
+		generateCode(32, decl);
+		generateCode(24, decl);
 	}
 
 	@Override
