@@ -1,11 +1,14 @@
 {
-    % A1b.488: Forms of arrays
-    % Author: Jasmeet Brar
+    var a : integer
+    var b : integer
 
-    procedure hello_world
+    function add(a : integer, b : integer): integer
     {
-        write "hello world"
+        return with a + b
     }
 
-    hello_world
+    a := 10
+    b := 20
+
+    write add(1, 2)
 }

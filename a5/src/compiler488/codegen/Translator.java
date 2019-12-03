@@ -32,6 +32,7 @@ public class Translator
     private Stack<Short> frame_stack;
     private Stack<ArrayList<Short>> exit_stack;
     private Stack<Short> call_stack;
+    private Stack<ArrayList<Short>> return_stack;
 
     private HashMap<Short, Short> routine_map;
 
@@ -48,6 +49,7 @@ public class Translator
         this.exit_stack = new Stack<>();
         this.frame_stack = new Stack<>();
         this.call_stack = new Stack<>();
+        this.return_stack = new Stack<>();
 
         this.routine_map = new HashMap<Short, Short>();
     }
@@ -150,11 +152,13 @@ public class Translator
             case IR.PATCH_FRAME: op = "PATCH_FRAME"; break;
             case IR.FREE_FRAME: op = "FREE_FRAME"; break;
             case IR.UPDATE_DISPLAY: op = "UPDATE_DISPLAY"; break;
-            case IR.CALL_PROC: op = "CALL_PROC"; break;
-            case IR.CALL_FUNC: op = "CALL_FUNC"; break;
-            case IR.RET: op = "RET"; break;
-            case IR.INIT_FRAME: op = "INIT_FRAME"; break;
+            case IR.CALL_ROUTINE: op = "CALL_ROUTINE"; break;
+            case IR.RETURN: op = "RETURN"; break;
+            case IR.ROUTINE_RETURN: op = "ROUTINE_RETURN"; break;
+            case IR.INIT_FUNC_FRAME: op = "INIT_FUNC_FRAME"; break;
+            case IR.INIT_PROC_FRAME: op = "INIT_PROC_FRAME"; break;
             case IR.COPY: op = "COPY"; break;
+            case IR.ROUTINE_EXIT: op = "ROUTINE_EXIT"; break;
             default: break;
         }
 
@@ -360,6 +364,7 @@ public class Translator
                 case IR.ROUTINE_ENTRY:
                 {
                     this.routine_map.put(ir.op1.get_value(), this.wptr);
+                    this.return_stack.push(new ArrayList<Short>());
                     break;
                 }
 
@@ -417,7 +422,7 @@ public class Translator
                     break;
                 }
 
-                case IR.CALL_PROC:
+                case IR.CALL_ROUTINE:
                 {
                     // call the function
                     append(Machine.PUSH);
@@ -426,26 +431,64 @@ public class Translator
                     
                     // write the return address
                     write(this.call_stack.pop(), this.wptr);
+
+                    if(ir.op2 != null) {
+                        append(Machine.ADDR);
+                        append(ir.op2.get_lexical_level());
+                        append(ir.op2.get_value());
+                        append(Machine.SWAP);
+                        append(Machine.STORE);
+                    }
                     break;
                 }
 
-                case IR.RET:
+                case IR.ROUTINE_RETURN:
                 {
                     append(Machine.BR);
                     break;
                 }
 
-                case IR.INIT_FRAME:
+                case IR.RETURN:
                 {
-                    // push the return address (needs to be patched)
                     append(Machine.PUSH);
-                    short ret_addr = append((short) 0);
+                    short addr = append((short) 0);
+                    append(Machine.BR);
 
-                    // push a placeholder for the display value
+                    this.return_stack.peek().add(addr);
+                    break;
+                }
+
+                case IR.INIT_PROC_FRAME:
+                {
+                    // return address
                     append(Machine.PUSH);
-                    append((short) 0);
+                    short addr = append(Machine.UNDEFINED);
 
-                    this.call_stack.add(ret_addr);
+                    // previous display
+                    append(Machine.PUSH);
+                    append(Machine.UNDEFINED);
+
+                    // the return address needs to be patched
+                    this.call_stack.add(addr);
+                    break;
+                }
+
+                case IR.INIT_FUNC_FRAME:
+                {
+                    // return value
+                    append(Machine.PUSH);
+                    append(Machine.UNDEFINED);
+                    
+                    // return address
+                    append(Machine.PUSH);
+                    short addr = append(Machine.UNDEFINED);
+
+                    // previous display
+                    append(Machine.PUSH);
+                    append(Machine.UNDEFINED);
+
+                    // the return address needs to be patched
+                    this.call_stack.add(addr);
                     break;
                 }
 
@@ -455,6 +498,16 @@ public class Translator
                     append(ir.op1.get_lexical_level());
                     append(ir.op1.get_value());
                     append(Machine.LOAD);
+                    break;
+                }
+
+                case IR.ROUTINE_EXIT:
+                {
+                    ArrayList<Short> addr_list = this.return_stack.pop();
+                    for(Short addr : addr_list)
+                    {
+                        write(addr, this.wptr);
+                    }
                     break;
                 }
 

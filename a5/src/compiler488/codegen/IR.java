@@ -42,11 +42,13 @@ public class IR
 	public static final short PATCH_FRAME = 38;
 	public static final short FREE_FRAME = 39;
 	public static final short UPDATE_DISPLAY = 40;
-	public static final short CALL_PROC = 41;
-	public static final short CALL_FUNC = 42;
-	public static final short RET = 43;
-	public static final short INIT_FRAME = 44;
+	public static final short CALL_ROUTINE = 41;
+	public static final short RETURN = 42;
+	public static final short INIT_FUNC_FRAME = 43;
+	public static final short INIT_PROC_FRAME = 44;
 	public static final short COPY = 45;
+	public static final short ROUTINE_EXIT = 46;
+	public static final short ROUTINE_RETURN = 47;
 
 	public static class Operand
 	{

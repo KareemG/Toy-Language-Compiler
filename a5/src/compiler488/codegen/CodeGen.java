@@ -155,18 +155,58 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C10 - Emit code for the start of a function with no parameters.
 		actions.put(10, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level ++;
+			register_tracker.add((short) 3); // R00 = return value, R01 = return address, R02 = previous display value
+
+			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
+			IR.Operand offset = new IR.Operand(IR.Operand.NONE, (short) 3);
+			IR.Operand display_register = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, (short) 2);
+
+			this.intermediate_code.add(new IR(IR.UPDATE_DISPLAY, lexical_level, offset,	display_register));
+			this.intermediate_code.add(new IR(IR.ALLOC_FRAME, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C11 - Emit code for the end of a function with no parameters.
 		actions.put(11, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level--;
+			short num_registers = this.register_tracker.pop();
+
+			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 3))));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
 		// C12 - Emit code for the start of a function with parameters.
 		actions.put(12, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
+			IR.Operand offset = new IR.Operand(IR.Operand.NONE, (short) (((RoutineDecl) s.get(0)).getParameters().size() + 3));
+			IR.Operand display_register = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, (short) 2);
+
+			this.intermediate_code.add(new IR(IR.UPDATE_DISPLAY, lexical_level, offset, display_register));
+			this.intermediate_code.add(new IR(IR.ALLOC_FRAME, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C13 - Emit code for the end of a function with parameters.
 		actions.put(13, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level--;
+			short num_registers = this.register_tracker.pop();
+			short num_parameters = (short) ((RoutineDecl) s.get(0)).getParameters().size();
+
+			short frame_size = (short) (num_registers - num_parameters - 3);
+
+			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
 		// C14 - Emit code for the start of a procedure with no parameters.
@@ -191,9 +231,10 @@ public class CodeGen extends ASTVisitor.Default {
 			this.current_lexical_level--;
 			short num_registers = this.register_tracker.pop();
 
+			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
 			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
 			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
-			this.intermediate_code.add(new IR(IR.RET));
+			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
 		// C16 - Emit code for the start of a procedure with parameters.
@@ -218,21 +259,27 @@ public class CodeGen extends ASTVisitor.Default {
 
 			short frame_size = (short) (num_registers - num_parameters - 2);
 
+			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
 			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
 			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
-			this.intermediate_code.add(new IR(IR.RET));
+			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
 		// C18 - Emit code to return from a function.
 		actions.put(18, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.ASSIGN, new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, (short) 0), this.result_stack.pop()));
+			this.intermediate_code.add(new IR(IR.RETURN));
 		});
 
 		// C19 - Emit code to return from a procedure.
 		actions.put(19, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.RETURN));
 		});
 
 		// C20 - Emit any code required before the parameter list of a function.
 		actions.put(20, (s, self) -> {
+			this.current_lexical_level ++;
+			register_tracker.add((short) 3); // R00 = return value, R01 = return address, R01 = previous display value
 		});
 
 		// C21 - Emit any code required after the parameter list of a function.
@@ -255,16 +302,22 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C25 - Emit any code required before a function argument list.
 		actions.put(25, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.INIT_FUNC_FRAME));
 		});
 
 		// C26- Emit any code required after a function argument list.
 		actions.put(26, (s, self) -> {
+			for(int i = 0; i < this.result_stack.size(); i++)
+			{
+				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.get(i)));
+			}
+			this.result_stack.clear();
 		});
 
 		// C27 - Emit any code required before a procedure argument list.
 		actions.put(27, (s, self) -> {
 			assert(s.get(0) instanceof ProcedureCallStmt);
-			this.intermediate_code.add(new IR(IR.INIT_FRAME));
+			this.intermediate_code.add(new IR(IR.INIT_PROC_FRAME));
 		});
 
 		// C28 - Emit any code required after a procedure argument list.
@@ -335,6 +388,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C36 - Fill in address of forward branch generated by C35.
 		actions.put(36, (s, self) -> {
 			this.intermediate_code.add(new IR(IR.PATCH_BR));
+			this.map.pop();
 		});
 
 		// C37 - Allocate storage for a 2 dimensional array variable. Save address in
@@ -415,10 +469,24 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C49 - Emit code to call a function with no arguments.
 		actions.put(49, (s, self) -> {
+			assert(s.get(0) instanceof IdentExpn);
+			SymbolMap.Function entry = (SymbolMap.Function) this.map.search(((IdentExpn) s.get(0)).getName());
+			
+			this.intermediate_code.add(new IR(IR.INIT_FUNC_FRAME));
+
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(new IR(IR.CALL_ROUTINE, new IR.Operand(IR.Operand.NONE, entry.location), result));
+			this.result_stack.add(result);
 		});
 
 		// C50 - Emit code to call a function with arguments.
 		actions.put(50, (s, self) -> {
+			assert(s.get(0) instanceof FunctionCallExpn);
+			SymbolMap.Function entry = (SymbolMap.Function) this.map.search(((FunctionCallExpn) s.get(0)).getIdent());
+
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(new IR(IR.CALL_ROUTINE, new IR.Operand(IR.Operand.NONE, entry.location), result));
+			this.result_stack.add(result);
 		});
 
 		// C51 - Emit code to print an integer expression.
@@ -426,7 +494,6 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof PrintExpn);
 			IR.Operand result = result_stack.pop();
 			this.intermediate_code.add(new IR(IR.PRINTI, result));
-
 		});
 
 		// C52 - Emit code to print a text string.
@@ -451,15 +518,15 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(55, (s, self) -> {
 			assert(s.get(0) instanceof ProcedureCallStmt);
 			SymbolMap.Procedure entry = (SymbolMap.Procedure) this.map.search(((ProcedureCallStmt) s.get(0)).getName());
-			this.intermediate_code.add(new IR(IR.INIT_FRAME));
-			this.intermediate_code.add(new IR(IR.CALL_PROC, new IR.Operand(IR.Operand.NONE, entry.location)));
+			this.intermediate_code.add(new IR(IR.INIT_PROC_FRAME));
+			this.intermediate_code.add(new IR(IR.CALL_ROUTINE, new IR.Operand(IR.Operand.NONE, entry.location)));
 		});
 
 		// C56 - Emit code to call a procedure with arguments.
 		actions.put(56, (s, self) -> {
 			assert(s.get(0) instanceof ProcedureCallStmt);
 			SymbolMap.Procedure entry = (SymbolMap.Procedure) this.map.search(((ProcedureCallStmt) s.get(0)).getName());
-			this.intermediate_code.add(new IR(IR.CALL_PROC, new IR.Operand(IR.Operand.NONE, entry.location)));
+			this.intermediate_code.add(new IR(IR.CALL_ROUTINE, new IR.Operand(IR.Operand.NONE, entry.location)));
 		});
 
 		// C57 - Emit branch on TRUE. Save address of branch instruction. Save level if
@@ -830,8 +897,26 @@ public class CodeGen extends ASTVisitor.Default {
 	}
 
 	@Override
-	public void visit(IdentExpn expn) {
-		generateCode(76, expn);
+	public void visit(IdentExpn expn)
+	{
+		SymbolMap.Entry entry = this.map.search(expn.getName());
+
+		if(entry.type == SymbolMap.Entry.TYPE.FUNCTION) {
+			generateCode(49, expn);
+		} else {
+			generateCode(76, expn);
+		}
+	}
+
+	@Override
+	public void visitEnter(FunctionCallExpn expn) {
+		generateCode(25, expn);
+	}
+
+	@Override
+	public void visitLeave(FunctionCallExpn expn) {
+		generateCode(26, expn);
+		generateCode(50, expn);
 	}
 
 	@Override
@@ -1022,14 +1107,30 @@ public class CodeGen extends ASTVisitor.Default {
 				generateCode(14, routine);
 			}
 		}
+		else
+		{
+			if(routine.getParameters().size() > 0) {
+				generateCode(20, routine);
+			} else {
+				generateCode(10, routine);
+			}
+		}
 	}
 
 	@Override
 	public void visit(RoutineDecl routine)
 	{
 		if(routine.getParameters().size() > 0) {
-			generateCode(23, routine);
-			generateCode(16, routine);
+			if(routine.getType() == null)
+			{
+				generateCode(23, routine);
+				generateCode(16, routine);
+			}
+			else
+			{
+				generateCode(21, routine);
+				generateCode(12, routine);
+			}
 		}
 	}
 
@@ -1042,6 +1143,14 @@ public class CodeGen extends ASTVisitor.Default {
 				generateCode(17, routine);
 			} else {
 				generateCode(15, routine);
+			}
+		}
+		else
+		{
+			if(routine.getParameters().size() > 0) {
+				generateCode(13, routine);
+			} else {
+				generateCode(11, routine);
 			}
 		}
 
@@ -1075,5 +1184,15 @@ public class CodeGen extends ASTVisitor.Default {
 	public void visitLeave(ScalarDecl decl)
 	{
 		generateCode(32, decl);
+	}
+
+	@Override
+	public void visit(ReturnStmt stmt)
+	{
+		if(stmt.getValue() == null) {
+			generateCode(19, stmt);
+		} else {
+			generateCode(18, stmt);
+		}
 	}
 }
