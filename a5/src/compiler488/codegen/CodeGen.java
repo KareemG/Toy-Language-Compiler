@@ -307,11 +307,13 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C26- Emit any code required after a function argument list.
 		actions.put(26, (s, self) -> {
-			for(int i = 0; i < this.result_stack.size(); i++)
+			assert(s.get(0) instanceof FunctionCallExpn);
+
+			FunctionCallExpn expn = (FunctionCallExpn) s.get(0);
+			for(int i = 0; i < expn.getArguments().size(); i++)
 			{
-				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.get(i)));
+				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.pop()));
 			}
-			this.result_stack.clear();
 		});
 
 		// C27 - Emit any code required before a procedure argument list.
@@ -322,11 +324,13 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C28 - Emit any code required after a procedure argument list.
 		actions.put(28, (s, self) -> {
-			for(int i = 0; i < this.result_stack.size(); i++)
+			assert(s.get(0) instanceof ProcedureCallStmt);
+
+			ProcedureCallStmt stmt = (ProcedureCallStmt) s.get(0);
+			for(int i = 0; i < stmt.getArguments().size(); i++)
 			{
-				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.get(i)));
+				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.pop()));
 			}
-			this.result_stack.clear();
 		});
 
 		// C29 - Emit any code required for an argument.
