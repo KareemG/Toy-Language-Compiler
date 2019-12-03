@@ -1,0 +1,6 @@
+% it is quite useless to declare local variable in a loop without a scope
+% as such, our language does not support that
+{
+	while 1
+	do var i : integer	% syntax error here
+}
