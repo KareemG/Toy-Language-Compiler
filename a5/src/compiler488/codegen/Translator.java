@@ -25,6 +25,7 @@ public class Translator
 
     private short wptr;
 
+    Stack<Short> allocate_stack;
     Stack<Short> bt_stack;
     Stack<Short> bf_stack;
     Stack<Short> br_stack;
@@ -37,6 +38,7 @@ public class Translator
         this.intermediate_code = intermediate_code;
         
         this.wptr = 0;
+        this.allocate_stack = new Stack<>();
         this.bt_stack = new Stack<>();
         this.bf_stack = new Stack<>();
         this.br_stack = new Stack<>();
@@ -62,16 +64,10 @@ public class Translator
 
     public void initialize(short num_registers)
     {
+        append(Machine.TRON);
         append(Machine.PUSHMT);
 		append(Machine.SETD);
 		append((short) 0);
-
-		// allocating space for all registers:
-		append(Machine.PUSH); // we will be filling the register space with zeroes
-		append(Machine.UNDEFINED);
-		append(Machine.PUSH); // we have 'reg_offset' registers
-		append((short) num_registers);
-		append(Machine.DUPN); // perform the fill
     }
 
     public static String print(IR.Operand op)
@@ -147,7 +143,7 @@ public class Translator
     {
         for(IR ir : this.intermediate_code)
         {
-            print(ir);
+            //print(ir);
 
             switch(ir.opcode)
             {
@@ -171,6 +167,7 @@ public class Translator
 
                 case IR.HALT:
                 {
+                    popn(ir.op1.get_value());
                     halt();
                     break;
                 }
@@ -339,6 +336,26 @@ public class Translator
                     break;
                 }
 
+                case IR.ALLOCATE:
+                {
+                    allocate();
+                    break;
+                }
+
+                case IR.PATCH_ALLOCATE:
+                {
+                    short addrz = allocate_stack.pop();
+                    System.out.println("Stff: " + addrz + ", " + ir.op1.get_value());
+                    write(addrz, ir.op1.get_value());
+                    break;
+                }
+
+                case IR.MINOR_CLEANUP:
+                {
+                    popn(ir.op1.get_value());
+                    break;
+                }
+
                 default:
                 {
                     System.out.println("error: unknown intermediate instruction\n");
@@ -348,6 +365,17 @@ public class Translator
         }
 
         return this.wptr;
+    }
+
+    private void allocate()
+    {
+        append(Machine.PUSH);
+        append(Machine.UNDEFINED);
+        append(Machine.PUSH);
+        short ptr = append((short) 0);
+        append(Machine.DUPN);
+
+        this.allocate_stack.add(ptr);
     }
 
     private void assign(IR.Operand lhs, IR.Operand rhs)
@@ -401,6 +429,13 @@ public class Translator
     {
         load_operand(op);
         append(Machine.PRINTI);
+    }
+
+    private void popn(short n)
+    {
+        append(Machine.PUSH);
+        append(n);
+        append(Machine.POPN);
     }
 
     private void halt()

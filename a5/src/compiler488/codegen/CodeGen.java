@@ -65,13 +65,14 @@ public class CodeGen extends ASTVisitor.Default {
 
 	private Machine machine;
 
-	private Stack<Short> register_tracker;
+	private ArrayList<Stack<Short>> register_trackers_by_level;
 	private short current_lexical_level;
 	private SymbolMap map;
 
 	private Stack<IR.Operand> result_stack;
 	private ArrayList<IR> intermediate_code;
 	private Map<Integer, BiConsumer<List<BaseAST>, CodeGen>> actions;
+	private int expr_count = 0;
 
 	/**
 	 * Constructor to initialize code generation
@@ -85,16 +86,33 @@ public class CodeGen extends ASTVisitor.Default {
 
 	private short new_register()
 	{
-		Short reg = this.register_tracker.pop();
-		this.register_tracker.push((short) (reg + 1));
+		Short reg = register_tracker().pop();
+		register_tracker().push((short) (reg + 1));
 		return reg;
+	}
+
+	private void cache_expr(SymbolMap.Scalar entry) {
+		this.map.cache("unique_identifier_placeholder_" + this.expr_count,
+			entry);
+		this.expr_count++;
+	}
+
+	private Stack<Short> register_tracker()
+	{
+		return this.register_trackers_by_level.get(
+			this.current_lexical_level);
 	}
 
 	private void ir_operation_helper(short operation, IR.Operand lhs, IR.Operand rhs)
 	{
-		IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-		this.intermediate_code.add(new IR(operation, lhs, rhs, new IR.Operand(IR.Operand.REGISTER, result.get_lexical_level(), result.get_value())));
+		IR.Operand result = new IR.Operand(
+			IR.Operand.REGISTER, this.current_lexical_level, new_register());
+		this.intermediate_code.add(
+			new IR(operation, lhs, rhs,
+				new IR.Operand(
+					IR.Operand.REGISTER, result.get_lexical_level(), result.get_value())));
 		this.result_stack.push(result);
+		cache_expr(new SymbolMap.Scalar(result.get_value()));
 	}
 
 	/**
@@ -114,23 +132,30 @@ public class CodeGen extends ASTVisitor.Default {
 		this.intermediate_code = new ArrayList<>();
 
 		this.map = new SymbolMap();
-		this.register_tracker = new Stack<Short>();
+		this.register_trackers_by_level = new ArrayList<Stack<Short>>();
+		this.register_trackers_by_level.add(new Stack<Short>());
 		this.result_stack = new Stack<IR.Operand>();
 
 		this.current_lexical_level = 0;
-		this.register_tracker.push((short) 0);
+		register_tracker().push((short) 0);
 
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
 			assert (s.get(0) instanceof Program);
 			// this.intermediate_code.add(new IR(IR.SET_DISPLAY, new
 			// IR.Operand(IR.Operand.NONE, (short) 0)));
+			this.intermediate_code.add(new IR(IR.ALLOCATE));
 		});
 
 		// C01 - Emit code to end program execution.
 		actions.put(1, (s, self) -> {
 			assert (s.get(0) instanceof Program);
-			this.intermediate_code.add(new IR(IR.HALT));
+			this.intermediate_code.add(
+				new IR(IR.PATCH_ALLOCATE,
+					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
+			this.intermediate_code.add(
+				new IR(IR.HALT,
+					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
 		});
 
 		// C02 - Set pc, msp and mlp to values for starting program execution.
@@ -145,10 +170,19 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C03 - Emit code (if any) to enter an ordinary scope.
 		actions.put(3, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.ALLOCATE));
+			this.map.push_minor();
 		});
 
 		// C04 - Emit code (if any) to exit an ordinary scope.
 		actions.put(4, (s, self) -> {
+			this.intermediate_code.add(
+				new IR(IR.PATCH_ALLOCATE,
+					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
+			this.intermediate_code.add(
+				new IR(IR.MINOR_CLEANUP,
+					new IR.Operand(IR.Operand.NONE, this.map.getSize())));
+			this.map.pop();
 		});
 
 		// C10 - Emit code for the start of a function with no parameters.
@@ -247,10 +281,13 @@ public class CodeGen extends ASTVisitor.Default {
 			ArrayDeclPart decl = ((ArrayDeclPart) s.get(0));
 
 			// allocate registers for all the elements
-			Short offset = this.register_tracker.pop();
-			this.register_tracker.push((short) (offset + decl.getSize()));
+			Short offset = register_tracker().pop();
+			register_tracker().push((short) (offset + decl.getSize()));
 
-			this.map.insert(decl.getName(), new SymbolMap.Array1D(offset, decl.getLowerBoundary1().shortValue()));
+			this.map.insert(
+				decl.getName(),
+				new SymbolMap.Array1D(offset,
+					decl.getLowerBoundary1().shortValue(), (short) decl.getSize()));
 		});
 
 		// C32 - Allocate storage for a parameter. Save address in symbol table.
@@ -283,20 +320,23 @@ public class CodeGen extends ASTVisitor.Default {
 			ArrayDeclPart decl = ((ArrayDeclPart) s.get(0));
 
 			// allocate registers for all the elements
-			Short offset = this.register_tracker.pop();
-			this.register_tracker.push((short) (offset + decl.getSize()));
+			Short offset = register_tracker().pop();
+			register_tracker().push((short) (offset + decl.getSize()));
 
 			short offset1 = decl.getLowerBoundary1().shortValue();
 			short offset2 = decl.getLowerBoundary2().shortValue();
 			short stride  = (short) (decl.getUpperBoundary1() - decl.getLowerBoundary1() + 1);
 
-			this.map.insert(decl.getName(), new SymbolMap.Array2D(offset, offset1, offset2, stride));
+			this.map.insert(decl.getName(),
+				new SymbolMap.Array2D(offset, offset1, offset2, stride, (short) decl.getSize()));
 		});
 
 		// C40 - Emit unconditional branch. Save address of branch instruction.
 		actions.put(40, (s, self) -> {
 			assert (s.get(0) instanceof IfStmt);
-			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
+			this.intermediate_code.add(
+				new IR(IR.BR,
+					new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
 		});
 
 		// C41 - Fill in address of branch instruction generated by C40.
@@ -308,7 +348,9 @@ public class CodeGen extends ASTVisitor.Default {
 		// C42 - Emit branch on FALSE. Save address of branch instruction.
 		actions.put(42, (s, self) -> {
 			IR.Operand condition = this.result_stack.pop();
-			this.intermediate_code.add(new IR(IR.BF, condition, new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
+			this.intermediate_code.add(
+				new IR(IR.BF, condition,
+					new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
 		});
 
 		// C43 - Fill in address of branch instruction generated by C42.
@@ -347,7 +389,9 @@ public class CodeGen extends ASTVisitor.Default {
 
 			ExitStmt stmt = (ExitStmt) s.get(0);
 			short level = stmt.getLevel() <= 1 ? 1 : stmt.getLevel().shortValue();
-			this.intermediate_code.add(new IR(IR.EXIT, new IR.Operand(IR.Operand.NONE, (short) 0, level)));
+			this.intermediate_code.add(
+				new IR(IR.EXIT,
+					new IR.Operand(IR.Operand.NONE, (short) 0, level)));
 		});
 
 		// C49 - Emit code to call a function with no arguments.
@@ -363,21 +407,24 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof PrintExpn);
 			IR.Operand result = result_stack.pop();
 			this.intermediate_code.add(new IR(IR.PRINTI, result));
-
 		});
 
 		// C52 - Emit code to print a text string.
 		actions.put(52, (s, self) -> {
 			assert (s.get(0) instanceof TextConstExpn);
 			for (char ch : ((TextConstExpn) s.get(0)).getValue().toCharArray()) {
-				this.intermediate_code.add(new IR(IR.PRINTC, new IR.Operand(IR.Operand.NONE, (short) 0, (short) ch)));
+				this.intermediate_code.add(
+					new IR(IR.PRINTC,
+						new IR.Operand(IR.Operand.NONE, (short) 0, (short) ch)));
 			}
 		});
 
 		// C53 - Emit code to implement newline.
 		actions.put(53, (s, self) -> {
 			assert (s.get(0) instanceof SkipConstExpn);
-			this.intermediate_code.add(new IR(IR.PRINTC, new IR.Operand(IR.Operand.NONE, (short) 0, (short) '\n')));
+			this.intermediate_code.add(
+				new IR(IR.PRINTC,
+					new IR.Operand(IR.Operand.NONE, (short) 0, (short) '\n')));
 		});
 
 		// C54 - Emit code to read one integer value and save it in a variable.
@@ -400,21 +447,26 @@ public class CodeGen extends ASTVisitor.Default {
 			ExitStmt stmt = (ExitStmt) s.get(0);
 			short level = stmt.getLevel() <= 1 ? 1 : stmt.getLevel().shortValue();
 			IR.Operand cond = result_stack.pop();
-			this.intermediate_code.add(new IR(IR.COND_EXIT, new IR.Operand(IR.Operand.NONE, (short) 0, level), cond));
+			this.intermediate_code.add(
+				new IR(IR.COND_EXIT,
+					new IR.Operand(IR.Operand.NONE, (short) 0, level), cond));
 		});
 
 		// C60 - Emit instruction(s) to perform negation.
 		actions.put(60, (s, self) -> {
 			assert (s.get(0) instanceof UnaryMinusExpn);
 			IR.Operand operand = result_stack.pop();
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
 			this.intermediate_code.add(new IR(IR.NEG, operand, result));
 			this.result_stack.push(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C61 - Emit instruction(s) to perform addition.
 		actions.put(61, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_PLUS));
+			assert (s.get(0) instanceof ArithExpn &&
+				((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_PLUS));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.ADD, lhs, rhs);
@@ -422,7 +474,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C62 - Emit instruction(s) to perform subtraction.
 		actions.put(62, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_MINUS));
+			assert (s.get(0) instanceof ArithExpn &&
+				((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_MINUS));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.SUB, lhs, rhs);
@@ -430,7 +483,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C63 - Emit instruction(s) to perform multiplication.
 		actions.put(63, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_TIMES));
+			assert (s.get(0) instanceof ArithExpn &&
+				((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_TIMES));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.MUL, lhs, rhs);
@@ -438,7 +492,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C64 - Emit instruction(s) to perform division.
 		actions.put(64, (s, self) -> {
-			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_DIVIDE));
+			assert (s.get(0) instanceof ArithExpn &&
+				((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_DIVIDE));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.DIV, lhs, rhs);
@@ -448,14 +503,17 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(65, (s, self) -> {
 			assert (s.get(0) instanceof NotExpn);
 			IR.Operand operand = result_stack.pop();
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
 			this.intermediate_code.add(new IR(IR.NOT, operand, result));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C66 - Emit instruction(s) to perform logical and operation.
 		actions.put(66, (s, self) -> {
-			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_AND));
+			assert (s.get(0) instanceof BoolExpn &&
+				((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_AND));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.AND, lhs, rhs);
@@ -463,7 +521,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C67 - Emit instruction(s) to perform logical or operation.
 		actions.put(67, (s, self) -> {
-			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_OR));
+			assert (s.get(0) instanceof BoolExpn &&
+				((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_OR));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.OR, lhs, rhs);
@@ -511,8 +570,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C73 - Emit instruction(s) to perform greater than comparison.
 		actions.put(73, (s, self) -> {
-			assert (s.get(0) instanceof CompareExpn
-					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER));
+			assert (s.get(0) instanceof CompareExpn &&
+				((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.GT, lhs, rhs);
@@ -520,8 +579,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C74 - Emit instruction(s) to perform greater than or equal comparison.
 		actions.put(74, (s, self) -> {
-			assert (s.get(0) instanceof CompareExpn
-					&& ((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER_EQUAL));
+			assert (s.get(0) instanceof CompareExpn &&
+				((CompareExpn) s.get(0)).getOpSymbol().equals(CompareExpn.OP_GREATER_EQUAL));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
 			ir_operation_helper(IR.GEQ, lhs, rhs);
@@ -537,8 +596,12 @@ public class CodeGen extends ASTVisitor.Default {
 
 			SymbolMap.Entry entry = this.map.search(((IdentExpn) s.get(0)).getName());
 
-			if(entry.type == SymbolMap.Entry.TYPE.SCALAR) {
-				this.result_stack.add(new IR.Operand(IR.Operand.REGISTER, entry.parent.lexical_level, ((SymbolMap.Scalar) entry).register));
+			if (entry.type == SymbolMap.Entry.TYPE.SCALAR) {
+				this.result_stack.add(
+					new IR.Operand(
+						IR.Operand.REGISTER,
+						entry.parent.lexical_level,
+						((SymbolMap.Scalar) entry).register));
 			} else {
 				System.out.println("error: invalid symbol type");
 			}
@@ -555,25 +618,37 @@ public class CodeGen extends ASTVisitor.Default {
 		// C78 - Emit instruction(s) to load the value MACHINEFALSE.
 		actions.put(78, (s, self) -> {
 			assert (s.get(0) instanceof BoolConstExpn);
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(
+				new IR(IR.ASSIGN, result,
+					new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C79 - Emit instruction(s) to load the value MACHINETRUE.
 		actions.put(79, (s, self) -> {
 			assert (s.get(0) instanceof BoolConstExpn);
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE)));
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(
+				new IR(IR.ASSIGN, result,
+					new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE)));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C80 - Emit instruction(s) to load the value of the integer constant.
 		actions.put(80, (s, self) -> {
 			assert (s.get(0) instanceof IntConstExpn);
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue())));
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(
+				new IR(IR.ASSIGN, result,
+				new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue())));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C81 - Emit instructions(s)to obtain address of an array variable.
@@ -583,16 +658,20 @@ public class CodeGen extends ASTVisitor.Default {
 			short register = 0;
 			SymbolMap.Entry entry = this.map.search(((SubsExpn) s.get(0)).getVariable());
 
-			if(entry.type == SymbolMap.Entry.TYPE.ARRAY_1D) {
+			if (entry.type == SymbolMap.Entry.TYPE.ARRAY_1D) {
 				register = ((SymbolMap.Array1D) entry).base_register;
-			} else if(entry.type == SymbolMap.Entry.TYPE.ARRAY_2D) {
+			} else if (entry.type == SymbolMap.Entry.TYPE.ARRAY_2D) {
 				register = ((SymbolMap.Array2D) entry).base_register;
 			}
 
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ADDRESS, new IR.Operand(IR.Operand.NONE, entry.parent.lexical_level),
-				new IR.Operand(IR.Operand.NONE, register), result));
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(
+				new IR(IR.ADDRESS,
+					new IR.Operand(IR.Operand.NONE, entry.parent.lexical_level),
+					new IR.Operand(IR.Operand.NONE, register), result));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C82 - Emit instruction(s) to create address of a 1 dimensional array element.
@@ -600,21 +679,28 @@ public class CodeGen extends ASTVisitor.Default {
 			assert(s.get(0) instanceof SubsExpn);
 			assert(((SubsExpn) s.get(0)).getSubscript2() == null);
 
-			SymbolMap.Array1D array = (SymbolMap.Array1D) this.map.search(((SubsExpn) s.get(0)).getVariable());
+			SymbolMap.Array1D array =
+				(SymbolMap.Array1D) this.map.search(((SubsExpn) s.get(0)).getVariable());
 
 			IR.Operand index = this.result_stack.pop();
 			IR.Operand base = this.result_stack.pop();
 
-			IR.Operand final_index = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			IR.Operand result = new IR.Operand(IR.Operand.PTR, this.current_lexical_level, new_register());
+			IR.Operand final_index = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand result = new IR.Operand(
+				IR.Operand.PTR, this.current_lexical_level, new_register());
 
 			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index));
-			if(array.offset != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index));
+			if (array.offset != 0) {
+				this.intermediate_code.add(
+					new IR(IR.SUB, final_index,
+						new IR.Operand(IR.Operand.NONE, array.offset), final_index));
 			}
 
 			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(final_index.get_value()));
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C86 - Emit instruction(s) to create address of a 2 dimensional array element.
@@ -622,30 +708,41 @@ public class CodeGen extends ASTVisitor.Default {
 			assert(s.get(0) instanceof SubsExpn);
 			assert(((SubsExpn) s.get(0)).getSubscript2() != null);
 
-			SymbolMap.Array2D array = (SymbolMap.Array2D) this.map.search(((SubsExpn) s.get(0)).getVariable());
+			SymbolMap.Array2D array =
+				(SymbolMap.Array2D) this.map.search(((SubsExpn) s.get(0)).getVariable());
 
 			IR.Operand index2 = this.result_stack.pop();
 			IR.Operand index1 = this.result_stack.pop();
 			IR.Operand base = this.result_stack.pop();
 
-			IR.Operand final_index = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			IR.Operand result = new IR.Operand(IR.Operand.PTR, this.current_lexical_level, new_register());
+			IR.Operand final_index = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand result = new IR.Operand(
+				IR.Operand.PTR, this.current_lexical_level, new_register());
 
 			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index2));
-			if(array.offset2 != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset2), final_index));
+			if (array.offset2 != 0) {
+				this.intermediate_code.add(
+					new IR(IR.SUB, final_index,
+						new IR.Operand(IR.Operand.NONE, array.offset2), final_index));
 			}
-			if(array.stride != 0) {
-				this.intermediate_code.add(new IR(IR.MUL, final_index, new IR.Operand(IR.Operand.NONE, array.stride), final_index));
+			if (array.stride != 0) {
+				this.intermediate_code.add(
+					new IR(IR.MUL, final_index,
+						new IR.Operand(IR.Operand.NONE, array.stride), final_index));
 			}
 
 			this.intermediate_code.add(new IR(IR.ADD, final_index, index1, final_index));
-			if(array.offset1 != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset1), final_index));
+			if (array.offset1 != 0) {
+				this.intermediate_code.add(
+					new IR(IR.SUB, final_index,
+						new IR.Operand(IR.Operand.NONE, array.offset1), final_index));
 			}
 
 			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(final_index.get_value()));
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 
 		// C90 - Custom action to get result of a ternary expression
@@ -653,9 +750,12 @@ public class CodeGen extends ASTVisitor.Default {
 			IR.Operand f_value = this.result_stack.pop();
 			IR.Operand t_value = this.result_stack.pop();
 			IR.Operand condition = this.result_stack.pop();
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.COND_ASSIGN, condition, result, t_value, f_value));
+			IR.Operand result = new IR.Operand(
+				IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			this.intermediate_code.add(
+				new IR(IR.COND_ASSIGN, condition, result, t_value, f_value));
 			this.result_stack.add(result);
+			cache_expr(new SymbolMap.Scalar(result.get_value()));
 		});
 	}
 
@@ -687,7 +787,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// convert the IR code into machine code
 		try {
 			Translator translator = new Translator(this.machine, this.intermediate_code);
-			translator.initialize(this.register_tracker.peek());
+			translator.initialize(register_tracker().peek());
 			this.startMSP = translator.translate();
 		} catch (Exception e) {
 			System.out.println("error generating machine code from intermediate code:");
@@ -732,6 +832,16 @@ public class CodeGen extends ASTVisitor.Default {
 	public void visitLeave(Program prog) {
 		generateCode(1, prog);
 		generateCode(2, prog);
+	}
+
+	@Override
+	public void visitEnter(ScopeStmt stmt) {
+		generateCode(3);
+	}
+
+	@Override
+	public void visitLeave(ScopeStmt stmt) {
+		generateCode(4);
 	}
 
 	@Override
@@ -895,7 +1005,7 @@ public class CodeGen extends ASTVisitor.Default {
 	@Override
 	public void visit(ArrayDeclPart array)
 	{
-		if(!array.isTwoDimensional()) {
+		if (!array.isTwoDimensional()) {
 			generateCode(31, array);
 		} else {
 			generateCode(37, array);
@@ -911,7 +1021,7 @@ public class CodeGen extends ASTVisitor.Default {
 	@Override
 	public void visitLeave(SubsExpn expn)
 	{
-		if(expn.getSubscript2() == null) {
+		if (expn.getSubscript2() == null) {
 			generateCode(82, expn);
 		} else {
 			generateCode(86, expn);
