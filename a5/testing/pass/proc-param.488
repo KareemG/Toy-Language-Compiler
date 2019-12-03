@@ -5,9 +5,9 @@
 	procedure foo ( a : boolean )
 	{
 		if a then
-			write "Result: pass"
+			write "Result: pass", newline
 		else
-			write "Result: fail"
+			write "Result: fail", newline
 	}
 
 	foo (true)
