@@ -25,11 +25,15 @@ public class Translator
 
     private short wptr;
 
-    Stack<Short> bt_stack;
-    Stack<Short> bf_stack;
-    Stack<Short> br_stack;
-    Stack<Short> loop_stack;
-    Stack<ArrayList<Short>> exit_stack;
+    private Stack<Short> bt_stack;
+    private Stack<Short> bf_stack;
+    private Stack<Short> br_stack;
+    private Stack<Short> loop_stack;
+    private Stack<Short> frame_stack;
+    private Stack<ArrayList<Short>> exit_stack;
+    private Stack<Short> call_stack;
+
+    private HashMap<Short, Short> routine_map;
 
     public Translator(Machine machine, ArrayList<IR> intermediate_code)
     {
@@ -42,6 +46,10 @@ public class Translator
         this.br_stack = new Stack<>();
 		this.loop_stack = new Stack<>();
         this.exit_stack = new Stack<>();
+        this.frame_stack = new Stack<>();
+        this.call_stack = new Stack<>();
+
+        this.routine_map = new HashMap<Short, Short>();
     }
 
     private void write(short addr, short value)
@@ -137,6 +145,16 @@ public class Translator
             case IR.ADDRESS: op = "ADDRESS"; break;
             case IR.INDEX: op = "INDEX"; break;
             case IR.COND_ASSIGN: op = "COND_ASSIGN"; break;
+            case IR.ROUTINE_ENTRY: op = "ROUTINE_ENTRY"; break;
+            case IR.ALLOC_FRAME: op = "ALLOC_FRAME"; break;
+            case IR.PATCH_FRAME: op = "PATCH_FRAME"; break;
+            case IR.FREE_FRAME: op = "FREE_FRAME"; break;
+            case IR.UPDATE_DISPLAY: op = "UPDATE_DISPLAY"; break;
+            case IR.CALL_PROC: op = "CALL_PROC"; break;
+            case IR.CALL_FUNC: op = "CALL_FUNC"; break;
+            case IR.RET: op = "RET"; break;
+            case IR.INIT_FRAME: op = "INIT_FRAME"; break;
+            case IR.COPY: op = "COPY"; break;
             default: break;
         }
 
@@ -189,13 +207,13 @@ public class Translator
 
                 case IR.BT:
                 {
-                    cond_branch(true, ir.op1.get_value(), ir.op2.get_value(), ir.op2.needs_patch());
+                    cond_branch(true, ir.op1, ir.op2.get_value(), ir.op2.needs_patch());
                     break;
                 }
 
                 case IR.BF:
                 {
-                    cond_branch(false, ir.op1.get_value(), ir.op2.get_value(), ir.op2.needs_patch());
+                    cond_branch(false, ir.op1, ir.op2.get_value(), ir.op2.needs_patch());
                     break;
                 }
 
@@ -244,7 +262,7 @@ public class Translator
 
                 case IR.COND_EXIT:
                 {
-                    cond_exit(ir.op1.get_value(), ir.op2.get_value());
+                    cond_exit(ir.op1.get_value(), ir.op2);
                     break;
                 }
 
@@ -338,6 +356,107 @@ public class Translator
                     cond_assign(ir.op1, ir.op2, ir.op3, ir.op4);
                     break;
                 }
+    
+                case IR.ROUTINE_ENTRY:
+                {
+                    this.routine_map.put(ir.op1.get_value(), this.wptr);
+                    break;
+                }
+
+                case IR.ALLOC_FRAME:
+                {
+                    append(Machine.PUSH);
+                    append(Machine.UNDEFINED);
+                    append(Machine.PUSH);
+                    short frame_size = append((short) 0);
+                    append(Machine.DUPN);
+
+                    this.frame_stack.add(frame_size);
+                    break;
+                }
+
+                case IR.PATCH_FRAME:
+                {
+                    write(this.frame_stack.pop(), ir.op1.get_value());
+                    break;
+                }
+
+                case IR.FREE_FRAME:
+                {
+                    append(Machine.PUSH);
+                    append(ir.op1.get_value());
+                    append(Machine.POPN);
+                    break;
+                }
+
+                case IR.UPDATE_DISPLAY:
+                {
+                    // new value
+                    append(Machine.PUSHMT);
+                    
+                    append(Machine.PUSH);
+                    append(ir.op2.get_value());
+                    append(Machine.SUB);
+
+                    // old value
+                    append(Machine.ADDR);
+                    append(ir.op1.get_value());
+                    append((short) 0);
+
+                    // update the display
+                    append(Machine.SWAP);
+                    append(Machine.SETD);
+                    append(ir.op1.get_value());
+
+                    append(Machine.ADDR);
+                    append(ir.op3.get_lexical_level());
+                    append(ir.op3.get_value());
+                    append(Machine.SWAP);
+                    append(Machine.STORE);
+                    
+                    break;
+                }
+
+                case IR.CALL_PROC:
+                {
+                    // call the function
+                    append(Machine.PUSH);
+                    append(this.routine_map.get(ir.op1.get_value()));
+                    append(Machine.BR);
+                    
+                    // write the return address
+                    write(this.call_stack.pop(), this.wptr);
+                    break;
+                }
+
+                case IR.RET:
+                {
+                    append(Machine.BR);
+                    break;
+                }
+
+                case IR.INIT_FRAME:
+                {
+                    // push the return address (needs to be patched)
+                    append(Machine.PUSH);
+                    short ret_addr = append((short) 0);
+
+                    // push a placeholder for the display value
+                    append(Machine.PUSH);
+                    append((short) 0);
+
+                    this.call_stack.add(ret_addr);
+                    break;
+                }
+
+                case IR.COPY:
+                {
+                    append(Machine.ADDR);
+                    append(ir.op1.get_lexical_level());
+                    append(ir.op1.get_value());
+                    append(Machine.LOAD);
+                    break;
+                }
 
                 default:
                 {
@@ -357,11 +476,7 @@ public class Translator
             append(Machine.LOAD);
         }
 
-        if(!rhs.is_register()) {
-            push(rhs.get_value());
-        } else {
-            load(rhs.get_lexical_level(), rhs.get_value());
-        }
+        load_operand(rhs);
         
         store();
     }
@@ -448,15 +563,15 @@ public class Translator
         if(needs_patch) this.br_stack.add(ptr);
     }
 
-    private void cond_branch(boolean type, short cond, short addr, boolean needs_patch)
+    private void cond_branch(boolean type, IR.Operand cond, short addr, boolean needs_patch)
     {
-        load((short) 0, cond); // load the condition result
+        load_operand(cond); // load the condition result
         if(type) {
             negate();
         }
 
         append(Machine.PUSH);
-        short ptr = append((short) 0);
+        short ptr = append(addr);
         append(Machine.BF);
 
         if(needs_patch)
@@ -498,10 +613,10 @@ public class Translator
         append(Machine.BR);
     }
 
-    private void cond_exit(short level, short cond)
+    private void cond_exit(short level, IR.Operand cond)
     {
         // condition
-        load((short) 0, cond);
+        load_operand(cond);
         negate();
 
         // branch address

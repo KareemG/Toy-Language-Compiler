@@ -71,19 +71,21 @@ public class SymbolMap
 
     public static class Procedure extends Entry
     {
-        public short address;
+        public short location;
 
-        public Procedure(short address) {
+        public Procedure(short location) {
             super(Entry.TYPE.PROCEDURE);
+            this.location = location;
         }
     }
 
     public static class Function extends Entry
     {
-        public short address;
+        public short location;
 
-        public Function(short address) {
+        public Function(short location) {
             super(Entry.TYPE.FUNCTION);
+            this.location = location;
         }
     }
 

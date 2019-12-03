@@ -67,6 +67,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 	private Stack<Short> register_tracker;
 	private short current_lexical_level;
+	private short routine_counter;
 	private SymbolMap map;
 
 	private Stack<IR.Operand> result_stack;
@@ -117,6 +118,7 @@ public class CodeGen extends ASTVisitor.Default {
 		this.register_tracker = new Stack<Short>();
 		this.result_stack = new Stack<IR.Operand>();
 
+		this.routine_counter = 1;
 		this.current_lexical_level = 0;
 		this.register_tracker.push((short) 0);
 
@@ -169,18 +171,56 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C14 - Emit code for the start of a procedure with no parameters.
 		actions.put(14, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level ++;
+			register_tracker.add((short) 2); // R00 = return address, R01 = previous display value
+
+			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
+			IR.Operand offset = new IR.Operand(IR.Operand.NONE, (short) 2);
+			IR.Operand display_register = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, (short) 1);
+
+			this.intermediate_code.add(new IR(IR.UPDATE_DISPLAY, lexical_level, offset,	display_register));
+			this.intermediate_code.add(new IR(IR.ALLOC_FRAME, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C15 - Emit code for the end of a procedure with no parameters.
 		actions.put(15, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level--;
+			short num_registers = this.register_tracker.pop();
+
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
+			this.intermediate_code.add(new IR(IR.RET));
 		});
 
 		// C16 - Emit code for the start of a procedure with parameters.
 		actions.put(16, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
+			IR.Operand offset = new IR.Operand(IR.Operand.NONE, (short) (((RoutineDecl) s.get(0)).getParameters().size() + 2));
+			IR.Operand display_register = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, (short) 1);
+
+			this.intermediate_code.add(new IR(IR.UPDATE_DISPLAY, lexical_level, offset, display_register));
+			this.intermediate_code.add(new IR(IR.ALLOC_FRAME, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C17 - Emit code for the end of a procedure with parameters.
 		actions.put(17, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			this.current_lexical_level--;
+			short num_registers = this.register_tracker.pop();
+			short num_parameters = (short) ((RoutineDecl) s.get(0)).getParameters().size();
+
+			short frame_size = (short) (num_registers - num_parameters - 2);
+
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
+			this.intermediate_code.add(new IR(IR.RET));
 		});
 
 		// C18 - Emit code to return from a function.
@@ -201,6 +241,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C22 - Emit any code required before the parameter list of a procedure.
 		actions.put(22, (s, self) -> {
+			this.current_lexical_level ++;
+			register_tracker.add((short) 2); // R00 = return address, R01 = previous display value
 		});
 
 		// C23 - Emit any code required after the parameter list of a procedure.
@@ -221,10 +263,17 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C27 - Emit any code required before a procedure argument list.
 		actions.put(27, (s, self) -> {
+			assert(s.get(0) instanceof ProcedureCallStmt);
+			this.intermediate_code.add(new IR(IR.INIT_FRAME));
 		});
 
 		// C28 - Emit any code required after a procedure argument list.
 		actions.put(28, (s, self) -> {
+			for(int i = 0; i < this.result_stack.size(); i++)
+			{
+				this.intermediate_code.add(new IR(IR.COPY, this.result_stack.get(i)));
+			}
+			this.result_stack.clear();
 		});
 
 		// C29 - Emit any code required for an argument.
@@ -255,6 +304,9 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C32 - Allocate storage for a parameter. Save address in symbol table.
 		actions.put(32, (s, self) -> {
+			assert(s.get(0) instanceof ScalarDecl);
+			ScalarDecl decl = (ScalarDecl) s.get(0);
+			this.map.insert(decl.getName(), new SymbolMap.Scalar(new_register()));
 		});
 
 		// C33 - Allocate storage for the return value of a function. Save address in
@@ -264,14 +316,25 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C34 - Save entry point address of procedure or function in symbol table.
 		actions.put(34, (s, self) -> {
+			assert(s.get(0) instanceof RoutineDecl);
+
+			short id = this.routine_counter++;
+			RoutineDecl decl = (RoutineDecl) s.get(0);
+
+			this.map.insert(decl.getName(), (decl.getType() != null) ? new SymbolMap.Function(id) : new SymbolMap.Procedure(id));
+			this.map.push();
+
+			this.intermediate_code.add(new IR(IR.ROUTINE_ENTRY, new IR.Operand(IR.Operand.NONE, id)));
 		});
 
 		// C35 - Emit a forward branch around a function or procedure body.
 		actions.put(35, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C36 - Fill in address of forward branch generated by C35.
 		actions.put(36, (s, self) -> {
+			this.intermediate_code.add(new IR(IR.PATCH_BR));
 		});
 
 		// C37 - Allocate storage for a 2 dimensional array variable. Save address in
@@ -296,7 +359,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C40 - Emit unconditional branch. Save address of branch instruction.
 		actions.put(40, (s, self) -> {
 			assert (s.get(0) instanceof IfStmt);
-			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
+			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C41 - Fill in address of branch instruction generated by C40.
@@ -308,7 +371,7 @@ public class CodeGen extends ASTVisitor.Default {
 		// C42 - Emit branch on FALSE. Save address of branch instruction.
 		actions.put(42, (s, self) -> {
 			IR.Operand condition = this.result_stack.pop();
-			this.intermediate_code.add(new IR(IR.BF, condition, new IR.Operand(IR.Operand.PATCH, (short) 0, (short) 0)));
+			this.intermediate_code.add(new IR(IR.BF, condition, new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 
 		// C43 - Fill in address of branch instruction generated by C42.
@@ -386,10 +449,17 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C55 - Emit code to call a procedure with no arguments.
 		actions.put(55, (s, self) -> {
+			assert(s.get(0) instanceof ProcedureCallStmt);
+			SymbolMap.Procedure entry = (SymbolMap.Procedure) this.map.search(((ProcedureCallStmt) s.get(0)).getName());
+			this.intermediate_code.add(new IR(IR.INIT_FRAME));
+			this.intermediate_code.add(new IR(IR.CALL_PROC, new IR.Operand(IR.Operand.NONE, entry.location)));
 		});
 
 		// C56 - Emit code to call a procedure with arguments.
 		actions.put(56, (s, self) -> {
+			assert(s.get(0) instanceof ProcedureCallStmt);
+			SymbolMap.Procedure entry = (SymbolMap.Procedure) this.map.search(((ProcedureCallStmt) s.get(0)).getName());
+			this.intermediate_code.add(new IR(IR.CALL_PROC, new IR.Operand(IR.Operand.NONE, entry.location)));
 		});
 
 		// C57 - Emit branch on TRUE. Save address of branch instruction. Save level if
@@ -936,5 +1006,74 @@ public class CodeGen extends ASTVisitor.Default {
 	{
 		// generateCode(41, expn);
 		generateCode(90, expn);
+	}
+
+	@Override
+	public void visitEnter(RoutineDecl routine)
+	{
+		generateCode(35, routine);
+		generateCode(34, routine);
+
+		if(routine.getType() == null)
+		{
+			if(routine.getParameters().size() > 0) {
+				generateCode(22, routine);
+			} else {
+				generateCode(14, routine);
+			}
+		}
+	}
+
+	@Override
+	public void visit(RoutineDecl routine)
+	{
+		if(routine.getParameters().size() > 0) {
+			generateCode(23, routine);
+			generateCode(16, routine);
+		}
+	}
+
+	@Override
+	public void visitLeave(RoutineDecl routine)
+	{
+		if(routine.getType() == null)
+		{
+			if(routine.getParameters().size() > 0) {
+				generateCode(17, routine);
+			} else {
+				generateCode(15, routine);
+			}
+		}
+
+		generateCode(36, routine);
+	}
+
+	@Override
+	public void visitEnter(ProcedureCallStmt stmt)
+	{
+		if((stmt.getArguments() != null) && (stmt.getArguments().size() > 0))
+		{
+			generateCode(27, stmt);
+		}
+	}
+
+	@Override
+	public void visitLeave(ProcedureCallStmt stmt)
+	{
+		if((stmt.getArguments() != null) && (stmt.getArguments().size() > 0))
+		{
+			generateCode(28, stmt);
+			generateCode(56, stmt);
+		}
+		else
+		{
+			generateCode(55, stmt);
+		}
+	}
+
+	@Override
+	public void visitLeave(ScalarDecl decl)
+	{
+		generateCode(32, decl);
 	}
 }

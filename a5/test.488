@@ -2,34 +2,10 @@
     % A1b.488: Forms of arrays
     % Author: Jasmeet Brar
 
-    var a[3] : integer
-    var b[1 .. 10] : integer
-    var c[-3 .. 3] : boolean
-    var d[-3 .. -1] : integer
-    var e[1, 2] : integer
-    var f[-4 .. -2, 2 .. 4], g[2] : boolean
+    procedure hello_world
+    {
+        write "hello world"
+    }
 
-    a[1] := 4
-    a[2] := 10
-    a[3] := -5
-
-    c[-3] := true
-    c[-2] := false
-    c[-1] := false
-    c[0] := true
-    c[1] := true
-    c[2] := false
-    c[3] := true
-
-    e[1,1] := 5
-    e[1,2] := -3
-
-    f[-4,2] := true
-    f[-3,3] := false
-    f[-2,4] := true
-
-    g[1] := true
-    g[2] := false
-
-    write "Result: ", a[1], " ", a[2], " ", a[3], " ", e[1,1], " ", e[1,2], newline
+    hello_world
 }
