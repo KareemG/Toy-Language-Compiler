@@ -172,12 +172,12 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(11, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level--;
-			short num_registers = this.register_tracker.pop();
+			short frame_size = (short) (this.register_tracker.pop() - 3);
 
 			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
-			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 3))));
-			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.RESTORE_DISPLAY, new IR.Operand(IR.Operand.NONE, this.current_lexical_level--)));
 			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
@@ -197,7 +197,6 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(13, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level--;
 			short num_registers = this.register_tracker.pop();
 			short num_parameters = (short) ((RoutineDecl) s.get(0)).getParameters().size();
 
@@ -205,7 +204,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
 			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
-			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 3))));
+			this.intermediate_code.add(new IR(IR.RESTORE_DISPLAY, new IR.Operand(IR.Operand.NONE, this.current_lexical_level--)));
 			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
@@ -228,12 +228,12 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(15, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level--;
-			short num_registers = this.register_tracker.pop();
+			short frame_size = (short) (this.register_tracker.pop() - 2);
 
 			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
-			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
-			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
+			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
+			this.intermediate_code.add(new IR(IR.RESTORE_DISPLAY, new IR.Operand(IR.Operand.NONE, this.current_lexical_level--)));
 			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 
@@ -253,7 +253,6 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(17, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level--;
 			short num_registers = this.register_tracker.pop();
 			short num_parameters = (short) ((RoutineDecl) s.get(0)).getParameters().size();
 
@@ -261,7 +260,8 @@ public class CodeGen extends ASTVisitor.Default {
 
 			this.intermediate_code.add(new IR(IR.ROUTINE_EXIT));
 			this.intermediate_code.add(new IR(IR.PATCH_FRAME, new IR.Operand(IR.Operand.NONE, frame_size)));
-			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 1))));
+			this.intermediate_code.add(new IR(IR.FREE_FRAME, new IR.Operand(IR.Operand.NONE, (short) (num_registers - 2))));
+			this.intermediate_code.add(new IR(IR.RESTORE_DISPLAY, new IR.Operand(IR.Operand.NONE, this.current_lexical_level--)));
 			this.intermediate_code.add(new IR(IR.ROUTINE_RETURN));
 		});
 

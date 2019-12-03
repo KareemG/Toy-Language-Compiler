@@ -49,6 +49,7 @@ public class IR
 	public static final short COPY = 45;
 	public static final short ROUTINE_EXIT = 46;
 	public static final short ROUTINE_RETURN = 47;
+	public static final short RESTORE_DISPLAY = 48;
 
 	public static class Operand
 	{

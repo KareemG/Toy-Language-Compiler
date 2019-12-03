@@ -1,14 +1,27 @@
 {
-    var a : integer
-    var b : integer
+    var result : integer
 
-    function add(a : integer, b : integer): integer
+    function const (v : integer) : integer
     {
-        return with a + b
+        return with v
     }
 
-    a := 10
-    b := 20
+    function bar : integer
+    {
+        return with const(2)
+    }
 
-    write add(1, 2)
+    procedure add(a : integer, b : integer)
+    {
+        result := a + b
+    }
+
+    procedure foo
+    {
+        add(2, 3)
+        result := result * bar
+    }
+
+    foo
+    write result
 }

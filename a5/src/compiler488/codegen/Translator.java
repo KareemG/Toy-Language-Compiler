@@ -159,6 +159,7 @@ public class Translator
             case IR.INIT_PROC_FRAME: op = "INIT_PROC_FRAME"; break;
             case IR.COPY: op = "COPY"; break;
             case IR.ROUTINE_EXIT: op = "ROUTINE_EXIT"; break;
+            case IR.RESTORE_DISPLAY: op = "RESTORE_DISPLAY"; break;
             default: break;
         }
 
@@ -445,6 +446,13 @@ public class Translator
                 case IR.ROUTINE_RETURN:
                 {
                     append(Machine.BR);
+                    break;
+                }
+
+                case IR.RESTORE_DISPLAY:
+                {
+                    append(Machine.SETD);
+                    append(ir.op1.get_value());
                     break;
                 }
 
