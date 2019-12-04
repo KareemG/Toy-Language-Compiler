@@ -125,8 +125,6 @@ public class CodeGen extends ASTVisitor.Default {
 		// C00 - Emit code to prepare for the start of program execution.
 		actions.put(0, (s, self) -> {
 			assert (s.get(0) instanceof Program);
-			// this.intermediate_code.add(new IR(IR.SET_DISPLAY, new
-			// IR.Operand(IR.Operand.NONE, (short) 0)));
 		});
 
 		// C01 - Emit code to end program execution.
@@ -858,7 +856,7 @@ public class CodeGen extends ASTVisitor.Default {
 		/* FEEL FREE TO ignore or replace this procedure */
 		/****************************************************************/
 
-		System.out.println("Codegen: C" + actionNumber);
+		// System.out.println("Codegen: C" + actionNumber);
 
 		this.actions.get(actionNumber).accept(Arrays.asList(nodes), this);
 	}
