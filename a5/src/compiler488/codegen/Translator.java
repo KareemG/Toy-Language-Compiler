@@ -35,6 +35,7 @@ public class Translator
     private Stack<ArrayList<Short>> return_stack;
 
     private HashMap<Short, Short> routine_map;
+    private short program_size;
 
     public Translator(Machine machine, ArrayList<IR> intermediate_code)
     {
@@ -72,6 +73,8 @@ public class Translator
 
     public void initialize(short num_registers)
     {
+        this.program_size = num_registers;
+
         append(Machine.PUSHMT);
 		append(Machine.SETD);
 		append((short) 0);
@@ -170,7 +173,7 @@ public class Translator
     {
         for(IR ir : this.intermediate_code)
         {
-            print(ir);
+            // print(ir);
 
             switch(ir.opcode)
             {
@@ -597,6 +600,9 @@ public class Translator
 
     private void halt()
     {
+        append(Machine.PUSH);
+        append(this.program_size);
+        append(Machine.POPN);
         append(Machine.HALT);
     }
 
