@@ -1,14 +1,11 @@
 {
-	% recurse-func.488: check correctness of recursive function call
-	% Author: KyoKeun Park
+	var a : integer
 
-	function foo ( i : integer ) : integer
+	a := 1
 	{
-		if ( i = 5 ) then
-			return with 5
-		else
-			return with foo ( i + 1 )
+		var a : integer
+		a := 2
 	}
 
-	write "Result: ", foo(0), newline
+	write a
 }

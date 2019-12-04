@@ -119,8 +119,8 @@ public class SymbolMap
         this.current_scope = new Scope((short) 0, null);
     }
 
-    void push() {
-        current_scope = new Scope((short) (current_scope.lexical_level + 1), current_scope);
+    void push(short lexical_level) {
+        current_scope = new Scope(lexical_level, current_scope);
     }
 
     void pop() {

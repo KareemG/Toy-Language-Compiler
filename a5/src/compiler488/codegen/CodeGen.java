@@ -147,17 +147,18 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C03 - Emit code (if any) to enter an ordinary scope.
 		actions.put(3, (s, self) -> {
+			this.map.push(this.current_lexical_level);
 		});
 
 		// C04 - Emit code (if any) to exit an ordinary scope.
 		actions.put(4, (s, self) -> {
+			this.map.pop();
 		});
 
 		// C10 - Emit code for the start of a function with no parameters.
 		actions.put(10, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level ++;
 			register_tracker.add((short) 3); // R00 = return value, R01 = return address, R02 = previous display value
 
 			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
@@ -213,7 +214,6 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(14, (s, self) -> {
 			assert(s.get(0) instanceof RoutineDecl);
 
-			this.current_lexical_level ++;
 			register_tracker.add((short) 2); // R00 = return address, R01 = previous display value
 
 			IR.Operand lexical_level = new IR.Operand(IR.Operand.NONE, this.current_lexical_level);
@@ -278,7 +278,6 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C20 - Emit any code required before the parameter list of a function.
 		actions.put(20, (s, self) -> {
-			this.current_lexical_level ++;
 			register_tracker.add((short) 3); // R00 = return value, R01 = return address, R01 = previous display value
 		});
 
@@ -288,7 +287,6 @@ public class CodeGen extends ASTVisitor.Default {
 
 		// C22 - Emit any code required before the parameter list of a procedure.
 		actions.put(22, (s, self) -> {
-			this.current_lexical_level ++;
 			register_tracker.add((short) 2); // R00 = return address, R01 = previous display value
 		});
 
@@ -379,7 +377,7 @@ public class CodeGen extends ASTVisitor.Default {
 			RoutineDecl decl = (RoutineDecl) s.get(0);
 
 			this.map.insert(decl.getName(), (decl.getType() != null) ? new SymbolMap.Function(id) : new SymbolMap.Procedure(id));
-			this.map.push();
+			this.map.push(++this.current_lexical_level);
 
 			this.intermediate_code.add(new IR(IR.ROUTINE_ENTRY, new IR.Operand(IR.Operand.NONE, id)));
 		});
@@ -1214,5 +1212,17 @@ public class CodeGen extends ASTVisitor.Default {
 
 			generateCode(54, expn);
 		}
+	}
+
+	@Override
+	public void visitEnter(ScopeStmt stmt)
+	{
+		generateCode(3, stmt);
+	}
+
+	@Override
+	public void visitLeave(ScopeStmt stmt)
+	{
+		generateCode(4, stmt);
 	}
 }
