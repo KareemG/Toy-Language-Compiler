@@ -75,7 +75,6 @@ public class Translator
     {
         this.program_size = num_registers;
 
-        append(Machine.TRON);
         append(Machine.PUSHMT);
 		append(Machine.SETD);
 		append((short) 0);
@@ -602,7 +601,7 @@ public class Translator
     private void halt()
     {
         append(Machine.PUSH);
-        append((short) this.program_size);
+        append(this.program_size);
         append(Machine.POPN);
         append(Machine.HALT);
     }

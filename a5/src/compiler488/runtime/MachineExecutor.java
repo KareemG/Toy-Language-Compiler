@@ -721,7 +721,6 @@ public final class MachineExecutor implements Machine {
 
 			// TRON: start tracing machine execution
 			case TRON:
-				tracingEnabled = true;
 				dumpMachineState("Start trace (TRON).\n", pc, msp, mlp);
 				break;
 
