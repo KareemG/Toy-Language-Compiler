@@ -1,0 +1,10 @@
+{
+	% zero-division.488: when we divide by zero, program should throw error
+	% Author: KyoKeun Park
+
+	var i, j: integer
+	i := 5
+	j := 0
+
+	write i / j
+}

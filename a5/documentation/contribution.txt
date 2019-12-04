@@ -1,0 +1,12 @@
+Jasmeet Sidhu: Focused on designing and implementation of IR and Translator.
+               Contributed to implementation of codegen rules.
+
+Jasmeet Brar: Contributed to IR and Translator implementation and design as well
+              as implementation of codegen rules.
+
+Kareem Golaub: Modified existing symbol table such that it integrates with
+               our IR and code generation. Also contributed to IR and Translator
+               design.
+
+KyoKeun Park: Contributed to IR implementatiion, as well as creation of
+              test cases and testing script.

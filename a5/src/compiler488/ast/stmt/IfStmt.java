@@ -66,6 +66,7 @@ public class IfStmt extends Stmt {
 		this.condition.accept(visitor);
 		visitor.visitEnter(this);
 		this.whenTrue.accept(visitor);
+		visitor.visit(this);
 		if(whenFalse != null)
 			this.whenFalse.accept(visitor);
 		visitor.visitLeave(this);

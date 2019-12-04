@@ -1,0 +1,11 @@
+{
+	var a : integer
+
+	a := 1
+	{
+		var a : integer
+		a := 2
+	}
+
+	write a
+}

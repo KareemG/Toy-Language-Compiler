@@ -547,7 +547,7 @@ public class Semantics extends ASTVisitor.Default {
 	}
 
 	@Override
-	public void visitEnter(WhileDoStmt whileStmt) {
+	public void visit(WhileDoStmt whileStmt) {
 		if(whileStmt.getExpn() != null) {
 			semanticAction(30, whileStmt.getExpn());
 		}

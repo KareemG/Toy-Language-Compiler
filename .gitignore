@@ -6,3 +6,5 @@ sym.java
 Lexer.java
 BaseParser.java
 .vs/*
+*.iml
+.idea/

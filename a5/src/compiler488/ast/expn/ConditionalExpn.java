@@ -66,6 +66,7 @@ public class ConditionalExpn extends Expn {
 		this.condition.accept(visitor);
 		visitor.visitEnter(this);
 		this.trueValue.accept(visitor);
+		visitor.visit(this);
 		this.falseValue.accept(visitor);
 		visitor.visitLeave(this);
 	}

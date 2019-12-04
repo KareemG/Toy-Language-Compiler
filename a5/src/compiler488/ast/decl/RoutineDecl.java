@@ -133,6 +133,7 @@ public class RoutineDecl extends Declaration {
 		while(param_lst.hasNext()) {
 			param_lst.next().accept(visitor);
 		}
+		visitor.visit(this);
 		this.body.accept(visitor);
 		visitor.visitLeave(this);
 	}

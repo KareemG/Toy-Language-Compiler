@@ -1,0 +1,14 @@
+{
+	% proc-param.488: check that procedure with parameter is working as intended
+	% Author: KyoKeun Park
+
+	procedure foo ( a : boolean )
+	{
+		if a then
+			write "Result: pass", newline
+		else
+			write "Result: fail", newline
+	}
+
+	foo (true)
+}

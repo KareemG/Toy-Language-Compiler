@@ -1,0 +1,10 @@
+{
+	% cond-expr.488: test to see if conditional expression is working as intended
+	% Author: KyoKeun Park
+
+	var i, j : integer
+	i := 1
+	j := ( i = 1 ? 1 : 0 )
+
+	write "Result: ", j, " ", ( j = 0 ? 0 : 1 ) , newline
+}
