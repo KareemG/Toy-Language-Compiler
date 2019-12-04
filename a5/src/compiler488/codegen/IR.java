@@ -95,42 +95,42 @@ public class IR
 	}
 
 	public short opcode;
-    public Operand op1;
-    public Operand op2;
+	public Operand op1;
+	public Operand op2;
 	public Operand op3;
 	public Operand op4;
 
-    public IR(short opcode)
-    {
-        this.opcode = opcode;
-    }
+	public IR(short opcode)
+	{
+		this.opcode = opcode;
+	}
 
-    public IR(short opcode, Operand op1)
-    {
-        this.opcode = opcode;
-        this.op1 = op1;
-    }
+	public IR(short opcode, Operand op1)
+	{
+		this.opcode = opcode;
+		this.op1 = op1;
+	}
 
-    public IR(short opcode, Operand op1, Operand op2)
-    {
-        this.opcode = opcode;
-        this.op1 = op1;
-        this.op2 = op2;
-    }
+	public IR(short opcode, Operand op1, Operand op2)
+	{
+		this.opcode = opcode;
+		this.op1 = op1;
+		this.op2 = op2;
+	}
 
-    public IR(short opcode, Operand op1, Operand op2, Operand op3)
-    {
-        this.opcode = opcode;
-        this.op1 = op1;
-        this.op2 = op2;
-        this.op3 = op3;
+	public IR(short opcode, Operand op1, Operand op2, Operand op3)
+	{
+		this.opcode = opcode;
+		this.op1 = op1;
+		this.op2 = op2;
+		this.op3 = op3;
 	}
 
 	public IR(short opcode, Operand op1, Operand op2, Operand op3, Operand op4)
-    {
-        this.opcode = opcode;
-        this.op1 = op1;
-        this.op2 = op2;
+	{
+		this.opcode = opcode;
+		this.op1 = op1;
+		this.op2 = op2;
 		this.op3 = op3;
 		this.op4 = op4;
 	}
