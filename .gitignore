@@ -8,3 +8,4 @@ BaseParser.java
 .vs/*
 *.iml
 .idea/
+bin
