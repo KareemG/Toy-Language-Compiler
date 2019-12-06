@@ -74,6 +74,12 @@ public class IR
 			this.value = value;
 		}
 
+		public Operand(short flags, short ll, short value, boolean constval)
+		{
+			this(flags, ll, value);
+			this.constval = constval;
+		}
+
 		public Operand(short flags, short value, boolean constval)
 		{
 			this(flags, (short) 0, value);

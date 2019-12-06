@@ -8,7 +8,7 @@ public class AssemblyReader {
         short counter = 0;
         while (reader.ready()) {
             String world = reader.readWord();
-            if (world.isBlank()) continue;
+            if (world.isEmpty()) continue;
             Field field = Machine.class.getField(world);
             Short opCode = field.getShort(null);
             Machine.writeMemory(counter++, opCode);

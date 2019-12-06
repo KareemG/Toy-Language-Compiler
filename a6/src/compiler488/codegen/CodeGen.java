@@ -733,10 +733,10 @@ public class CodeGen extends ASTVisitor.Default {
 		// C80 - Emit instruction(s) to load the value of the integer constant.
 		actions.put(80, (s, self) -> {
 			assert (s.get(0) instanceof IntConstExpn);
-			// this.result_stack.add(new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue()));
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue(), true)));
-			this.result_stack.add(result);
+			this.result_stack.add(new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue()));
+			// IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register(), true);
+			// this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue(), true)));
+			// this.result_stack.add(result);
 		});
 
 		// C81 - Emit instructions(s)to obtain address of an array variable.
