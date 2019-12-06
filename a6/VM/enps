@@ -1,0 +1,3 @@
+enscript -B -M Letter -fCourier12 -k -q  -p$$.ps $@
+echo Postscript output in file $$.ps
+exit 0

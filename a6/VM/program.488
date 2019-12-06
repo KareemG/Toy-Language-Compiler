@@ -1,0 +1,13 @@
+%   The program:
+   {
+        var i, j : integer
+        i := 0
+        j := 1
+        while j < 4  do  {
+             i := i + j 
+             j := j + 1
+        }
+        write i, newline
+   }
+
+
