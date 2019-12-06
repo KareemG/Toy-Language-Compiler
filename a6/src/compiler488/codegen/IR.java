@@ -61,6 +61,7 @@ public class IR
 
 		private short flags;
 		private short value;
+		private boolean constval = false;
 
 		public Operand(short flags, short value) // used for constant
 		{
@@ -71,6 +72,12 @@ public class IR
 		{
 			this.flags = (short) (flags | (ll & 0xF));
 			this.value = value;
+		}
+
+		public Operand(short flags, short value, boolean constval)
+		{
+			this(flags, (short) 0, value);
+			this.constval = constval;
 		}
 
 		public boolean is_register() {
@@ -91,6 +98,10 @@ public class IR
 
 		public short get_value() {
 			return this.value;
+		}
+
+		public boolean is_constant() {
+			return this.constval;
 		}
 	}
 

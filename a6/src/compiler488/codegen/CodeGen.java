@@ -555,7 +555,13 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_PLUS));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.ADD, lhs, rhs);
+			if (rhs.is_constant() && lhs.is_constant()) {
+				IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+				this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, (short) (rhs.get_value() + lhs.get_value()), true)));
+				this.result_stack.add(result);
+			} else {
+				ir_operation_helper(IR.ADD, lhs, rhs);
+			}
 		});
 
 		// C62 - Emit instruction(s) to perform subtraction.
@@ -563,7 +569,13 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_MINUS));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.SUB, lhs, rhs);
+			if (rhs.is_constant() && lhs.is_constant()) {
+				IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+				this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, (short) (rhs.get_value() - lhs.get_value()), true)));
+				this.result_stack.add(result);
+			} else {
+				ir_operation_helper(IR.SUB, lhs, rhs);
+			}
 		});
 
 		// C63 - Emit instruction(s) to perform multiplication.
@@ -571,7 +583,13 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_TIMES));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.MUL, lhs, rhs);
+			if (rhs.is_constant() && lhs.is_constant()) {
+				IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+				this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, (short) (rhs.get_value() * lhs.get_value()), true)));
+				this.result_stack.add(result);
+			} else {
+				ir_operation_helper(IR.MUL, lhs, rhs);
+			}
 		});
 
 		// C64 - Emit instruction(s) to perform division.
@@ -579,7 +597,13 @@ public class CodeGen extends ASTVisitor.Default {
 			assert (s.get(0) instanceof ArithExpn && ((ArithExpn) s.get(0)).getOpSymbol().equals(ArithExpn.OP_DIVIDE));
 			IR.Operand rhs = result_stack.pop();
 			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.DIV, lhs, rhs);
+			if (rhs.is_constant() && lhs.is_constant()) {
+				IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+				this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, (short) (rhs.get_value() / lhs.get_value()), true)));
+				this.result_stack.add(result);
+			} else {
+				ir_operation_helper(IR.DIV, lhs, rhs);
+			}
 		});
 
 		// C65 - Emit instruction(s) to perform logical not operation.
@@ -694,7 +718,7 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(78, (s, self) -> {
 			assert (s.get(0) instanceof BoolConstExpn);
 			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE, true)));
 			this.result_stack.add(result);
 		});
 
@@ -702,15 +726,16 @@ public class CodeGen extends ASTVisitor.Default {
 		actions.put(79, (s, self) -> {
 			assert (s.get(0) instanceof BoolConstExpn);
 			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE)));
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE, true)));
 			this.result_stack.add(result);
 		});
 
 		// C80 - Emit instruction(s) to load the value of the integer constant.
 		actions.put(80, (s, self) -> {
 			assert (s.get(0) instanceof IntConstExpn);
+			// this.result_stack.add(new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue()));
 			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue())));
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, ((IntConstExpn) s.get(0)).getValue().shortValue(), true)));
 			this.result_stack.add(result);
 		});
 
