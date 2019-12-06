@@ -1,0 +1,5 @@
+% Identifiers should not start with integer
+{
+	var 1a:integer	% synxtax error here
+	1a := 1
+}

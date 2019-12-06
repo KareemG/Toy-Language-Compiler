@@ -1,0 +1,14 @@
+{
+	% fmulti-param.488: check correct of function with multiple parameters
+	% Author: KyoKeun Park
+
+	function foo ( a : integer, b : boolean, c : integer, d : boolean ) : integer
+	{
+		if ( a = c and b or d ) then
+			return with 1
+		else
+			return with 0
+	}
+
+	write "Result: ", foo ( 1 , true , 1 , false ), newline
+}

@@ -1,0 +1,15 @@
+
+{
+   function a : integer
+    {
+        function b : integer
+        {
+            return with 1
+        }
+
+       return with b
+    }
+
+    b
+}
+

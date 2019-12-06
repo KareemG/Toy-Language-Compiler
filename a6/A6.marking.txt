@@ -1,0 +1,16 @@
+Assignment 5 Marking Scheme 
+                                  
+Basic Optimizations 90.00
+
+  Constant folding 45.00
+
+  Common Subexpression Elimination 45.00
+
+Packaging				  10.00
+    Was the submission correctly 
+    packaged? Did it compile?
+
+                   TOTAL                100.00
+
+
+Bonus 100.00

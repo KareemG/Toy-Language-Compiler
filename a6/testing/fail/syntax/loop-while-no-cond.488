@@ -1,0 +1,5 @@
+% while loop without a condition
+{
+	while do
+		"hello world"
+}

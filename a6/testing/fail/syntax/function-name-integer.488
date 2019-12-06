@@ -1,0 +1,7 @@
+% function name should not start with numbers
+{
+	function 1234f:integer
+	{
+		return with 0
+	}
+}

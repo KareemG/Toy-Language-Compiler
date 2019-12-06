@@ -1,0 +1,14 @@
+{
+	% pmulti-param.488: check correctness of procedure with multiple parameters
+	% Author: KyoKeun Park
+
+	procedure foo ( a : integer , b : boolean , c : boolean , d : integer )
+	{
+		if ( a = d and b or c ) then
+			write "Result: pass", newline
+		else
+			write "Result: fail", newline
+	}
+
+	foo ( 1 , true , false , 1 )
+}

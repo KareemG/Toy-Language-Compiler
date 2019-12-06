@@ -1,0 +1,14 @@
+{
+	% func-param.488: check correctness for calling function with parameter
+	% Author: KyoKeun Park
+
+	function foo (m : integer) : integer
+	{
+		return with m + 1
+	}
+
+	var i : integer
+	i := 1
+
+	write "Result: ", foo(i), newline
+}

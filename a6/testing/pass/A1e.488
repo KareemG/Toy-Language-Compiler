@@ -1,0 +1,45 @@
+{
+    % A1e.488: Recursive functions and procedures
+    % Author: KyoKeun Park
+
+    procedure proc(a : integer, b : integer)
+    {
+        procedure proc2(c : integer)
+        {
+            if c = 0 then
+                return
+            proc2(c - 1)
+        }
+        proc2(a - 1)
+    }
+
+    function f1(n : integer) : integer
+    {
+        function f2(m : integer) : integer
+        {
+            if m = 0 then
+                return with m
+            return with f2(m - 1)
+        }
+        var a : integer
+        a := f2(n)
+        return with a
+    }
+
+    procedure proc3
+    {
+        write "hello world", newline
+        proc(3, 4)
+
+        return
+    }
+
+    function f3 : integer
+    {
+        return with f1(10)
+    }
+
+    proc3
+    proc(1, 2)
+    write "Result: ", f3, newline
+}
