@@ -505,10 +505,18 @@ public class Translator
 
                 case IR.COPY:
                 {
-                    append(Machine.ADDR);
-                    append(ir.op1.get_lexical_level());
-                    append(ir.op1.get_value());
-                    append(Machine.LOAD);
+                    if(ir.op1.is_register())
+                    {
+                        append(Machine.ADDR);
+                        append(ir.op1.get_lexical_level());
+                        append(ir.op1.get_value());
+                        append(Machine.LOAD);
+                    }
+                    else
+                    {
+                        append(Machine.PUSH);
+                        append(ir.op1.get_value());
+                    }
                     break;
                 }
 

@@ -61,7 +61,6 @@ public class IR
 
 		private short flags;
 		private short value;
-		private boolean constval = false;
 
 		public Operand(short flags, short value) // used for constant
 		{
@@ -74,24 +73,16 @@ public class IR
 			this.value = value;
 		}
 
-		public Operand(short flags, short ll, short value, boolean constval)
-		{
-			this(flags, ll, value);
-			this.constval = constval;
-		}
-
-		public Operand(short flags, short value, boolean constval)
-		{
-			this(flags, (short) 0, value);
-			this.constval = constval;
-		}
-
 		public boolean is_register() {
 			return (this.flags & REGISTER) != 0;
 		}
 
 		public boolean is_pointer() {
 			return (this.flags & PTR) != 0;
+		}
+
+		public boolean is_reg_or_ptr() {
+			return (this.flags & (REGISTER | PTR)) != 0;
 		}
 
 		public boolean needs_patch() {
@@ -104,10 +95,6 @@ public class IR
 
 		public short get_value() {
 			return this.value;
-		}
-
-		public boolean is_constant() {
-			return this.constval;
 		}
 	}
 
