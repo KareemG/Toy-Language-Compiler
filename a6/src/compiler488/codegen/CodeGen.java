@@ -125,7 +125,7 @@ public class CodeGen extends ASTVisitor.Default {
 		String str = String.format("%s %s %s", op_to_str(lhs), op, op_to_str(rhs));
 		int hash = str.hashCode();
 
-		System.out.println(String.format("\"%s\" -> %d", str, hash));
+		// System.out.println(String.format("\"%s\" -> %d", str, hash));
 		return hash;
 	}
 
