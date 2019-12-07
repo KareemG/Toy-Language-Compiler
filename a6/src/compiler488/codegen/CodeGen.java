@@ -95,7 +95,7 @@ public class CodeGen extends ASTVisitor.Default {
 
 	private String op_to_str(IR.Operand op)
 	{
-		if(op.is_register())
+		if(op.is_reg_or_ptr())
 		{
 			return "L" + op.get_lexical_level() + "R" + op.get_value();
 		}
