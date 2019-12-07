@@ -85,6 +85,9 @@ public class Main {
 	/** User option -- trace program execution */
 	public static boolean traceExecution = false;
 
+	/** Use option -- dump machine code */
+	public static boolean dumpOutput = false;
+
 	/* FILE NAMES supplied by the user */
 	/** Source file to be compiled */
 	private static String sourceFileName = new String();
@@ -138,6 +141,10 @@ public class Main {
 
 	/** index of compiler source file in argv */
 	private static int sourceFileIndex = -1;
+
+	private static File asmFile = null;
+	private static FileOutputStream asmFileStream = null;
+	public static PrintStream asmStream = null;
 
 	/**
 	 * process command line arguments to Main program. <BR>
@@ -260,6 +267,32 @@ public class Main {
 			System.setIn(inputStream);
 		} catch (Exception e) {
 			System.err.println("Unable to set input stream to  file " + fileName);
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return; // continue with System.in unchanged
+		}
+	}
+
+	private static void setASM(String fileName) {
+		if (fileName.length() == 0) {
+			return;
+		}
+
+		int i = fileName.lastIndexOf('/');
+		int j = fileName.lastIndexOf('.');
+		String newFileName = fileName.substring(i + 1, j) + ".asm";
+
+		try {
+			asmFile = new File(newFileName);
+		} catch (Exception e) {
+			System.err.println("Unable to open file " + newFileName);
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return; // continue with System.in unchanged
+		}
+		try {
+			asmFileStream = new FileOutputStream(asmFile);
+			asmStream = new PrintStream(asmFileStream, true);
+		} catch (Exception e) {
+			System.err.println("Unable to set input stream to  file " + newFileName);
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			return; // continue with System.in unchanged
 		}
@@ -452,7 +485,7 @@ public class Main {
 		// Set trace stream, input stream for execution
 		setTraceStream(executeTraceFileName);
 		setInputSource(executeInputFileName);
-		dumpStream = System.out;
+		System.out.println(sourceFileName);
 
 		// execute the compiled program
 		try {
@@ -557,6 +590,8 @@ public class Main {
 		if (dumpAST2) {
 			dumpAST(programAST, "Exception during AST dump after semantic analysis");
 		}
+
+		setASM(sourceFileName);
 
 		/* do code generation for the program */
 		generateCode(machine, programAST);

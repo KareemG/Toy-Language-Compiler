@@ -1,22 +1,9 @@
 package compiler488.codegen;
 
-import java.io.*;
-import java.util.*;
 import compiler488.compiler.Main;
+import java.io.PrintStream;
+import java.util.*;
 import compiler488.runtime.Machine;
-import compiler488.runtime.MemoryAddressException;
-import compiler488.ast.*;
-import compiler488.ast.decl.*;
-import compiler488.ast.expn.*;
-import compiler488.ast.stmt.*;
-import compiler488.ast.type.*;
-import compiler488.semantics.ASTVisitor;
-import java.util.function.Consumer;
-
-import javax.sound.midi.Patch;
-
-import java.util.function.BiConsumer;
-import compiler488.symbol.*;
 
 public class Translator
 {
@@ -37,16 +24,18 @@ public class Translator
     private HashMap<Short, Short> routine_map;
     private short program_size;
 
+    private PrintStream asmStream = Main.asmStream;
+
     public Translator(Machine machine, ArrayList<IR> intermediate_code)
     {
         this.machine = machine;
         this.intermediate_code = intermediate_code;
-        
+
         this.wptr = 0;
         this.bt_stack = new Stack<>();
         this.bf_stack = new Stack<>();
         this.br_stack = new Stack<>();
-		this.loop_stack = new Stack<>();
+	this.loop_stack = new Stack<>();
         this.exit_stack = new Stack<>();
         this.frame_stack = new Stack<>();
         this.call_stack = new Stack<>();
@@ -641,7 +630,7 @@ public class Translator
         }
 
         load_operand(rhs);
-        
+
         store();
     }
 
@@ -694,6 +683,7 @@ public class Translator
     {
         addr(lex_level, addr);
         append(Machine.LOAD);
+	asmStream.println("LOAD");
     }
 
     private void addr(short lex_level, short addr)
@@ -701,17 +691,20 @@ public class Translator
         append(Machine.ADDR);
         append(lex_level);
         append(addr);
+	asmStream.println("ADDR " + lex_level + " " + addr);
     }
 
     private void store()
     {
         append(Machine.STORE);
+	asmStream.println("STORE");
     }
 
     private void push(short c)
     {
         append(Machine.PUSH);
         append(c);
+	asmStream.println("PUSH " + c);
     }
 
     private void negate()
@@ -719,6 +712,8 @@ public class Translator
         append(Machine.PUSH);
         append(Machine.MACHINE_FALSE);
         append(Machine.EQ);
+	asmStream.println("PUSH MACHINE_FALSE");
+	asmStream.println("EQ");
     }
 
     private void branch(short addr, boolean needs_patch)
