@@ -1,5 +1,8 @@
 package compiler488.codegen;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class IR
 {
 	public static final short NEG = 1;
@@ -35,7 +38,7 @@ public class IR
 	public static final short COND_EXIT = 31;
 	public static final short PATCH_EXIT_LIST = 32;
 	public static final short ADDRESS = 33;
-	public static final short INDEX = 34;
+	public static final short INDEX_1D = 34;
 	public static final short COND_ASSIGN = 35;
 	public static final short ROUTINE_ENTRY = 36;
 	public static final short ALLOC_FRAME = 37;
@@ -50,6 +53,7 @@ public class IR
 	public static final short ROUTINE_EXIT = 46;
 	public static final short ROUTINE_RETURN = 47;
 	public static final short RESTORE_DISPLAY = 48;
+	public static final short INDEX_2D = 49;
 
 	public static class Operand
 	{
@@ -99,43 +103,16 @@ public class IR
 	}
 
 	public short opcode;
-	public Operand op1;
-	public Operand op2;
-	public Operand op3;
-	public Operand op4;
+	public List<Operand> operands;
 
 	public IR(short opcode)
 	{
 		this.opcode = opcode;
 	}
 
-	public IR(short opcode, Operand op1)
+	public IR(short opcode, Operand... operands)
 	{
 		this.opcode = opcode;
-		this.op1 = op1;
-	}
-
-	public IR(short opcode, Operand op1, Operand op2)
-	{
-		this.opcode = opcode;
-		this.op1 = op1;
-		this.op2 = op2;
-	}
-
-	public IR(short opcode, Operand op1, Operand op2, Operand op3)
-	{
-		this.opcode = opcode;
-		this.op1 = op1;
-		this.op2 = op2;
-		this.op3 = op3;
-	}
-
-	public IR(short opcode, Operand op1, Operand op2, Operand op3, Operand op4)
-	{
-		this.opcode = opcode;
-		this.op1 = op1;
-		this.op2 = op2;
-		this.op3 = op3;
-		this.op4 = op4;
+		this.operands = Arrays.asList(operands);
 	}
 }

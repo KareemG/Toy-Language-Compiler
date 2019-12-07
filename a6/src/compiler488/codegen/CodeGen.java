@@ -767,10 +767,12 @@ public class CodeGen extends ASTVisitor.Default {
 				register = ((SymbolMap.Array2D) entry).base_register;
 			}
 
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(IR.ADDRESS, new IR.Operand(IR.Operand.NONE, entry.parent.lexical_level),
-				new IR.Operand(IR.Operand.NONE, register), result));
-			this.result_stack.add(result);
+			//IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			//this.intermediate_code.add(new IR(IR.ADDRESS, new IR.Operand(IR.Operand.NONE, entry.parent.lexical_level),
+			//	new IR.Operand(IR.Operand.NONE, register), result));
+			//this.result_stack.add(result);
+
+			this.result_stack.add(new IR.Operand(IR.Operand.REGISTER, entry.parent.lexical_level, register));
 		});
 
 		// C82 - Emit instruction(s) to create address of a 1 dimensional array element.
@@ -782,16 +784,13 @@ public class CodeGen extends ASTVisitor.Default {
 
 			IR.Operand index = this.result_stack.pop();
 			IR.Operand base = this.result_stack.pop();
-
-			IR.Operand final_index = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand offset = new IR.Operand(IR.Operand.NONE, array.offset);
 			IR.Operand result = new IR.Operand(IR.Operand.PTR, this.current_lexical_level, new_register());
 
-			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index));
-			if(array.offset != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset), final_index));
-			}
+			// (base, index, offset, result)
+			// result = base + index - offset
 
-			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));
+			this.intermediate_code.add(new IR(IR.INDEX_1D, base, index, offset, result));
 			this.result_stack.add(result);
 		});
 
@@ -806,23 +805,16 @@ public class CodeGen extends ASTVisitor.Default {
 			IR.Operand index1 = this.result_stack.pop();
 			IR.Operand base = this.result_stack.pop();
 
-			IR.Operand final_index = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+			IR.Operand offset1 = new IR.Operand(IR.Operand.NONE, array.offset1);
+			IR.Operand offset2 = new IR.Operand(IR.Operand.NONE, array.offset2);
+			IR.Operand stride = new IR.Operand(IR.Operand.NONE, array.stride);
+
 			IR.Operand result = new IR.Operand(IR.Operand.PTR, this.current_lexical_level, new_register());
 
-			this.intermediate_code.add(new IR(IR.ASSIGN, final_index, index2));
-			if(array.offset2 != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset2), final_index));
-			}
-			if(array.stride != 0) {
-				this.intermediate_code.add(new IR(IR.MUL, final_index, new IR.Operand(IR.Operand.NONE, array.stride), final_index));
-			}
+			// (base, index1, index2, offset1, offset2, stride, result)
+			// result = base + (index1 - offset1) + (index2 - offset2) * stride
 
-			this.intermediate_code.add(new IR(IR.ADD, final_index, index1, final_index));
-			if(array.offset1 != 0) {
-				this.intermediate_code.add(new IR(IR.SUB, final_index, new IR.Operand(IR.Operand.NONE, array.offset1), final_index));
-			}
-
-			this.intermediate_code.add(new IR(IR.INDEX, base, final_index, result));
+			this.intermediate_code.add(new IR(IR.INDEX_2D, base, index1, index2, offset1, offset2, stride, result));
 			this.result_stack.add(result);
 		});
 

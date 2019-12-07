@@ -148,7 +148,8 @@ public class Translator
             case IR.COND_EXIT: op = "COND_EXIT"; break;
             case IR.PATCH_EXIT_LIST: op = "PATCH_EXIT_LIST"; break;
             case IR.ADDRESS: op = "ADDRESS"; break;
-            case IR.INDEX: op = "INDEX"; break;
+            case IR.INDEX_1D: op = "INDEX_1D"; break;
+            case IR.INDEX_2D: op = "INDEX_2D"; break;
             case IR.COND_ASSIGN: op = "COND_ASSIGN"; break;
             case IR.ROUTINE_ENTRY: op = "ROUTINE_ENTRY"; break;
             case IR.ALLOC_FRAME: op = "ALLOC_FRAME"; break;
@@ -166,7 +167,15 @@ public class Translator
             default: break;
         }
 
-        System.out.println(String.format("(%s, %s, %s, %s, %s)", op, print(ir.op1), print(ir.op2), print(ir.op3), print(ir.op4)));
+        // System.out.println(String.format("(%s, %s, %s, %s, %s)", op, print(ir.op1), print(ir.op2), print(ir.op3), print(ir.op4)));
+
+        String str = "(" + op;
+        for(int i = 0; i < ir.operands.size(); i++)
+        {
+            str += print(ir.operands.get(i));
+        }
+        str += ")";
+        System.out.println(str);
     }
     
     public short translate() throws Exception
@@ -179,19 +188,19 @@ public class Translator
             {
                 case IR.SET_DISPLAY:
                 {
-                    set_display(ir.op1.get_value());
+                    set_display(ir.operands.get(0).get_value());
                     break;
                 }
 
                 case IR.PRINTC:
                 {
-                    printc(ir.op1.get_value());
+                    printc(ir.operands.get(0).get_value());
                     break;
                 }
 
                 case IR.PRINTI:
                 {
-                    printi(ir.op1);
+                    printi(ir.operands.get(0));
                     break;
                 }
 
@@ -203,25 +212,25 @@ public class Translator
 
                 case IR.ASSIGN:
                 {
-                    assign(ir.op1, ir.op2);
+                    assign(ir.operands.get(0), ir.operands.get(1));
                     break;
                 }
 
                 case IR.BR:
                 {
-                    branch(ir.op1.get_value(), ir.op1.needs_patch());
+                    branch(ir.operands.get(0).get_value(), ir.operands.get(0).needs_patch());
                     break;
                 }
 
                 case IR.BT:
                 {
-                    cond_branch(true, ir.op1, ir.op2.get_value(), ir.op2.needs_patch());
+                    cond_branch(true, ir.operands.get(0), ir.operands.get(1).get_value(), ir.operands.get(1).needs_patch());
                     break;
                 }
 
                 case IR.BF:
                 {
-                    cond_branch(false, ir.op1, ir.op2.get_value(), ir.op2.needs_patch());
+                    cond_branch(false, ir.operands.get(0), ir.operands.get(1).get_value(), ir.operands.get(1).needs_patch());
                     break;
                 }
 
@@ -258,19 +267,19 @@ public class Translator
 
                 case IR.COND_REPEAT:
                 {
-                    cond_repeat(ir.op1.get_value());
+                    cond_repeat(ir.operands.get(0).get_value());
                     break;
                 }
 
                 case IR.EXIT:
                 {
-                    exit(ir.op1.get_value());
+                    exit(ir.operands.get(0).get_value());
                     break;
                 }
 
                 case IR.COND_EXIT:
                 {
-                    cond_exit(ir.op1.get_value(), ir.op2);
+                    cond_exit(ir.operands.get(0).get_value(), ir.operands.get(1));
                     break;
                 }
 
@@ -286,8 +295,8 @@ public class Translator
 
                 case IR.NEG: // negate a integer
                 {
-                    addr((short) 0, ir.op2.get_value());
-                    load((short) 0, ir.op1.get_value());
+                    addr((short) 0, ir.operands.get(1).get_value());
+                    load((short) 0, ir.operands.get(0).get_value());
                     append(Machine.NEG);
                     append(Machine.STORE);
                     break;
@@ -295,8 +304,8 @@ public class Translator
 
                 case IR.NOT: // negate a boolean
                 {
-                    addr((short) 0, ir.op2.get_value());
-                    load((short) 0, ir.op1.get_value());
+                    addr((short) 0, ir.operands.get(1).get_value());
+                    load((short) 0, ir.operands.get(0).get_value());
                     negate();
                     append(Machine.STORE);
                     break;
@@ -304,13 +313,13 @@ public class Translator
 
                 case IR.OR:
                 {
-                    boolean_or(ir.op1, ir.op2, ir.op3);
+                    boolean_or(ir.operands.get(0), ir.operands.get(1), ir.operands.get(2));
                     break;
                 }
 
                 case IR.AND:
                 {
-                    boolean_and(ir.op1, ir.op2, ir.op3);
+                    boolean_and(ir.operands.get(0), ir.operands.get(1), ir.operands.get(2));
                     break;
                 }
 
@@ -325,19 +334,19 @@ public class Translator
                 case IR.MUL:
                 case IR.DIV:
                 {
-                    addr(ir.op3.get_lexical_level(), ir.op3.get_value()); // the target *must* be a register
+                    addr(ir.operands.get(2).get_lexical_level(), ir.operands.get(2).get_value()); // the target *must* be a register
                     switch(ir.opcode)
                     {
-                        case IR.LT:  { lt(ir.op1, ir.op2); break; }
-                        case IR.GT:  { gt(ir.op1, ir.op2); break; }
-                        case IR.EQ:  { eq(ir.op1, ir.op2); break; }
-                        case IR.LEQ: { leq(ir.op1, ir.op2); break; }
-                        case IR.GEQ: { geq(ir.op1, ir.op2); break; }
-                        case IR.NEQ: { neq(ir.op1, ir.op2); break; }
-                        case IR.ADD: { add(ir.op1, ir.op2); break; }
-                        case IR.SUB: { sub(ir.op1, ir.op2); break; }
-                        case IR.MUL: { mul(ir.op1, ir.op2); break; }
-                        case IR.DIV: { div(ir.op1, ir.op2); break; }
+                        case IR.LT:  { lt(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.GT:  { gt(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.EQ:  { eq(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.LEQ: { leq(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.GEQ: { geq(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.NEQ: { neq(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.ADD: { add(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.SUB: { sub(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.MUL: { mul(ir.operands.get(0), ir.operands.get(1)); break; }
+                        case IR.DIV: { div(ir.operands.get(0), ir.operands.get(1)); break; }
                     }
                     append(Machine.STORE);
                     break;
@@ -345,29 +354,96 @@ public class Translator
 
                 case IR.ADDRESS:
                 {
-                    addr(ir.op3.get_lexical_level(), ir.op3.get_value());
-                    addr(ir.op1.get_value(), ir.op2.get_value());
+                    addr(ir.operands.get(2).get_lexical_level(), ir.operands.get(2).get_value());
+                    addr(ir.operands.get(0).get_value(), ir.operands.get(1).get_value());
                     append(Machine.STORE);
                     break;
                 }
 
-                case IR.INDEX:
+                case IR.INDEX_1D:
                 {
-                    addr(ir.op3.get_lexical_level(), ir.op3.get_value());
-                    add(ir.op1, ir.op2);
+                    IR.Operand base = ir.operands.get(0);
+                    IR.Operand index = ir.operands.get(1);
+                    IR.Operand offset = ir.operands.get(2);
+                    IR.Operand result = ir.operands.get(3);
+
+                    addr(result.get_lexical_level(), result.get_value());
+
+                    // calculate the address of the element
+                    addr(base.get_lexical_level(), base.get_value());
+                    if(index.is_reg_or_ptr())
+                    {
+                        load_operand(index);
+                        push(offset.get_value());
+                        append(Machine.SUB);
+                    }
+                    else
+                    {
+                        push((short) (index.get_value() - offset.get_value()));
+                    }
+                    append(Machine.ADD);
+
+                    append(Machine.STORE);
+                    break;
+                }
+
+                case IR.INDEX_2D:
+                {
+                    IR.Operand base = ir.operands.get(0);
+                    IR.Operand index1 = ir.operands.get(1);
+                    IR.Operand index2 = ir.operands.get(2);
+                    IR.Operand offset1 = ir.operands.get(3);
+                    IR.Operand offset2 = ir.operands.get(4);
+                    IR.Operand stride = ir.operands.get(5);
+                    IR.Operand result = ir.operands.get(6);
+
+                    addr(result.get_lexical_level(), result.get_value());
+
+                    // calculate the address of the element
+                    addr(base.get_lexical_level(), base.get_value());
+
+                    // calcualte index1
+                    if(index1.is_reg_or_ptr())
+                    {
+                        load_operand(index1);
+                        push(offset1.get_value());
+                        append(Machine.SUB);
+                    }
+                    else
+                    {
+                        push((short) (index1.get_value() - offset1.get_value()));
+                    }
+                    
+                    // calculate index2
+                    if(index2.is_reg_or_ptr())
+                    {
+                        load_operand(index2);
+                        push(offset2.get_value());
+                        append(Machine.SUB);
+                        
+                        push(stride.get_value());
+                        append(Machine.MUL);
+                    }
+                    else
+                    {
+                        push((short) ((index2.get_value() - offset2.get_value()) * stride.get_value()));
+                    }
+
+                    append(Machine.ADD);
+                    append(Machine.ADD);
                     append(Machine.STORE);
                     break;
                 }
 
                 case IR.COND_ASSIGN:
                 {
-                    cond_assign(ir.op1, ir.op2, ir.op3, ir.op4);
+                    cond_assign(ir.operands.get(0), ir.operands.get(1), ir.operands.get(2), ir.operands.get(3));
                     break;
                 }
     
                 case IR.ROUTINE_ENTRY:
                 {
-                    this.routine_map.put(ir.op1.get_value(), this.wptr);
+                    this.routine_map.put(ir.operands.get(0).get_value(), this.wptr);
                     this.return_stack.push(new ArrayList<Short>());
                     break;
                 }
@@ -386,14 +462,14 @@ public class Translator
 
                 case IR.PATCH_FRAME:
                 {
-                    write(this.frame_stack.pop(), ir.op1.get_value());
+                    write(this.frame_stack.pop(), ir.operands.get(0).get_value());
                     break;
                 }
 
                 case IR.FREE_FRAME:
                 {
                     append(Machine.PUSH);
-                    append(ir.op1.get_value());
+                    append(ir.operands.get(0).get_value());
                     append(Machine.POPN);
                     break;
                 }
@@ -404,22 +480,22 @@ public class Translator
                     append(Machine.PUSHMT);
                     
                     append(Machine.PUSH);
-                    append(ir.op2.get_value());
+                    append(ir.operands.get(1).get_value());
                     append(Machine.SUB);
 
                     // old value
                     append(Machine.ADDR);
-                    append(ir.op1.get_value());
+                    append(ir.operands.get(0).get_value());
                     append((short) 0);
 
                     // update the display
                     append(Machine.SWAP);
                     append(Machine.SETD);
-                    append(ir.op1.get_value());
+                    append(ir.operands.get(0).get_value());
 
                     append(Machine.ADDR);
-                    append(ir.op3.get_lexical_level());
-                    append(ir.op3.get_value());
+                    append(ir.operands.get(2).get_lexical_level());
+                    append(ir.operands.get(2).get_value());
                     append(Machine.SWAP);
                     append(Machine.STORE);
                     
@@ -430,16 +506,16 @@ public class Translator
                 {
                     // call the function
                     append(Machine.PUSH);
-                    append(this.routine_map.get(ir.op1.get_value()));
+                    append(this.routine_map.get(ir.operands.get(0).get_value()));
                     append(Machine.BR);
                     
                     // write the return address
                     write(this.call_stack.pop(), this.wptr);
 
-                    if(ir.op2 != null) {
+                    if(ir.operands.size() == 2) {
                         append(Machine.ADDR);
-                        append(ir.op2.get_lexical_level());
-                        append(ir.op2.get_value());
+                        append(ir.operands.get(1).get_lexical_level());
+                        append(ir.operands.get(1).get_value());
                         append(Machine.SWAP);
                         append(Machine.STORE);
                     }
@@ -455,7 +531,7 @@ public class Translator
                 case IR.RESTORE_DISPLAY:
                 {
                     append(Machine.SETD);
-                    append(ir.op1.get_value());
+                    append(ir.operands.get(0).get_value());
                     break;
                 }
 
@@ -505,17 +581,17 @@ public class Translator
 
                 case IR.COPY:
                 {
-                    if(ir.op1.is_register())
+                    if(ir.operands.get(0).is_register())
                     {
                         append(Machine.ADDR);
-                        append(ir.op1.get_lexical_level());
-                        append(ir.op1.get_value());
+                        append(ir.operands.get(0).get_lexical_level());
+                        append(ir.operands.get(0).get_value());
                         append(Machine.LOAD);
                     }
                     else
                     {
                         append(Machine.PUSH);
-                        append(ir.op1.get_value());
+                        append(ir.operands.get(0).get_value());
                     }
                     break;
                 }
@@ -533,10 +609,10 @@ public class Translator
                 case IR.READI:
                 {
                     append(Machine.ADDR);
-                    append(ir.op1.get_lexical_level());
-                    append(ir.op1.get_value());
+                    append(ir.operands.get(0).get_lexical_level());
+                    append(ir.operands.get(0).get_value());
 
-                    if(ir.op1.is_pointer())
+                    if(ir.operands.get(0).is_pointer())
                     {
                         append(Machine.LOAD);
                     }
