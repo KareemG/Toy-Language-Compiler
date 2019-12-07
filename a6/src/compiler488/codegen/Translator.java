@@ -1,7 +1,5 @@
 package compiler488.codegen;
 
-import compiler488.compiler.Main;
-import java.io.PrintStream;
 import java.util.*;
 import compiler488.runtime.Machine;
 
@@ -23,8 +21,6 @@ public class Translator
 
     private HashMap<Short, Short> routine_map;
     private short program_size;
-
-    private PrintStream asmStream = Main.asmStream;
 
     public Translator(Machine machine, ArrayList<IR> intermediate_code)
     {
@@ -683,7 +679,6 @@ public class Translator
     {
         addr(lex_level, addr);
         append(Machine.LOAD);
-	asmStream.println("LOAD");
     }
 
     private void addr(short lex_level, short addr)
@@ -691,20 +686,17 @@ public class Translator
         append(Machine.ADDR);
         append(lex_level);
         append(addr);
-	asmStream.println("ADDR " + lex_level + " " + addr);
     }
 
     private void store()
     {
         append(Machine.STORE);
-	asmStream.println("STORE");
     }
 
     private void push(short c)
     {
         append(Machine.PUSH);
         append(c);
-	asmStream.println("PUSH " + c);
     }
 
     private void negate()
@@ -712,8 +704,6 @@ public class Translator
         append(Machine.PUSH);
         append(Machine.MACHINE_FALSE);
         append(Machine.EQ);
-	asmStream.println("PUSH MACHINE_FALSE");
-	asmStream.println("EQ");
     }
 
     private void branch(short addr, boolean needs_patch)

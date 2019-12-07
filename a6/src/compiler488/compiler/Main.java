@@ -274,6 +274,7 @@ public class Main {
 
 	private static void setASM(String fileName) {
 		if (fileName.length() == 0) {
+			System.out.println("Length of filename is 0");
 			return;
 		}
 

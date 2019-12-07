@@ -31,6 +31,8 @@ public final class MachineExecutor implements Machine {
 	/** Hardware program counter for the Machine. */
 	protected short pc;
 
+	private PrintStream asmStream = null;
+
 	/**
 	 * Hardware memory stack pointer.
 	 *
@@ -445,6 +447,8 @@ public final class MachineExecutor implements Machine {
 		// Only a runError can make it true.
 		errorOccurred = false;
 
+		asmStream = Main.asmStream;
+
 		// This instance variable can be set to false by HALT or by a runError.
 		executing = true;
 		while (executing) {
@@ -491,10 +495,12 @@ public final class MachineExecutor implements Machine {
 				rangeCheck(ll, 0, Machine.DISPLAY_SIZE - 1, "ADDR: Display index out of range.\n");
 				spush();
 				memory[msp - 1] = (short) (display[ll] + memory[pc + 2]);
+				asmStream.println("ADDR " + ll + " " + memory[pc + 2]);
 				break;
 
 			// LOAD: push the value of memory[TOP] to the stack
 			case LOAD:
+				asmStream.println("LOAD");
 				addr = memory[msp - 1];
 				rangeCheck(addr, 0, Machine.MEMORY_SIZE - 1, "LOAD address out of range.\n");
 				if (memory[addr] == UNDEFINED) {
@@ -506,6 +512,7 @@ public final class MachineExecutor implements Machine {
 
 			// STORE: store a value on top of the stack in memory
 			case STORE:
+				asmStream.println("STORE");
 				v = memory[msp - 1];
 				spop();
 				addr = memory[msp - 1];
@@ -519,11 +526,13 @@ public final class MachineExecutor implements Machine {
 			// PUSH V: push V to the stack
 			case PUSH:
 				spush();
+				asmStream.println("PUSH " + memory[pc + 1]);
 				memory[msp - 1] = memory[pc + 1];
 				break;
 
 			// PUSHMT: effectively, push MT to the top of the stack
 			case PUSHMT:
+				asmStream.println("PUSHMT");
 				spush();
 				memory[msp - 1] = (short) (msp - 1);
 				break;
@@ -533,6 +542,7 @@ public final class MachineExecutor implements Machine {
 				addr = memory[msp - 1];
 				spop();
 				ll = memory[pc + 1];
+				asmStream.println("SETD " + ll);
 				rangeCheck(ll, 0, Machine.DISPLAY_SIZE - 1, "SETD display index out of range.\n");
 				if (addr != MIN_INTEGER) { // special case - uninitialized
 					rangeCheck(addr, bottomOfStack, mlp, "SETD display entry out of range.\n");
@@ -544,12 +554,14 @@ public final class MachineExecutor implements Machine {
 			// POPN: do n pops, where n is the value on top of the stack
 			// Underflow error will be caught before next instruction
 			case POPN:
+				asmStream.println("POPN");
 				msp -= memory[msp - 1];
 				spop();
 				break;
 
 			// POP: pop the top of the machine stack
 			case POP:
+				asmStream.println("POP");
 				spop();
 				break;
 
@@ -558,6 +570,7 @@ public final class MachineExecutor implements Machine {
 			 * top of the stack, where n is the initial top of the stack value
 			 */
 			case DUPN:
+				asmStream.println("DUPN");
 				n = memory[msp - 1];
 				spop();
 				v = memory[msp - 1];
@@ -571,12 +584,14 @@ public final class MachineExecutor implements Machine {
 
 			// DUP: push the top of the stack
 			case DUP:
+				asmStream.println("DUP");
 				spush();
 				memory[msp - 1] = topm1();
 				break;
 
 			// BR: branch to the address on the top of the stack
 			case BR:
+				asmStream.println("BR");
 				pc = memory[msp - 1]; // BR sets pc directly
 				spop();
 				break;
@@ -584,6 +599,7 @@ public final class MachineExecutor implements Machine {
 			// BF: branch to address atop the stack if the next-to-the-top
 			// value is MACHINE_FALSE
 			case BF:
+				asmStream.println("BF");
 				addr = memory[msp - 1];
 				spop();
 				v = memory[msp - 1];
@@ -600,6 +616,7 @@ public final class MachineExecutor implements Machine {
 
 			// NEG: arithmetic negation of top of stack
 			case NEG:
+				asmStream.println("NEG");
 				memory[msp - 1] = (short) (-memory[msp - 1]);
 				if (memory[msp - 1] == UNDEFINED) {
 					runError("Arithmetic underflow - NEG operator");
@@ -614,6 +631,7 @@ public final class MachineExecutor implements Machine {
 			 * meager overflow checking is done.
 			 */
 			case ADD:
+				asmStream.println("ADD");
 				atemp = topm1() + top();
 				rangeCheck(atemp, MIN_INTEGER, MAX_INTEGER, "ADD operator overflow or underflow");
 				spop();
@@ -621,6 +639,7 @@ public final class MachineExecutor implements Machine {
 				break;
 
 			case SUB:
+				asmStream.println("SUB");
 				atemp = topm1() - top();
 				rangeCheck(atemp, MIN_INTEGER, MAX_INTEGER, "SUB operator overflow or underflow");
 				spop();
@@ -628,6 +647,7 @@ public final class MachineExecutor implements Machine {
 				break;
 
 			case MUL:
+				asmStream.println("MUL");
 				atemp = topm1() * top();
 				rangeCheck(atemp, MIN_INTEGER, MAX_INTEGER, "MUL operator overflow or underflow");
 				spop();
@@ -635,6 +655,7 @@ public final class MachineExecutor implements Machine {
 				break;
 
 			case DIV:
+				asmStream.println("DIV");
 				atemp = 0;
 				v = memory[msp - 1];
 				spop();
@@ -648,16 +669,19 @@ public final class MachineExecutor implements Machine {
 				break;
 
 			case EQ:
+				asmStream.println("EQ");
 				spop();
 				memory[msp - 1] = (short) (memory[msp - 1] == topp1() ? MACHINE_TRUE : MACHINE_FALSE);
 				break;
 
 			case LT:
+				asmStream.println("LT");
 				spop();
 				memory[msp - 1] = (short) (memory[msp - 1] < topp1() ? MACHINE_TRUE : MACHINE_FALSE);
 				break;
 
 			case OR:
+				asmStream.println("OR");
 				spop();
 				rangeCheck(memory[msp - 1], MACHINE_FALSE, MACHINE_TRUE, "OR operand is not a Boolean value");
 				rangeCheck(memory[msp], MACHINE_FALSE, MACHINE_TRUE, "OR operand is not a Boolean value");
@@ -670,6 +694,7 @@ public final class MachineExecutor implements Machine {
 			 * other arithmetic/boolean operations efficiently
 			 */
 			case SWAP:
+				asmStream.println("SWAP");
 				v = topm1();
 				memory[msp - 2] = memory[msp - 1];
 				memory[msp - 1] = v;
@@ -680,6 +705,7 @@ public final class MachineExecutor implements Machine {
 			 * and pushed to the top of the stack
 			 */
 			case READC:
+				asmStream.println("READC");
 				spush();
 				memory[msp - 1] = (short) (inputSource.readChar() & CHARMASK);
 				break;
@@ -689,6 +715,7 @@ public final class MachineExecutor implements Machine {
 			 * stack. Used for implementing output functions.
 			 */
 			case PRINTC:
+				asmStream.println("PRINTC");
 				machineOutput.print((char) (memory[msp - 1] & CHARMASK));
 				spop();
 				break;
@@ -699,6 +726,7 @@ public final class MachineExecutor implements Machine {
 			 * handout for more details.
 			 */
 			case READI:
+				asmStream.println("READI");
 				intInput = inputSource.readInt();
 				rangeCheck(intInput, MIN_INTEGER, MAX_INTEGER, "READI: Integer input out of range");
 				spush();
@@ -710,12 +738,14 @@ public final class MachineExecutor implements Machine {
 			 * stack
 			 */
 			case PRINTI:
+				asmStream.println("PRINTI");
 				machineOutput.print(memory[msp - 1]);
 				spop();
 				break;
 
 			// HALT: halt execution
 			case HALT:
+				asmStream.println("HALT");
 				executing = false;
 				break;
 
