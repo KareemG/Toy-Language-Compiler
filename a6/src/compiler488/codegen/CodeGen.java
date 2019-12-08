@@ -115,8 +115,8 @@ public class CodeGen extends ASTVisitor.Default {
 			case IR.GT:  { op = ">"; break; }
 			case IR.EQ:  { op = "="; break; }
 			case IR.NEQ: { op = "not ="; break; }
-			case IR.LEQ: { op = "<"; break; }
-			case IR.GEQ: { op = ">"; break; }
+			case IR.LEQ: { op = "<="; break; }
+			case IR.GEQ: { op = ">="; break; }
 			case IR.OR:  { op = "or"; break; }
 			case IR.AND: { op = "and"; break; }
 			default: { break; }
