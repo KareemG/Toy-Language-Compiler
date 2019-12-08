@@ -486,6 +486,7 @@ public class Main {
 		// Set trace stream, input stream for execution
 		setTraceStream(executeTraceFileName);
 		setInputSource(executeInputFileName);
+		dumpStream = System.out;
 		System.out.println(sourceFileName);
 
 		// execute the compiled program
