@@ -74,6 +74,8 @@ public class CodeGen extends ASTVisitor.Default {
 	private ArrayList<IR> intermediate_code;
 	private Map<Integer, BiConsumer<List<BaseAST>, CodeGen>> actions;
 
+	private HashMap<Integer, IR.Operand> expr_map;
+
 	/**
 	 * Constructor to initialize code generation
 	 */
@@ -89,6 +91,42 @@ public class CodeGen extends ASTVisitor.Default {
 		Short reg = this.register_tracker.pop();
 		this.register_tracker.push((short) (reg + 1));
 		return reg;
+	}
+
+	private String op_to_str(IR.Operand op)
+	{
+		if(op.is_reg_or_ptr())
+		{
+			return "L" + op.get_lexical_level() + "R" + op.get_value();
+		}
+		return Integer.toString(op.get_value());
+	}
+
+	private int compute_hash(IR.Operand lhs, short operation, IR.Operand rhs)
+	{
+		String op = "";
+		switch(operation)
+		{
+			case IR.ADD: { op = "+"; break; }
+			case IR.SUB: { op = "-"; break; }
+			case IR.MUL: { op = "*"; break; }
+			case IR.DIV: { op = "/"; break; }
+			case IR.LT:  { op = "<"; break; }
+			case IR.GT:  { op = ">"; break; }
+			case IR.EQ:  { op = "="; break; }
+			case IR.NEQ: { op = "not ="; break; }
+			case IR.LEQ: { op = "<="; break; }
+			case IR.GEQ: { op = ">="; break; }
+			case IR.OR:  { op = "or"; break; }
+			case IR.AND: { op = "and"; break; }
+			default: { break; }
+		}
+
+		String str = String.format("%s %s %s", op_to_str(lhs), op, op_to_str(rhs));
+		int hash = str.hashCode();
+
+		// System.out.println(String.format("\"%s\" -> %d", str, hash));
+		return hash;
 	}
 
 	private void ir_operation_helper(short operation, IR.Operand lhs, IR.Operand rhs)
@@ -117,9 +155,21 @@ public class CodeGen extends ASTVisitor.Default {
 		}
 		else
 		{
-			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
-			this.intermediate_code.add(new IR(operation, lhs, rhs, new IR.Operand(IR.Operand.REGISTER, result.get_lexical_level(), result.get_value())));
-			this.result_stack.push(result);
+			Integer hash = compute_hash(lhs, operation, rhs);
+			IR.Operand register = expr_map.get(hash);
+
+			if(register != null)
+			{
+				this.result_stack.push(register);
+			}
+			else
+			{
+				register = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+				this.intermediate_code.add(new IR(operation, lhs, rhs, new IR.Operand(IR.Operand.REGISTER, register.get_lexical_level(), register.get_value())));
+				this.result_stack.push(register);
+
+				expr_map.put(hash, register);
+			}
 		}
 	}
 
@@ -142,6 +192,8 @@ public class CodeGen extends ASTVisitor.Default {
 		this.map = new SymbolMap();
 		this.register_tracker = new Stack<Short>();
 		this.result_stack = new Stack<IR.Operand>();
+
+		this.expr_map = new HashMap<>();
 
 		this.routine_counter = 1;
 		this.current_lexical_level = 0;
