@@ -1,22 +1,11 @@
 {
-    function a : boolean
-    {
-        write "evaluate a", newline
-        return with true
-    }
+	var i, j : integer
+	var a, c : boolean
 
-    function b : boolean
-    {
-        write "evaluate b", newline
-        return with false
-    }
+	i := 1
+	j := 2
 
-    if a or b then
-        write "pass", newline
+	a := ( i = 1 or j = 1 ) % should be true
+	c := ( i = 0 or j = 1  ) % should be true
 
-    if not a and b then
-        write "pass", newline
-
-    if not a or not b then
-        write "pass", newline
 }
