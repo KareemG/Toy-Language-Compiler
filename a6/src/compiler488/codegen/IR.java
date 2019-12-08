@@ -16,8 +16,8 @@ public class IR
 	public static final short GT = 9;
 	public static final short LEQ = 10;
 	public static final short GEQ = 11;
-	public static final short AND = 12;
-	public static final short OR = 13;
+	//public static final short AND = 12;
+	//public static final short OR = 13;
 	public static final short NOT = 14;
 	public static final short READI = 15;
 	public static final short PRINTI = 16;

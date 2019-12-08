@@ -126,8 +126,8 @@ public class Translator
             case IR.GT: op = "GT"; break;
             case IR.LEQ: op = "LEQ"; break;
             case IR.GEQ: op = "GEQ"; break;
-            case IR.AND: op = "AND"; break;
-            case IR.OR: op = "OR"; break;
+            //case IR.AND: op = "AND"; break;
+            //case IR.OR: op = "OR"; break;
             case IR.NOT: op = "NOT"; break;
             case IR.READI: op = "READI"; break;
             case IR.PRINTI: op = "PRINTI"; break;
@@ -311,6 +311,7 @@ public class Translator
                     break;
                 }
 
+                /*
                 case IR.OR:
                 {
                     boolean_or(ir.operands.get(0), ir.operands.get(1), ir.operands.get(2));
@@ -322,6 +323,7 @@ public class Translator
                     boolean_and(ir.operands.get(0), ir.operands.get(1), ir.operands.get(2));
                     break;
                 }
+                */
 
                 case IR.LT:
                 case IR.GT:

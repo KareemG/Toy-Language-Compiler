@@ -117,8 +117,8 @@ public class CodeGen extends ASTVisitor.Default {
 			case IR.NEQ: { op = "not ="; break; }
 			case IR.LEQ: { op = "<"; break; }
 			case IR.GEQ: { op = ">"; break; }
-			case IR.OR:  { op = "or"; break; }
-			case IR.AND: { op = "and"; break; }
+			//case IR.OR:  { op = "or"; break; }
+			//case IR.AND: { op = "and"; break; }
 			default: { break; }
 		}
 
@@ -147,8 +147,8 @@ public class CodeGen extends ASTVisitor.Default {
 				case IR.NEQ: { value = (lhs.get_value() != rhs.get_value()) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
 				case IR.LEQ: { value = (lhs.get_value() <= rhs.get_value()) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
 				case IR.GEQ: { value = (lhs.get_value() >= rhs.get_value()) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
-				case IR.OR:  { value = ((lhs.get_value() != Machine.MACHINE_FALSE) || (rhs.get_value() != Machine.MACHINE_TRUE)) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
-				case IR.AND: { value = ((lhs.get_value() != Machine.MACHINE_FALSE) && (rhs.get_value() != Machine.MACHINE_TRUE)) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
+				//case IR.OR:  { value = ((lhs.get_value() != Machine.MACHINE_FALSE) || (rhs.get_value() != Machine.MACHINE_TRUE)) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
+				//case IR.AND: { value = ((lhs.get_value() != Machine.MACHINE_FALSE) && (rhs.get_value() != Machine.MACHINE_TRUE)) ? Machine.MACHINE_TRUE : Machine.MACHINE_FALSE; break; }
 			}
 
 			this.result_stack.push(new IR.Operand(IR.Operand.NONE, value));
@@ -688,17 +688,39 @@ public class CodeGen extends ASTVisitor.Default {
 		// C66 - Emit instruction(s) to perform logical and operation.
 		actions.put(66, (s, self) -> {
 			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_AND));
-			IR.Operand rhs = result_stack.pop();
-			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.AND, lhs, rhs);
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+
+			this.intermediate_code.add(new IR(IR.BF, this.result_stack.pop(), new IR.Operand(IR.Operand.PATCH, (short) 0)));
+
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE)));
+			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0)));
+
+			this.intermediate_code.add(new IR(IR.PATCH_BF)); // patch the first expression's branch on false
+			this.intermediate_code.add(new IR(IR.PATCH_BF)); // patch the second expression's branch on false
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
+
+			this.intermediate_code.add(new IR(IR.PATCH_BR));
+
+			this.result_stack.add(result);
 		});
 
 		// C67 - Emit instruction(s) to perform logical or operation.
 		actions.put(67, (s, self) -> {
 			assert (s.get(0) instanceof BoolExpn && ((BoolExpn) s.get(0)).getOpSymbol().equals(BoolExpn.OP_OR));
-			IR.Operand rhs = result_stack.pop();
-			IR.Operand lhs = result_stack.pop();
-			ir_operation_helper(IR.OR, lhs, rhs);
+			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
+
+			this.intermediate_code.add(new IR(IR.BT, this.result_stack.pop(), new IR.Operand(IR.Operand.PATCH, (short) 0)));
+
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_FALSE)));
+			this.intermediate_code.add(new IR(IR.BR, new IR.Operand(IR.Operand.PATCH, (short) 0)));
+
+			this.intermediate_code.add(new IR(IR.PATCH_BT)); // patch the first expression's branch on false
+			this.intermediate_code.add(new IR(IR.PATCH_BT)); // patch the second expression's branch on false
+			this.intermediate_code.add(new IR(IR.ASSIGN, result, new IR.Operand(IR.Operand.NONE, Machine.MACHINE_TRUE)));
+
+			this.intermediate_code.add(new IR(IR.PATCH_BR));
+
+			this.result_stack.add(result);
 		});
 
 		// C68 - Emit instruction(s) to obtain address of parameter.
@@ -878,6 +900,18 @@ public class CodeGen extends ASTVisitor.Default {
 			IR.Operand result = new IR.Operand(IR.Operand.REGISTER, this.current_lexical_level, new_register());
 			this.intermediate_code.add(new IR(IR.COND_ASSIGN, condition, result, t_value, f_value));
 			this.result_stack.add(result);
+		});
+
+		// C91 - Custom action to evalulate first expression of an AND expression
+		actions.put(91, (s, self) -> {
+			assert(s.get(0) instanceof BoolExpn);
+			this.intermediate_code.add(new IR(IR.BF, this.result_stack.pop(), new IR.Operand(IR.Operand.PATCH, (short) 0)));
+		});
+
+		// C92 - Custom action to evalulate first expression of an OR expression
+		actions.put(92, (s, self) -> {
+			assert(s.get(0) instanceof BoolExpn);
+			this.intermediate_code.add(new IR(IR.BT, this.result_stack.pop(), new IR.Operand(IR.Operand.PATCH, (short) 0)));
 		});
 	}
 
@@ -1094,6 +1128,15 @@ public class CodeGen extends ASTVisitor.Default {
 	@Override
 	public void visitLeave(NotExpn expn) {
 		generateCode(65, expn);
+	}
+
+	@Override
+	public void visitEnter(BoolExpn expn) {
+		if (expn.getOpSymbol().equals(BoolExpn.OP_AND)) {
+			generateCode(91, expn);
+		} else {
+			generateCode(92, expn);
+		}
 	}
 
 	@Override
