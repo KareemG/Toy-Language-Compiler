@@ -1,7 +1,0 @@
-{
-	% no-assign.488: program should throw an error if variable is used
-	%		 without assigning values to it
-
-	var i : integer
-	write i
-}

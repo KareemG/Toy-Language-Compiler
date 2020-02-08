@@ -1,7 +1,0 @@
-% Different way of incrementing integer variable "+=". Still not supported
-{
-	var a : integer
-
-	a := 1
-	a += 10		% Should cause syntax error here
-}

@@ -1,6 +1,0 @@
-% 'while' keyword should come before 'do' keyword
-{
-	do	% syntax error here
-		write "hello world"
-	while 1
-}

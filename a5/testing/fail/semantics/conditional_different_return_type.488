@@ -1,8 +1,0 @@
-
-{
-    var a : integer
-    var b : boolean
-    var c : integer
-
-    c := (c < a ? b : b)
-}

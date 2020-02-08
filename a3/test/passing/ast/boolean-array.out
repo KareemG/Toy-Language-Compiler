@@ -1,8 +1,0 @@
- { 
- var a[1..4] : boolean
- var b[1..10] : boolean
- var c[-3..3] : boolean
- a[1] : = false
- b[4] : = true
- c[-(3)] : = false
- }

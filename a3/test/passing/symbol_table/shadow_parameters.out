@@ -1,8 +1,0 @@
-{
- Symbols:
- b: integer
- a: integer
- foo: integer
- foo : integer ( a: integer, b: integer ) {
- Symbols:
- }

@@ -1,9 +1,0 @@
- { 
- function factorial(n : integer) : integer { 
- if (n) = (0) then
- return with 0 else
- return with (n) * (factorial((n) - (1)))end
- } 
- var x : integer
- x : = factorial(5)
- }

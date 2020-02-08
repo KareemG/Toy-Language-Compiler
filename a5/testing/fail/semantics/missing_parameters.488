@@ -1,9 +1,0 @@
-
-{
-    function abc(a : integer, b : integer)  : integer
-    {
-        return with a + b
-    }
-
-    abc(0)
-}

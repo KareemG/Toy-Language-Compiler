@@ -1,6 +1,0 @@
-% Our language does not support incrementing an integer variable by "++"
-{
-	var a : integer
-	a := 1
-	a++	% syntax error here
-}

@@ -1,3 +1,0 @@
-% Simply "forgot" to close the scope
-{
-	write "hello world"

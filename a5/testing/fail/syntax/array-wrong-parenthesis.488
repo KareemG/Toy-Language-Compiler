@@ -1,6 +1,0 @@
-% Use of round parenthesis, rather than squared parenthesis while declaring array
-{
-	var array(10) : integer
-	array(0) := 1
-	write array(0)
-}

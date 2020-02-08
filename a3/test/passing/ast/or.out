@@ -1,5 +1,0 @@
- { 
- if ((0) > (4)) or ((-(3)) < (4)) then
- write "PASS" else
- write "FAIL"end
- }

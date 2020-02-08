@@ -1,7 +1,0 @@
-% When comparing two expressions, we must use "not =". A single "not" would not work
-{
-	var a,b : integer
-	var c : boolean
-
-	c := a not b
-}

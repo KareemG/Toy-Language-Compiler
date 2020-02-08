@@ -1,8 +1,0 @@
- { 
- function test(a : integer, b : boolean) : integer { 
- if b then
- return with aend
- } 
- var i : integer
- i : = test(2, true)
- }

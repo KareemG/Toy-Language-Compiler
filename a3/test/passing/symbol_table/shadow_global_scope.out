@@ -1,9 +1,0 @@
-{
- Symbols:
- b: integer
- a: integer
- test: integer
- test : integer{
- Symbols:
- a: integer
- }
