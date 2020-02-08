@@ -1,6 +1,6 @@
 # Toy Language Compiler
 
-Contributors: @KareemG, @kyokeunpark, @Jas03x, and @Playjasb2
+Contributors: [@KareemG](https://github.com/KareemG), [@kyokeunpark](https://github.com/kyokeunpark), [@Jas03x](https://github.com/Jas03x), and [@Playjasb2](https://github.com/Playjasb2)
 
 As a side project, we have decided to build a compiler for a simple toy language, that would compile the code into bytecode that the VM can execute.
 
