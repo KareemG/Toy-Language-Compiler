@@ -4,8 +4,6 @@ Contributors: @KareemG, @kyokeunpark, @Jas03x, and @Playjasb2
 
 As a side project, we have decided to build a compiler for a simple toy language, that would compile the code into bytecode that the VM can execute.
 
----
-
 ### Getting Started
 
 ---
