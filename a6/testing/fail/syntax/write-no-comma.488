@@ -1,4 +1,0 @@
-% when writing, each element should be separated by a comma
-{
-	write "hello" newline "world"	%syntax error here
-}

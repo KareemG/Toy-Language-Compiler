@@ -1,4 +1,0 @@
- { 
- if true then
- write "PASS"end
- }

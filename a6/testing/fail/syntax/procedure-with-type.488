@@ -1,9 +1,0 @@
-% procedures do not return anything. As such, should not define a return type
-{
-	procedure p : integer
-	{
-		write "hello world"
-	}
-
-	p
-}

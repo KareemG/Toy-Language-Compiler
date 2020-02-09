@@ -1,9 +1,0 @@
-% if statement's body should be enclosed in scope if multiple statements are required.
-{
-	var a, b : integer
-	if (1 > 2) then
-		a := 1
-		b := 2		% Should expect 'else' here
-	else
-		a := b
-}

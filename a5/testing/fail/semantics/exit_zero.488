@@ -1,8 +1,0 @@
-
-{
-    while true do
-    {
-        write "loop"
-        exit 0
-    }
-}

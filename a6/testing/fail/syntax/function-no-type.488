@@ -1,7 +1,0 @@
-% All functions should have a return type
-{
-	function f
-	{
-		write "testing"
-	}
-}

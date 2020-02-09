@@ -1,6 +1,0 @@
-% Forgetting to close the parenthesis while declaring an array
-{
-	var array[10 : integer
-	array[0] := 1
-	write array[0]
-}

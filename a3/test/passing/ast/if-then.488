@@ -1,6 +1,0 @@
-% If then statement
-
-{
-    if true then
-        write "PASS"
-}

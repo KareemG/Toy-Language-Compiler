@@ -1,7 +1,0 @@
-
-{
-    var a : integer
-    var b, c : integer
-
-    a := 0
-}

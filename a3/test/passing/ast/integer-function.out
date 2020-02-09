@@ -1,6 +1,0 @@
- { 
- function test : integer { 
- return with 5
- } 
- write test
- }

@@ -1,9 +1,0 @@
-
-{
-    procedure abc
-    {
-        return with 0
-    }
-
-    abc
-}

@@ -1,9 +1,0 @@
-{
-    var x : boolean
-    var y : boolean
-
-    x := true
-    y := false
-
-    x := x + y
-}

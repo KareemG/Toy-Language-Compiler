@@ -1,4 +1,0 @@
-% Program cannot contain only declaration
-{
-	var a : integer
-}
